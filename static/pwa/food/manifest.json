@@ -1,0 +1,26 @@
+{
+  "name": "Soma Ko Food - Order Delicious Meals",
+  "short_name": "Soma Ko Food",
+  "description": "Order your favorite meals from local restaurants",
+  "start_url": "/food/",
+  "scope": "/food/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "categories": ["food", "delivery", "restaurant"],
+  "icons": [
+    {
+      "src": "/static/pwa/food/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/pwa/food/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

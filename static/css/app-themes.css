@@ -1,0 +1,191 @@
+/* ================================================
+   Soma Ko - App-Specific Theme Overrides
+   Individual color themes for each app module
+   ================================================ */
+
+/* Shop App - Green Theme (Default) */
+.app-shop {
+  --primary-color: #22c55e;
+  --primary-dark: #16a34a;
+  --primary-darker: #15803d;
+  --primary-light: #4ade80;
+  --primary-lighter: #86efac;
+  --primary-pale: #dcfce7;
+  --primary-ultra-pale: #f0fdf4;
+  --accent-color: #059669;
+}
+
+/* Rent App - Teal/Cyan Theme */
+.app-rent {
+  --primary-color: #14b8a6;
+  --primary-dark: #0d9488;
+  --primary-darker: #0f766e;
+  --primary-light: #2dd4bf;
+  --primary-lighter: #5eead4;
+  --primary-pale: #ccfbf1;
+  --primary-ultra-pale: #f0fdfa;
+  --accent-color: #0d9488;
+}
+
+/* Pharmacy App - Purple Theme */
+.app-pharmacy {
+  --primary-color: #a855f7;
+  --primary-dark: #9333ea;
+  --primary-darker: #7e22ce;
+  --primary-light: #c084fc;
+  --primary-lighter: #d8b4fe;
+  --primary-pale: #f3e8ff;
+  --primary-ultra-pale: #faf5ff;
+  --accent-color: #9333ea;
+}
+
+/* Food App - Orange Theme */
+.app-food {
+  --primary-color: #f97316;
+  --primary-dark: #ea580c;
+  --primary-darker: #c2410c;
+  --primary-light: #fb923c;
+  --primary-lighter: #fdba74;
+  --primary-pale: #ffedd5;
+  --primary-ultra-pale: #fff7ed;
+  --accent-color: #ea580c;
+}
+
+/* Ride App - Royal Blue Theme */
+.app-ride {
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-darker: #1e40af;
+  --primary-light: #3b82f6;
+  --primary-lighter: #60a5fa;
+  --primary-pale: #dbeafe;
+  --primary-ultra-pale: #eff6ff;
+  --accent-color: #1d4ed8;
+}
+
+/* Apply theme colors to common elements */
+[class*="app-"] {
+  /* Hero sections and primary backgrounds */
+  & section[style*="background: #"] {
+    background-color: var(--primary-color) !important;
+  }
+  
+  /* Buttons */
+  & .btn-primary,
+  & button[style*="background: #"],
+  & a[style*="background: #22c55e"],
+  & a[style*="background: #14b8a6"],
+  & a[style*="background: #a855f7"],
+  & a[style*="background: #f97316"],
+  & a[style*="background: #2563eb"] {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+  
+  & button[style*="background: #"]:hover,
+  & a[style*="background: #"]:hover {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+  }
+  
+  /* Icons and text colors */
+  & i[style*="color: #"],
+  & span[style*="color: #22c55e"],
+  & span[style*="color: #14b8a6"],
+  & span[style*="color: #a855f7"],
+  & span[style*="color: #f97316"],
+  & span[style*="color: #2563eb"] {
+    color: var(--accent-color) !important;
+  }
+  
+  /* Borders */
+  & [style*="border: 2px solid #"],
+  & [style*="border-color: #"] {
+    border-color: var(--primary-color) !important;
+  }
+  
+  /* Light backgrounds */
+  & [style*="background: #dcfce7"],
+  & [style*="background: #ccfbf1"],
+  & [style*="background: #f3e8ff"],
+  & [style*="background: #ffedd5"],
+  & [style*="background: #dbeafe"] {
+    background-color: var(--primary-pale) !important;
+  }
+  
+  /* Badges and tags */
+  & .badge[style*="background: #"],
+  & span[style*="background: rgba"] {
+    background-color: var(--primary-pale) !important;
+    color: var(--primary-darker) !important;
+  }
+}
+
+/* Override inline styles with !important for app-specific sections */
+.app-rent section[style*="background: #22c55e"] { background-color: #14b8a6 !important; }
+.app-rent [style*="color: #22c55e"] { color: #14b8a6 !important; }
+.app-rent [style*="color: #16a34a"] { color: #0d9488 !important; }
+.app-rent [style*="color: #059669"] { color: #0d9488 !important; }
+.app-rent [style*="background: #22c55e"] { background-color: #14b8a6 !important; }
+.app-rent [style*="background: #16a34a"] { background-color: #0d9488 !important; }
+.app-rent [style*="border-color: #22c55e"] { border-color: #14b8a6 !important; }
+.app-rent [style*="background: #dcfce7"] { background-color: #ccfbf1 !important; }
+
+.app-pharmacy section[style*="background: #22c55e"] { background-color: #a855f7 !important; }
+.app-pharmacy [style*="color: #22c55e"] { color: #a855f7 !important; }
+.app-pharmacy [style*="color: #16a34a"] { color: #9333ea !important; }
+.app-pharmacy [style*="color: #059669"] { color: #9333ea !important; }
+.app-pharmacy [style*="background: #22c55e"] { background-color: #a855f7 !important; }
+.app-pharmacy [style*="background: #16a34a"] { background-color: #9333ea !important; }
+.app-pharmacy [style*="border-color: #22c55e"] { border-color: #a855f7 !important; }
+.app-pharmacy [style*="background: #dcfce7"] { background-color: #f3e8ff !important; }
+
+.app-food section[style*="background: #22c55e"] { background-color: #f97316 !important; }
+.app-food [style*="color: #22c55e"] { color: #f97316 !important; }
+.app-food [style*="color: #16a34a"] { color: #ea580c !important; }
+.app-food [style*="color: #059669"] { color: #ea580c !important; }
+.app-food [style*="background: #22c55e"] { background-color: #f97316 !important; }
+.app-food [style*="background: #16a34a"] { background-color: #ea580c !important; }
+.app-food [style*="border-color: #22c55e"] { border-color: #f97316 !important; }
+.app-food [style*="background: #dcfce7"] { background-color: #ffedd5 !important; }
+
+.app-ride section[style*="background: #22c55e"],
+.app-ride section[style*="background: #eab308"] { background-color: #2563eb !important; }
+.app-ride [style*="color: #22c55e"],
+.app-ride [style*="color: #eab308"] { color: #2563eb !important; }
+.app-ride [style*="color: #16a34a"],
+.app-ride [style*="color: #fbbf24"] { color: #1d4ed8 !important; }
+.app-ride [style*="color: #059669"] { color: #1d4ed8 !important; }
+.app-ride [style*="background: #22c55e"],
+.app-ride [style*="background: #eab308"] { background-color: #2563eb !important; }
+.app-ride [style*="background: #16a34a"],
+.app-ride [style*="background: #fbbf24"] { background-color: #1d4ed8 !important; }
+.app-ride [style*="border-color: #22c55e"],
+.app-ride [style*="border-color: #eab308"] { border-color: #2563eb !important; }
+.app-ride [style*="background: #dcfce7"],
+.app-ride [style*="background: #fef3c7"] { background-color: #dbeafe !important; }
+
+/* Hover states */
+.app-rent [style*="background: #22c55e"]:hover { background-color: #0d9488 !important; }
+.app-pharmacy [style*="background: #22c55e"]:hover { background-color: #9333ea !important; }
+.app-food [style*="background: #22c55e"]:hover { background-color: #ea580c !important; }
+.app-ride [style*="background: #22c55e"]:hover,
+.app-ride [style*="background: #eab308"]:hover { background-color: #1d4ed8 !important; }
+
+/* Shadow overrides */
+.app-rent [style*="box-shadow"][style*="rgba(34, 197, 94"] {
+  box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.3) !important;
+}
+
+.app-pharmacy [style*="box-shadow"][style*="rgba(34, 197, 94"] {
+  box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.3) !important;
+}
+
+.app-food [style*="box-shadow"][style*="rgba(34, 197, 94"] {
+  box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.3) !important;
+}
+
+.app-ride [style*="box-shadow"][style*="rgba(34, 197, 94"],
+.app-ride [style*="box-shadow"][style*="rgba(234, 179, 8"] {
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3) !important;
+}

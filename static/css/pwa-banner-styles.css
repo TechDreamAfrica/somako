@@ -1,0 +1,479 @@
+/* ============================================
+   PWA Banner & Header Styles
+   Robust, reusable styling for all PWA pages
+   ============================================ */
+
+/* Base Banner Container */
+.pwa-banner {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  color: white;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Banner Background Pattern */
+.pwa-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Banner Shimmer Effect */
+.pwa-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Banner Content */
+.pwa-banner-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 1rem 1.75rem;
+}
+
+/* Hero Banner (for home/dashboard pages) */
+.pwa-banner.hero {
+  border-radius: 0 0 24px 24px;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.pwa-banner.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.08), transparent);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 0 0 24px 24px;
+}
+
+.pwa-banner.hero .pwa-banner-content {
+  padding: 2.5rem 1rem 2rem;
+}
+
+/* Compact Banner (for non-home pages) */
+.pwa-banner.compact .pwa-banner-content {
+  padding: 1.5rem 1rem 1.25rem;
+}
+
+/* Banner Title */
+.pwa-banner-title {
+  font-size: clamp(1.875rem, 6vw, 2.5rem);
+  font-weight: 900;
+  margin: 0 0 0.625rem 0;
+  letter-spacing: -0.75px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 2;
+  line-height: 1.15;
+  animation: fadeInUp 0.7s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pwa-banner.compact .pwa-banner-title {
+  font-size: clamp(1.5rem, 4.5vw, 1.875rem);
+  margin-bottom: 0.375rem;
+  letter-spacing: -0.5px;
+}
+
+/* Banner Subtitle */
+.pwa-banner-subtitle {
+  opacity: 0.98;
+  font-size: 1.0625rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+  position: relative;
+  z-index: 2;
+  line-height: 1.5;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.pwa-banner.compact .pwa-banner-subtitle {
+  font-size: 0.9375rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Banner Badge */
+.pwa-banner-badge {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.625rem 1.25rem;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Banner Icon */
+.pwa-banner-icon {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Search Box in Banner */
+.pwa-banner-search {
+  position: relative;
+  z-index: 10;
+  margin-top: 1rem;
+}
+
+.pwa-banner-search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3.25rem;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  background: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  outline: none;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.pwa-banner-search-input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.pwa-banner-search-input:focus {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.pwa-banner-search-icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ea580c;
+  font-size: 1.125rem;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Image Banner (for restaurant detail, etc.) */
+.pwa-image-banner {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 0 0 20px 20px;
+}
+
+.pwa-image-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.pwa-image-banner:active img {
+  transform: scale(1.02);
+}
+
+/* Image Banner Overlay */
+.pwa-image-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Image Banner Placeholder */
+.pwa-image-banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pwa-image-banner-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.08"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+  opacity: 0.4;
+}
+
+.pwa-image-banner-placeholder i {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.4);
+  position: relative;
+  z-index: 1;
+}
+
+/* Banner Back Button */
+.pwa-banner-back-button {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+  left: 1rem;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  z-index: 100;
+  color: #1f2937;
+  font-size: 1.25rem;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.pwa-banner-back-button:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.pwa-banner-back-button:hover {
+  background: white;
+}
+
+/* Banner Action Button (e.g., favorite, share) */
+.pwa-banner-action-button {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  z-index: 100;
+  color: #1f2937;
+  font-size: 1.25rem;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.pwa-banner-action-button:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.pwa-banner-action-button.active {
+  background: #ea580c;
+  color: white;
+  border-color: #ea580c;
+}
+
+/* Banner Info Strip */
+.pwa-banner-info {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.pwa-banner-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+.pwa-banner-info-item i {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Color Variants */
+.pwa-banner.food {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+}
+
+.pwa-banner.shop {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.pwa-banner.pharmacy {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.pwa-banner.rent {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.pwa-banner.ride {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* Responsive Design */
+@media (min-width: 640px) {
+  .pwa-banner-content {
+    padding: 2.5rem 2rem 2rem;
+  }
+
+  .pwa-banner.hero .pwa-banner-content {
+    padding: 3rem 2rem 2.5rem;
+  }
+
+  .pwa-banner.compact .pwa-banner-content {
+    padding: 1.75rem 2rem 1.5rem;
+  }
+
+  .pwa-image-banner {
+    height: 180px;
+  }
+}
+
+@media (min-width: 768px) {
+  .pwa-banner-content {
+    padding: 3rem 2.5rem 2.5rem;
+  }
+
+  .pwa-banner.hero .pwa-banner-content {
+    padding: 3.5rem 2.5rem 3rem;
+  }
+
+  .pwa-banner.compact .pwa-banner-content {
+    padding: 2rem 2.5rem 1.75rem;
+  }
+
+  .pwa-image-banner {
+    height: 200px;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .pwa-banner.hero {
+    border-radius: 0 0 32px 32px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .pwa-banner-back-button,
+  .pwa-banner-action-button {
+    background: rgba(31, 41, 55, 0.95);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .pwa-banner-back-button:hover,
+  .pwa-banner-action-button:hover {
+    background: rgba(31, 41, 55, 1);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-banner::after,
+  .pwa-banner.hero::after {
+    animation: none;
+  }
+
+  .pwa-banner-badge,
+  .pwa-banner-title,
+  .pwa-banner-subtitle {
+    animation: none;
+  }
+
+  .pwa-image-banner img {
+    transition: none;
+  }
+
+  .pwa-banner-back-button,
+  .pwa-banner-action-button,
+  .pwa-banner-search-input {
+    transition: none;
+  }
+}
+
+/* Safe Area Inset Support */
+@supports (padding: max(0px)) {
+  .pwa-banner-back-button {
+    top: max(1rem, calc(env(safe-area-inset-top) + 1rem));
+  }
+
+  .pwa-banner-action-button {
+    top: max(1rem, calc(env(safe-area-inset-top) + 1rem));
+  }
+}

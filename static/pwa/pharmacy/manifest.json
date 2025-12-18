@@ -1,0 +1,26 @@
+{
+  "name": "Soma Ko Pharmacy - Order Medicines",
+  "short_name": "Soma Ko Pharmacy",
+  "description": "Order prescription and over-the-counter medicines",
+  "start_url": "/pharmacy/",
+  "scope": "/pharmacy/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["health", "pharmacy", "medicine"],
+  "icons": [
+    {
+      "src": "/static/pwa/pharmacy/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/pwa/pharmacy/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

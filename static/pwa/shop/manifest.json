@@ -1,0 +1,26 @@
+{
+  "name": "Soma Ko Shop - Buy Products Online",
+  "short_name": "Soma Ko Shop",
+  "description": "Shop for products from local vendors",
+  "start_url": "/shop/",
+  "scope": "/shop/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "marketplace", "ecommerce"],
+  "icons": [
+    {
+      "src": "/static/pwa/shop/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/pwa/shop/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

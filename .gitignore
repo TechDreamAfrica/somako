@@ -281,7 +281,6 @@ dump.rdb
 celerybeat-schedule.*
 
 # Collected static files
-/static/
 /staticfiles/
 
 # Webpack stats
