@@ -598,7 +598,7 @@ def send_express_order_notification(express_order):
             f"Sender: {express_order.sender.get_full_name() or express_order.sender.username}\n"
             f"Expected Delivery: Soon\n\n"
             f"You will receive updates as your package moves through our delivery network.\n\n"
-            f"Track your package at www.somako.org\n"
+            f"Track your package at http://www.somako.org/pwa/express/\n"
             f"- Soma Ko Express Team"
         )
         
@@ -654,7 +654,7 @@ def send_express_order_status_update(express_order, new_status):
         message = (
             f"Hello {recipient['name']}!\n\n"
             f"{base_message}\n\n"
-            f"Track your order at www.somako.org\n"
+            f"Track your order at http://www.somako.org/pwa/express/\n"
             f"- Soma Ko Express Team"
         )
         
@@ -716,7 +716,7 @@ def send_express_sender_notification(express_order, notification_type):
         f"Order Details:\n"
         f"• Items: {express_order.items.count()}\n"
         f"• Total: GH₵{express_order.total_estimated_cost}\n\n"
-        f"Track at www.somako.org\n"
+        f"Track at http://www.somako.org/pwa/express/\n"
         f"- Soma Ko Express Team"
     )
     
@@ -787,7 +787,7 @@ def send_express_driver_assignment_notification(express_order, driver):
     
     message += (
         f"\nPlease log in to your driver dashboard to view full details and start the delivery.\n\n"
-        f"Dashboard: www.somako.org/pwa/express/\n"
+        f"Dashboard: http://www.somako.org/pwa/express/\n"
         f"- Soma Ko Express Team"
     )
     
