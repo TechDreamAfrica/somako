@@ -223,7 +223,7 @@ class MenuItem(models.Model):
         upload_to='menu_items/',
         blank=True,
         null=True,
-        help_text="Menu item image"
+        help_text="Menu item image (supports both file uploads and URLs)"
     )
 
     # Pricing
@@ -290,7 +290,27 @@ class MenuItem(models.Model):
     def get_image_url(self):
         """Get image URL"""
         if self.image:
-            return self.image.url
+            # First, get the raw name/value of the image field
+            try:
+                image_name = str(self.image.name) if hasattr(self.image, 'name') else str(self.image)
+            except:
+                image_name = str(self.image)
+            
+            # If it's a GitHub URL or any external URL, return it directly
+            if image_name.startswith(('http://', 'https://')):
+                return image_name
+            
+            # If it's a regular file path, try to get the URL
+            if image_name and not image_name.startswith('http'):
+                try:
+                    return self.image.url
+                except (ValueError, OSError, AttributeError):
+                    # If URL generation fails, check if it's actually a URL string
+                    raw_value = str(self.image)
+                    if raw_value.startswith(('http://', 'https://')):
+                        return raw_value
+                    return None
+                    
         return None
 
 

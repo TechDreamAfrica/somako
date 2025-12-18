@@ -6,14 +6,19 @@ Optimized for mobile-first experience with touch-friendly interfaces
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Q, Prefetch
 from django.utils import timezone
 from django.urls import reverse
+from django.conf import settings
 from datetime import timedelta, date
 from decimal import Decimal
 import uuid
+import logging
 
-from food.models import Restaurant, MenuItem, Order, OrderItem, Cart, CartItem, FoodCategory, Review
+from food.models import (
+    Restaurant, MenuItem, Order, OrderItem, Cart, CartItem, 
+    FoodCategory, Review, DeliveryZone, OrderItemAddon
+)
 from core.pwa_decorators import pwa_login_required
 
 
@@ -272,130 +277,308 @@ def pwa_clear_cart(request):
 @pwa_login_required(pwa_app='food')
 def pwa_checkout(request):
     """Checkout page"""
-    cart = get_object_or_404(Cart, user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart).select_related('menu_item__restaurant')
+    try:
+        # Models already imported at top
+        
+        cart = Cart.objects.prefetch_related(
+            Prefetch(
+                'items',
+                queryset=CartItem.objects.select_related(
+                    'menu_item__restaurant'
+                ).prefetch_related('addons')
+            )
+        ).get(user=request.user)
 
-    if not cart_items.exists():
+        cart_items = cart.items.all()
+
+        if not cart_items.exists():
+            messages.warning(request, 'Your cart is empty!')
+            return redirect('food_pwa:restaurant_list')
+
+        # Check if all items are from the same restaurant
+        restaurants = list(set(item.menu_item.restaurant for item in cart_items))
+        if len(restaurants) > 1:
+            messages.error(
+                request,
+                'You can only order from one restaurant at a time. '
+                'Please remove items from other restaurants.'
+            )
+            return redirect('food_pwa:cart')
+
+        restaurant = restaurants[0]
+
+        # Get available delivery zones for the restaurant
+        delivery_zones = DeliveryZone.objects.filter(
+            Q(restaurant=restaurant) | Q(restaurant__isnull=True),
+            is_active=True
+        )
+
+        # Calculate totals to match main food app
+        subtotal = cart.get_total()
+        delivery_fee = Decimal('25.00')  # Default door delivery fee to match main app
+        total = subtotal + delivery_fee  # No tax to match main app
+
+
+        context = {
+            'cart': cart,
+            'cart_items': cart_items,
+            'restaurant': restaurant,
+            'delivery_zones': delivery_zones,
+            'subtotal': subtotal,
+            'delivery_fee': delivery_fee,
+            'total': total,
+            'user': request.user,
+            'PAYSTACK_PUBLIC_KEY': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
+        }
+        return render(request, 'food/pwa/checkout.html', context)
+
+    except Cart.DoesNotExist:
         messages.warning(request, 'Your cart is empty!')
         return redirect('food_pwa:restaurant_list')
-
-    # Calculate totals
-    subtotal = sum(item.get_total_price() for item in cart_items)
-    delivery_fee = Decimal('5.00')
-    tax = subtotal * Decimal('0.15')  # 15% tax
-    total = subtotal + delivery_fee + tax
-
-    context = {
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'delivery_fee': delivery_fee,
-        'tax': tax,
-        'total': total,
-        'user': request.user,
-    }
-    return render(request, 'food/pwa/checkout.html', context)
 
 
 @pwa_login_required(pwa_app='food')
 def pwa_confirm_order(request):
     """Process order confirmation"""
     if request.method == 'POST':
-        cart = get_object_or_404(Cart, user=request.user)
-        cart_items = CartItem.objects.filter(cart=cart)
+        try:
 
-        if not cart_items.exists():
-            messages.error(request, 'Your cart is empty!')
-            return redirect('food_pwa:restaurant_list')
+            
+            # Try to import payment helpers, handle if not available
+            try:
+                from payment.helpers import create_payment, initialize_paystack_payment
+                payment_available = True
+            except ImportError:
+                payment_available = False
+                logger = logging.getLogger(__name__)
+                logger.warning("Payment helpers not available - online payments will not work")
+            
+            cart = Cart.objects.prefetch_related(
+                Prefetch(
+                    'items',
+                    queryset=CartItem.objects.select_related(
+                        'menu_item__restaurant'
+                    ).prefetch_related('addons')
+                )
+            ).get(user=request.user)
 
-        # Get delivery details
-        delivery_address = request.POST.get('delivery_address', '')
-        delivery_city = request.POST.get('delivery_city', 'Accra')
-        delivery_phone = request.POST.get('delivery_phone', '')
-        payment_method = request.POST.get('payment_method', 'cash_on_delivery')
-        special_instructions = request.POST.get('special_instructions', '')
+            cart_items = cart.items.all()
 
-        # Validate required fields
-        if not delivery_address or not delivery_phone:
-            messages.error(request, 'Please provide delivery address and phone number')
-            return redirect('food_pwa:checkout')
+            if not cart_items.exists():
+                messages.error(request, 'Your cart is empty!')
+                return redirect('food_pwa:restaurant_list')
 
-        # Calculate totals
-        subtotal = sum(item.get_total_price() for item in cart_items)
-        delivery_fee = Decimal('5.00')
-        tax = subtotal * Decimal('0.15')
-        total = subtotal + delivery_fee + tax
+            # Check if all items are from the same restaurant
+            restaurants = list(set(item.menu_item.restaurant for item in cart_items))
+            if len(restaurants) > 1:
+                messages.error(
+                    request,
+                    'You can only order from one restaurant at a time. '
+                    'Please remove items from other restaurants.'
+                )
+                return redirect('food_pwa:cart')
 
-        # Generate unique order number
-        order_number = f'FO-{timezone.now().strftime("%Y%m%d")}-{uuid.uuid4().hex[:8].upper()}'
+            restaurant = restaurants[0]
 
-        # Create order
-        order = Order.objects.create(
-            order_number=order_number,
-            customer=request.user,
-            restaurant=cart_items.first().menu_item.restaurant,
-            delivery_address=delivery_address,
-            delivery_city=delivery_city,
-            delivery_phone=delivery_phone,
-            payment_method=payment_method,
-            delivery_instructions=special_instructions,
-            subtotal=subtotal,
-            delivery_fee=delivery_fee,
-            tax=tax,
-            total_amount=total,
-            status='pending'
-        )
+            # Get form data
+            delivery_address = request.POST.get('delivery_address', '').strip()
+            delivery_city = request.POST.get('delivery_city', '').strip()
+            delivery_phone = request.POST.get('delivery_phone', '').strip()
+            delivery_instructions = request.POST.get('delivery_instructions', '').strip()
+            payment_method = request.POST.get('payment_method')
+            delivery_method = request.POST.get('delivery_method', 'door_delivery')
+            delivery_zone_id = request.POST.get('delivery_zone')
 
-        # Create order items
-        for cart_item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                menu_item=cart_item.menu_item,
-                quantity=cart_item.quantity,
-                price=cart_item.menu_item.get_display_price(),
-                special_instructions=cart_item.special_instructions
+            # Validate required fields
+            if not all([delivery_address, delivery_city, delivery_phone, payment_method, delivery_method]):
+                messages.error(request, 'Please fill in all required fields.')
+                return redirect('food_pwa:checkout')
+
+            # Get delivery zone
+            delivery_zone = None
+            if delivery_zone_id:
+                try:
+                    delivery_zone = DeliveryZone.objects.get(id=delivery_zone_id, is_active=True)
+                except DeliveryZone.DoesNotExist:
+                    pass
+
+            # Calculate order totals
+            subtotal = cart.get_total()
+
+            # Calculate delivery fee based on delivery method
+            if delivery_method == 'pickup':
+                delivery_fee = Decimal('0.00')
+            else:
+                delivery_fee = delivery_zone.delivery_fee if delivery_zone else Decimal('25.00')
+
+            # No tax
+            tax = Decimal('0.00')
+            total_amount = subtotal + delivery_fee
+
+            # Check minimum order amount
+            if restaurant.minimum_order_amount and restaurant.minimum_order_amount > subtotal:
+                messages.error(
+                    request,
+                    f'Minimum order amount is GHS {restaurant.minimum_order_amount}. '
+                    f'Please add more items.'
+                )
+                return redirect('food_pwa:cart')
+
+            # Generate unique order number
+            order_number = f'PWA-{timezone.now().strftime("%Y%m%d")}-{uuid.uuid4().hex[:8].upper()}'
+
+            # Create order - always create the order first, then handle payment
+            order = Order.objects.create(
+                order_number=order_number,
+                customer=request.user,
+                restaurant=restaurant,
+                delivery_method=delivery_method,
+                payment_method=payment_method,
+                delivery_zone=delivery_zone,
+                delivery_address=delivery_address,
+                delivery_city=delivery_city,
+                delivery_phone=delivery_phone,
+                delivery_instructions=delivery_instructions,
+                subtotal=subtotal,
+                delivery_fee=delivery_fee,
+                tax=tax,
+                total_amount=total_amount,
+                status='pending',  # Start as pending, update based on payment method
+                payment_status='pending'
             )
 
-        # Clear cart
-        cart_items.delete()
+            # Create order items from cart items
+            for cart_item in cart_items:
+                order_item = OrderItem.objects.create(
+                    order=order,
+                    menu_item=cart_item.menu_item,
+                    quantity=cart_item.quantity,
+                    price=cart_item.menu_item.get_display_price(),
+                    special_instructions=cart_item.special_instructions
+                )
 
-        # Check payment method and redirect accordingly
-        if payment_method not in ['cash_on_delivery', 'cash']:
-            # Store order ID in session for post-payment reference
-            request.session['pending_order_id'] = order.id
-            
-            # Prepare Paystack initiation via auto-post (payment:initiate expects POST)
-            context = {
-                'action_url_name': 'payment:initiate',
-                'amount': str(total),  # Convert to string for template
-                'source_app': 'food',
-                'order_id': order.order_number,
-                'description': f'Food Order #{order.order_number} from {order.restaurant.name}',
-                'payment_method': payment_method,  # 'card' or 'mobile_money'
-            }
-            
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.info(f"Redirecting to payment for order {order.order_number} - Amount: {total} GHS - Method: {payment_method}")
-            
-            return render(request, 'payment/auto_post.html', context)
+                # Add addons to order item
+                for addon in cart_item.addons.all():
+                    OrderItemAddon.objects.create(
+                        order_item=order_item,
+                        addon_name=addon.name,
+                        addon_price=addon.price
+                    )
 
-        # For cash payments, send notifications immediately
-        try:
-            from utils.sms_utils import send_order_notification, send_customer_order_confirmation
-            
-            # Notify restaurant owner
-            send_order_notification(order, status_change=False)
-            
-            # Notify customer
-            send_customer_order_confirmation(order)
-            
+            # Clear cart
+            cart_items.delete()
+
+            # Send SMS notifications
+            try:
+                from utils.sms_utils import send_order_notification, send_customer_order_confirmation
+                
+                # Notify restaurant owner
+                send_order_notification(order, status_change=False)
+                
+                # Notify customer
+                send_customer_order_confirmation(order)
+                
+            except Exception as e:
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to send SMS notification: {str(e)}")
+
+            # Handle payment based on method
+            if payment_method == 'online_payment':
+                if not payment_available:
+                    # Payment system not available - create order anyway
+                    order.status = 'confirmed'
+                    order.payment_status = 'failed'
+                    order.save()
+                    
+                    messages.warning(
+                        request,
+                        f'Order created successfully (#{order_number}) but online payment is currently unavailable. Please contact us to complete payment.'
+                    )
+                    return redirect('food_pwa:order_detail', order_number=order_number)
+                
+                # Initialize Paystack payment for online payments
+                try:
+                    payment = create_payment(
+                        user=request.user,
+                        amount=total_amount,
+                        currency='GHS',
+                        source_app='food',
+                        order_id=order_number,
+                        description=f'PWA Food Order {order_number} from {restaurant.name}',
+                        payment_method='paystack'
+                    )
+
+                    # Initialize Paystack transaction
+                    result = initialize_paystack_payment(payment)
+
+                    if result.get('status'):
+                        # Update order status to pending payment
+                        order.status = 'pending'
+                        order.payment_status = 'pending'
+                        order.save()
+                        
+                        # Redirect to Paystack payment page
+                        return redirect(result['authorization_url'])
+                    else:
+                        # Payment initialization failed - still create order but mark payment as failed
+                        order.payment_status = 'failed'
+                        order.status = 'confirmed'
+                        order.save()
+                        
+                        messages.error(request, f"Payment initialization failed. Order created but please contact us to complete payment.")
+                        return redirect('food_pwa:order_detail', order_number=order_number)
+                        
+                except Exception as e:
+                    # Log the error but still create the order
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Payment initialization error for PWA order {order_number}: {str(e)}", exc_info=True)
+
+                    # Mark payment as failed but order as confirmed
+                    order.payment_status = 'failed' 
+                    order.status = 'confirmed'
+                    order.save()
+
+                    messages.warning(
+                        request,
+                        f"Order created successfully (#{order_number}) but payment setup failed. Please contact us to complete payment."
+                    )
+                    return redirect('food_pwa:order_detail', order_number=order_number)
+            else:
+                # Cash on delivery or other payment methods - confirm order immediately
+                order.status = 'confirmed'
+                order.payment_status = 'pending' if payment_method == 'cash_on_delivery' else 'completed'
+                order.save()
+                
+                success_message = f'Order placed successfully! Your order number is {order_number}.'
+                if payment_method == 'cash_on_delivery':
+                    success_message += f' Please pay GHS {total_amount} when you receive your order.'
+                    
+                messages.success(request, success_message)
+                return redirect('food_pwa:order_detail', order_number=order_number)
+
+        except Cart.DoesNotExist:
+            messages.warning(request, 'Your cart is empty!')
+            return redirect('food_pwa:restaurant_list')
         except Exception as e:
-            import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Failed to send SMS notification: {str(e)}")
-
-        messages.success(request, f'Order placed successfully! Order #{order.order_number}')
-        return redirect('food_pwa:order_detail', order_number=order.order_number)
+            logger.error(f"Error processing PWA order: {str(e)}", exc_info=True)
+            
+            # More specific error messages based on the exception
+            error_msg = str(e)
+            if "DeliveryZone" in error_msg:
+                messages.error(request, 'Please select a valid delivery zone.')
+            elif "minimum_order_amount" in error_msg:
+                messages.error(request, 'Your order does not meet the minimum order requirement.')
+            elif "payment" in error_msg.lower():
+                messages.error(request, 'There was an issue with payment processing. Your order may still have been created.')
+            elif "Cart.DoesNotExist" in error_msg:
+                messages.error(request, 'Your cart is empty. Please add items before checking out.')
+            elif "ValidationError" in error_msg:
+                messages.error(request, 'Please check all required fields and try again.')
+            else:
+                messages.error(request, f'An error occurred while processing your order: {error_msg}. Please contact support if this persists.')
+            
+            return redirect('food_pwa:checkout')
 
     return redirect('food_pwa:checkout')
 
@@ -830,7 +1013,7 @@ def pwa_add_menu_item(request):
             description=description,
             base_price=price,
             category=category,
-            image=image,
+            image=image if image else None,  # Use image field for both files and URLs
             is_available=is_available
         )
 

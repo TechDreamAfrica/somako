@@ -1,8 +1,8 @@
 {% extends 'pwa_base.html' %}
-{% block title %}Checkout - Food PWA{% endblock %}
+{% block title %}Checkout - {{ restaurant.name }}{% endblock %}
 
 {% block content %}
-<div class="pwa-page" style="background: #fff7ed;">
+<div class="pwa-page" style="background: #f9fafb;">
   <!-- PWA Header -->
   <div class="pwa-header" style="background: #f97316; color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
     <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -10,51 +10,50 @@
         <a href="{% url 'food_pwa:cart' %}" style="color: white; text-decoration: none; font-size: 1.25rem;">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Checkout</h1>
+        <div>
+          <h1 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Checkout</h1>
+          <p style="margin: 0; font-size: 0.8125rem; color: rgba(255, 255, 255, 0.9);">Complete your order from {{ restaurant.name }}</p>
+        </div>
       </div>
-      <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">
-        {{ restaurant.name }}
-      </span>
     </div>
   </div>
 
-  <form method="post" id="checkoutForm" style="padding: 0;">
+  <form method="post" action="{% url 'food_pwa:confirm_order' %}" id="checkoutForm" style="padding: 0;">
     {% csrf_token %}
     
     <!-- Delivery Address Section -->
-    <div style="background: white; margin: 1rem; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-      <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fas fa-map-marker-alt" style="color: #f97316;"></i> 
-        Delivery Address
+    <div style="background: white; margin: 1rem; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-map-marker-alt" style="color: #f97316;"></i> Delivery Address
       </h3>
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Full Address *</label>
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Full Address *</label>
         <input type="text" name="delivery_address" required 
-               style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; background: #f9fafb;" 
+               style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" 
                placeholder="Enter your delivery address">
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div>
-          <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">City *</label>
+          <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">City *</label>
           <input type="text" name="delivery_city" required 
-                 style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; background: #f9fafb;" 
+                 style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" 
                  placeholder="City">
         </div>
         <div>
-          <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Phone *</label>
+          <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Phone Number *</label>
           <input type="tel" name="delivery_phone" required 
-                 style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; background: #f9fafb;" 
+                 style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" 
                  placeholder="Phone Number">
         </div>
       </div>
 
       {% if delivery_zones %}
-      <div style="margin-top: 1rem;">
-        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Delivery Zone (Optional)</label>
+      <div style="margin-top: 1.5rem;">
+        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Delivery Zone (Optional)</label>
         <select name="delivery_zone" 
-                style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; background: #f9fafb;">
+                style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;">
           <option value="">Select delivery zone</option>
           {% for zone in delivery_zones %}
           <option value="{{ zone.id }}">{{ zone.name }} - GHS {{ zone.delivery_fee }}</option>
@@ -63,201 +62,362 @@
       </div>
       {% endif %}
 
-      <div style="margin-top: 1rem;">
-        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Special Instructions (Optional)</label>
-        <textarea name="special_instructions" rows="3" 
-                  style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; background: #f9fafb; resize: vertical;" 
+      <div style="margin-top: 1.5rem;">
+        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Delivery Instructions (Optional)</label>
+        <textarea name="delivery_instructions" rows="3" 
+                  style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem; resize: vertical;" 
                   placeholder="Any special delivery instructions..."></textarea>
       </div>
     </div>
 
-    <!-- Payment Method Section -->
-    <div style="background: white; margin: 1rem; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-      <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fas fa-credit-card" style="color: #f97316;"></i> 
-        Payment Method
+    <!-- Delivery Method Section -->
+    <div style="background: white; margin: 1rem; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-truck" style="color: #f97316;"></i> Delivery Method
       </h3>
 
-      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <label style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease;">
-          <input type="radio" name="payment_method" value="cash_on_delivery" checked style="width: 18px; height: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #f97316; border-radius: 0.75rem; cursor: pointer; background: #fef3c7;" onclick="this.querySelector('input').checked = true; updateDeliveryMethod('door_delivery');">
+          <input type="radio" name="delivery_method" value="door_delivery" checked required style="width: 18px; height: 18px; margin-right: 1rem;">
           <div style="flex: 1;">
-            <div style="font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-money-bill-wave" style="color: #10b981;"></i> 
-              Cash on Delivery
+            <div style="font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">
+              <i class="fas fa-home"></i> Door Delivery
             </div>
-            <div style="color: #6b7280; font-size: 0.8125rem; margin-top: 0.25rem;">Pay when you receive your order</div>
+            <div style="font-size: 0.8125rem; color: #78350f;">We'll deliver to your doorstep (Delivery fee applies)</div>
+          </div>
+          <div style="font-weight: 800; color: #f97316; font-size: 1rem;">+GHS <span id="door-delivery-fee">25.00</span></div>
+        </label>
+
+        <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; background: white;" onclick="this.querySelector('input').checked = true; updateDeliveryMethod('pickup');">
+          <input type="radio" name="delivery_method" value="pickup" style="width: 18px; height: 18px; margin-right: 1rem;">
+          <div style="flex: 1;">
+            <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+              <i class="fas fa-store"></i> Pick Up Point
+            </div>
+            <div style="font-size: 0.8125rem; color: #6b7280;">Collect from our pickup point (No delivery fee)</div>
+          </div>
+          <div style="font-weight: 800; color: #059669; font-size: 1rem;">FREE</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Payment Method Section -->
+    <div style="background: white; margin: 1rem; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-credit-card" style="color: #f97316;"></i> Payment Method
+      </h3>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <label style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fef3c7; border: 2px solid #f97316; border-radius: 0.875rem; cursor: pointer;" onclick="this.querySelector('input').checked = true; updatePaymentMethod('online_payment');">
+          <input type="radio" name="payment_method" value="online_payment" checked required style="width: 18px; height: 18px;">
+          <div style="flex: 1;">
+            <div style="font-weight: 700; color: #92400e;">
+              <i class="fas fa-credit-card"></i> Online Payment
+            </div>
+            <div style="color: #78350f; font-size: 0.8125rem;">Pay with Paystack (Card/Mobile Money)</div>
           </div>
         </label>
 
-        <label style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; opacity: 0.6;">
-          <input type="radio" name="payment_method" value="mobile_money" disabled style="width: 18px; height: 18px;">
+        <label style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border: 2px solid #e5e7eb; border-radius: 0.875rem; cursor: pointer;" onclick="this.querySelector('input').checked = true; updatePaymentMethod('cash_on_delivery');">
+          <input type="radio" name="payment_method" value="cash_on_delivery" style="width: 18px; height: 18px;">
           <div style="flex: 1;">
-            <div style="font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-mobile-alt" style="color: #f59e0b;"></i> 
-              Mobile Money
-              <span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500;">Coming Soon</span>
+            <div style="font-weight: 700; color: #1f2937;">
+              <i class="fas fa-money-bill-wave"></i> Cash on Delivery
             </div>
-            <div style="color: #6b7280; font-size: 0.8125rem; margin-top: 0.25rem;">Pay with MTN/Vodafone Mobile Money</div>
-          </div>
-        </label>
-
-        <label style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; opacity: 0.6;">
-          <input type="radio" name="payment_method" value="card" disabled style="width: 18px; height: 18px;">
-          <div style="flex: 1;">
-            <div style="font-weight: 600; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-credit-card" style="color: #3b82f6;"></i> 
-              Card Payment
-              <span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500;">Coming Soon</span>
-            </div>
-            <div style="color: #6b7280; font-size: 0.8125rem; margin-top: 0.25rem;">Pay with Visa, Mastercard, or other cards</div>
+            <div style="color: #6b7280; font-size: 0.8125rem;">Pay when you receive your order</div>
           </div>
         </label>
       </div>
     </div>
 
     <!-- Order Summary Section -->
-    <div style="background: white; margin: 1rem; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-      <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fas fa-receipt" style="color: #f97316;"></i> 
-        Order Summary
+    <div style="background: white; margin: 1rem; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-receipt" style="color: #f97316;"></i> Order Summary
       </h3>
 
       <!-- Restaurant Info -->
-      <div style="background: #fef3c7; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #fcd34d;">
-        <div style="font-weight: 600; color: #92400e; display: flex; align-items: center; gap: 0.5rem;">
+      <div style="background: #fef3c7; border-radius: 0.875rem; padding: 1rem; margin-bottom: 1.5rem; border: 2px solid #fcd34d;">
+        <div style="font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">
           <i class="fas fa-store"></i> {{ restaurant.name }}
         </div>
-        <div style="color: #78350f; font-size: 0.8125rem; margin-top: 0.25rem;">{{ restaurant.city }}</div>
+        <div style="color: #78350f; font-size: 0.8125rem;">{{ restaurant.city }}</div>
       </div>
 
       <!-- Cart Items -->
-      <div style="margin-bottom: 1rem;">
-        {% for item in cart_items %}
-        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
-          <div style="flex: 1;">
-            <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem; margin-bottom: 0.25rem;">{{ item.menu_item.name }}</div>
-            <div style="color: #6b7280; font-size: 0.8125rem;">Qty: {{ item.quantity }}</div>
-            {% if item.addons.all %}
-            <div style="color: #9ca3af; font-size: 0.75rem; margin-top: 0.25rem;">
-              {% for addon in item.addons.all %}
-                + {{ addon.name }}{% if not forloop.last %}, {% endif %}
-              {% endfor %}
-            </div>
-            {% endif %}
+      {% for item in cart_items %}
+      <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">{{ item.menu_item.name }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Qty: {{ item.quantity }}</div>
+          {% if item.addons.all %}
+          <div style="color: #9ca3af; font-size: 0.8125rem; margin-top: 0.25rem;">
+            {% for addon in item.addons.all %}
+              + {{ addon.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
           </div>
-          <div style="font-weight: 700; color: #f97316; font-size: 0.875rem;">GHS {{ item.get_subtotal }}</div>
+          {% endif %}
         </div>
-        {% endfor %}
+        <div style="font-weight: 700; color: #f97316;">GHS {{ item.get_subtotal }}</div>
       </div>
+      {% endfor %}
 
-      <!-- Price Breakdown -->
-      <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+      <div style="border-top: 2px solid #f3f4f6; padding-top: 1rem; margin-top: 1rem;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-          <span style="color: #6b7280; font-size: 0.875rem;">Subtotal</span>
-          <span style="font-weight: 600; font-size: 0.875rem;">GHS {{ subtotal }}</span>
+          <span style="color: #6b7280;">Subtotal</span>
+          <span style="font-weight: 700;">GHS {{ subtotal }}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-          <span style="color: #6b7280; font-size: 0.875rem;">Delivery Fee</span>
-          <span style="font-weight: 600; font-size: 0.875rem;" id="shipping-amount">GHS {{ delivery_fee }}</span>
+          <span style="color: #6b7280;">Delivery Fee</span>
+          <span style="font-weight: 700;" id="shipping-amount">GHS {{ delivery_fee }}</span>
         </div>
         <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid #f97316;">
           <span style="font-weight: 700; font-size: 1.125rem; color: #1f2937;">Total</span>
-          <span style="font-weight: 900; font-size: 1.25rem; color: #f97316;" id="total-amount">GHS {{ total }}</span>
+          <span style="font-weight: 900; font-size: 1.5rem; color: #f97316;" id="total-amount">GHS {{ total }}</span>
         </div>
       </div>
     </div>
 
     <!-- Place Order Button -->
     <div style="padding: 1rem; background: white; border-top: 1px solid #e5e7eb; position: sticky; bottom: 0;">
-      <button type="submit" 
-              style="width: 100%; padding: 1rem; background: #f97316; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(245, 115, 22, 0.3);">
-        <i class="fas fa-check-circle"></i>
-        Place Order - GHS {{ total }}
+      <button type="submit" id="payButton"
+              style="width: 100%; padding: 1.125rem; background: #f97316; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);"
+              onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <i class="fas fa-lock"></i> Place Order & Pay
       </button>
+      
+      <p style="text-align: center; color: #9ca3af; font-size: 0.8125rem; margin-top: 1rem; margin-bottom: 0;">
+        <i class="fas fa-shield-alt"></i> Secure checkout powered by Paystack
+      </p>
     </div>
   </form>
 </div>
 
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-// Handle delivery zone changes
+// Constants for pricing
+const SUBTOTAL = parseFloat('{{ subtotal }}');
+const DOOR_DELIVERY_FEE = 25.00;
+const PICKUP_FEE = 0.00;
+
 document.addEventListener('DOMContentLoaded', function() {
-  const deliveryZoneSelect = document.querySelector('select[name="delivery_zone"]');
-  const shippingAmount = document.getElementById('shipping-amount');
-  const totalAmount = document.getElementById('total-amount');
-  const placeOrderBtn = document.querySelector('button[type="submit"]');
-  
-  if (deliveryZoneSelect) {
-    deliveryZoneSelect.addEventListener('change', function() {
-      const selectedOption = this.options[this.selectedIndex];
-      if (selectedOption.value) {
-        // Extract delivery fee from option text (format: "Zone Name - GHS 5.00")
-        const feeMatch = selectedOption.text.match(/GHS\s*([\d.]+)/);
-        if (feeMatch) {
-          const deliveryFee = parseFloat(feeMatch[1]);
-          const subtotal = {{ subtotal }};
-          const newTotal = subtotal + deliveryFee;
-          
-          shippingAmount.textContent = `GHS ${deliveryFee.toFixed(2)}`;
-          totalAmount.textContent = `GHS ${newTotal.toFixed(2)}`;
-          placeOrderBtn.innerHTML = `<i class="fas fa-check-circle"></i> Place Order - GHS ${newTotal.toFixed(2)}`;
-        }
-      } else {
-        // Reset to default delivery fee
-        const defaultFee = {{ delivery_fee }};
-        const subtotal = {{ subtotal }};
-        const newTotal = subtotal + defaultFee;
-        
-        shippingAmount.textContent = `GHS ${defaultFee.toFixed(2)}`;
-        totalAmount.textContent = `GHS ${newTotal.toFixed(2)}`;
-        placeOrderBtn.innerHTML = `<i class="fas fa-check-circle"></i> Place Order - GHS ${newTotal.toFixed(2)}`;
-      }
-    });
-  }
+    const form = document.getElementById('checkoutForm');
+    const payButton = document.getElementById('payButton');
+    const deliveryMethodRadios = document.querySelectorAll('input[name="delivery_method"]');
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
 
-  // Handle payment method selection styling
-  const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-  paymentRadios.forEach(radio => {
-    radio.addEventListener('change', function() {
-      paymentRadios.forEach(r => {
-        const label = r.closest('label');
-        if (r.checked) {
-          label.style.borderColor = '#f97316';
-          label.style.background = '#fff7ed';
+    // Initialize delivery method listeners
+    deliveryMethodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateDeliveryMethod(this.value);
+        });
+    });
+
+    // Initialize payment method listeners
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updatePaymentMethod(this.value);
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+        if (selectedMethod === 'online_payment') {
+            // Paystack inline payment
+            payWithPaystack();
         } else {
-          label.style.borderColor = '#e5e7eb';
-          label.style.background = 'white';
+            // Cash on delivery - submit form normally
+            form.submit();
         }
-      });
     });
-  });
 
-  // Initialize selected payment method styling
-  const selectedRadio = document.querySelector('input[name="payment_method"]:checked');
-  if (selectedRadio) {
-    selectedRadio.dispatchEvent(new Event('change'));
-  }
+    function payWithPaystack() {
+        payButton.disabled = true;
+        payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-  // Form validation
-  const form = document.getElementById('checkoutForm');
-  form.addEventListener('submit', function(e) {
-    const requiredFields = form.querySelectorAll('input[required]');
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-      if (!field.value.trim()) {
-        isValid = false;
-        field.style.borderColor = '#ef4444';
-      } else {
-        field.style.borderColor = '#e5e7eb';
-      }
-    });
-    
-    if (!isValid) {
-      e.preventDefault();
-      alert('Please fill in all required fields.');
+        // Get current total
+        const totalText = document.getElementById('total-amount').textContent;
+        const totalAmount = parseFloat(totalText.replace('GHS ', ''));
+
+        const handler = PaystackPop.setup({
+            key: '{{ PAYSTACK_PUBLIC_KEY }}',
+            email: '{{ user.email }}',
+            amount: totalAmount * 100, // Amount in pesewas
+            currency: 'GHS',
+            ref: 'FOOD-PWA-' + Math.floor((Math.random() * 1000000000) + 1),
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Customer Name",
+                        variable_name: "customer_name",
+                        value: "{{ user.get_full_name }}"
+                    },
+                    {
+                        display_name: "Restaurant",
+                        variable_name: "restaurant",
+                        value: "{{ restaurant.name }}"
+                    }
+                ]
+            },
+            callback: function(response) {
+                // Payment successful
+                const paymentRef = response.reference;
+
+                // Add payment reference to form
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'payment_reference';
+                input.value = paymentRef;
+                form.appendChild(input);
+
+                // Submit form
+                form.submit();
+            },
+            onClose: function() {
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-lock"></i> Place Order & Pay';
+            }
+        });
+
+        handler.openIframe();
     }
-  });
+
+    // Handle delivery zone changes
+    const deliveryZoneSelect = document.querySelector('select[name="delivery_zone"]');
+    if (deliveryZoneSelect) {
+        deliveryZoneSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                // Extract delivery fee from option text (format: "Zone Name - GHS 5.00")
+                const feeMatch = selectedOption.text.match(/GHS\s*([\d.]+)/);
+                if (feeMatch) {
+                    const deliveryFee = parseFloat(feeMatch[1]);
+                    const subtotal = SUBTOTAL;
+                    const newTotal = subtotal + deliveryFee;
+                    
+                    document.getElementById('shipping-amount').textContent = `GHS ${deliveryFee.toFixed(2)}`;
+                    document.getElementById('total-amount').textContent = `GHS ${newTotal.toFixed(2)}`;
+                    updatePayButtonText(newTotal);
+                }
+            } else {
+                // Reset to current delivery method fee
+                const deliveryMethod = document.querySelector('input[name="delivery_method"]:checked').value;
+                const deliveryFee = deliveryMethod === 'door_delivery' ? DOOR_DELIVERY_FEE : PICKUP_FEE;
+                const newTotal = SUBTOTAL + deliveryFee;
+                
+                document.getElementById('shipping-amount').textContent = `GHS ${deliveryFee.toFixed(2)}`;
+                document.getElementById('total-amount').textContent = `GHS ${newTotal.toFixed(2)}`;
+                updatePayButtonText(newTotal);
+            }
+        });
+    }
+
+    function updatePayButtonText(total) {
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        if (paymentMethod === 'online_payment') {
+            payButton.innerHTML = `<i class="fas fa-lock"></i> Place Order & Pay - GHS ${total.toFixed(2)}`;
+        } else {
+            payButton.innerHTML = `<i class="fas fa-check-circle"></i> Place Order - GHS ${total.toFixed(2)}`;
+        }
+    }
 });
+
+function updateDeliveryMethod(method) {
+    // Calculate shipping cost based on delivery method
+    let shippingCost = method === 'door_delivery' ? DOOR_DELIVERY_FEE : PICKUP_FEE;
+    let total = SUBTOTAL + shippingCost;
+
+    // Update UI
+    document.getElementById('shipping-amount').textContent = 'GHS ' + shippingCost.toFixed(2);
+    document.getElementById('total-amount').textContent = 'GHS ' + total.toFixed(2);
+
+    // Update button text
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    const payButton = document.getElementById('payButton');
+    if (paymentMethod === 'online_payment') {
+        payButton.innerHTML = `<i class="fas fa-lock"></i> Place Order & Pay - GHS ${total.toFixed(2)}`;
+    } else {
+        payButton.innerHTML = `<i class="fas fa-check-circle"></i> Place Order - GHS ${total.toFixed(2)}`;
+    }
+
+    // Update radio button styling
+    document.querySelectorAll('[name="delivery_method"]').forEach(radio => {
+        const label = radio.parentElement;
+        if (radio.checked) {
+            if (method === 'door_delivery') {
+                label.style.borderColor = '#f97316';
+                label.style.background = '#fef3c7';
+            } else {
+                label.style.borderColor = '#059669';
+                label.style.background = '#d1fae5';
+            }
+        } else {
+            label.style.borderColor = '#e5e7eb';
+            label.style.background = 'white';
+        }
+    });
+}
+
+function updatePaymentMethod(method) {
+    // Update button text and icon
+    const total = document.getElementById('total-amount').textContent.replace('GHS ', '');
+    const payButton = document.getElementById('payButton');
+    
+    if (method === 'online_payment') {
+        payButton.innerHTML = `<i class="fas fa-lock"></i> Place Order & Pay - GHS ${total}`;
+    } else {
+        payButton.innerHTML = `<i class="fas fa-check-circle"></i> Place Order - GHS ${total}`;
+    }
+
+    // Update radio button styling
+    document.querySelectorAll('[name="payment_method"]').forEach(radio => {
+        const label = radio.parentElement;
+        if (radio.checked) {
+            if (method === 'online_payment') {
+                label.style.borderColor = '#f97316';
+                label.style.background = '#fef3c7';
+            } else {
+                label.style.borderColor = '#059669';
+                label.style.background = '#d1fae5';
+            }
+        } else {
+            label.style.borderColor = '#e5e7eb';
+            label.style.background = 'white';
+        }
+    });
+}
 </script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_list' %}" class="bottom-nav-item">
+    <i class="fas fa-utensils"></i>
+    <span>Restaurants</span>
+  </a>
+  <a href="{% url 'food_pwa:cart' %}" class="bottom-nav-item active">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+    {% if cart_items %}
+    <div style="position: absolute; top: 8px; right: 8px; background: #f97316; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+      {{ cart_items|length }}
+    </div>
+    {% endif %}
+  </a>
+  <a href="{% url 'food_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}?app=food" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
 {% endblock %}
