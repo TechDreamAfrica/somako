@@ -121,3 +121,25 @@ def downloads(request):
         'apk_filename': 'soma-ko-app.apk'  # Adjust this to match your actual APK filename
     }
     return render(request, 'core/downloads.html', context)
+
+
+def download_apk(request):
+    """Serve APK file with proper headers for download"""
+    from django.http import HttpResponse, Http404
+    from django.conf import settings
+    import os
+    
+    apk_filename = 'soma-ko-app.apk'
+    apk_path = os.path.join(settings.BASE_DIR, 'static', 'apk', apk_filename)
+    
+    if not os.path.exists(apk_path):
+        raise Http404("APK file not found")
+    
+    try:
+        with open(apk_path, 'rb') as apk_file:
+            response = HttpResponse(apk_file.read(), content_type='application/vnd.android.package-archive')
+            response['Content-Disposition'] = f'attachment; filename="{apk_filename}"'
+            response['Content-Length'] = os.path.getsize(apk_path)
+            return response
+    except Exception as e:
+        raise Http404(f"Error serving APK file: {str(e)}")

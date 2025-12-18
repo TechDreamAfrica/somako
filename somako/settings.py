@@ -146,6 +146,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# File serving configuration
+import mimetypes
+# Add APK MIME type for proper downloads
+mimetypes.add_type('application/vnd.android.package-archive', '.apk')
+
 # Google Drive Storage Configuration
 USE_GOOGLE_DRIVE_STORAGE = os.environ.get('USE_GOOGLE_DRIVE_STORAGE', 'False').lower() == 'true'
 GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = os.environ.get('GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE', None)

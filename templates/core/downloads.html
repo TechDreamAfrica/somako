@@ -98,9 +98,7 @@
                             <p class="text-gray-600 mb-6">Download the native Android app</p>
                             
                             <!-- APK Download Button -->
-                            {% load static %}
-                            <a href="{% static 'apk/' %}{{ apk_filename }}" 
-                               download="{{ apk_filename }}"
+                            <a href="{% url 'core:download_apk' %}" 
                                class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 mb-4">
                                 <i class="fas fa-download text-xl"></i>
                                 Download APK
