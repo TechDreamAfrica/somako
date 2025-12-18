@@ -1,0 +1,346 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Driver Profile - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: #eab308;
+    padding: 2rem 1rem;
+    margin-bottom: 1rem;
+    color: white;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #eab308;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+
+  .page-subtitle {
+    opacity: 0.9;
+    font-size: 0.875rem;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #eab308;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  }
+
+  .form-input:disabled {
+    background: #f9fafb;
+    color: #6b7280;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .stat-row:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    color: #6b7280;
+  }
+
+  .stat-value {
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .btn-save {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.75rem;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .status-approved {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="profile-avatar">
+    {% if driver.profile_photo %}
+      <img src="{{ driver.profile_photo.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+    {% else %}
+      {{ driver.user.first_name|first }}{{ driver.user.last_name|first }}
+    {% endif %}
+  </div>
+  <h1 class="page-title">{{ driver.user.get_full_name }}</h1>
+  <p class="page-subtitle">Driver Profile</p>
+</div>
+
+<div class="pwa-container">
+  <!-- Account Status -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-id-card" style="color: #eab308;"></i> Account Status
+    </h2>
+    <div class="stat-row">
+      <span class="stat-label">Verification Status</span>
+      <span class="stat-value">
+        <span class="status-badge status-{{ driver.status|lower }}">
+          {% if driver.status == 'APPROVED' %}
+            ✓ Approved
+          {% elif driver.status == 'PENDING' %}
+            ⏳ Pending
+          {% elif driver.status == 'REJECTED' %}
+            ✗ Rejected
+          {% else %}
+            {{ driver.get_status_display }}
+          {% endif %}
+        </span>
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Driver License</span>
+      <span class="stat-value">{{ driver.driver_license_number|default:"Not provided" }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">License Expiry</span>
+      <span class="stat-value">{{ driver.license_expiry_date|default:"Not provided" }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Member Since</span>
+      <span class="stat-value">{{ driver.created_at|date:"F Y" }}</span>
+    </div>
+  </div>
+
+  <!-- Personal Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-user" style="color: #eab308;"></i> Personal Information
+    </h2>
+    <div class="stat-row">
+      <span class="stat-label">Full Name</span>
+      <span class="stat-value">{{ driver.user.get_full_name }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Email</span>
+      <span class="stat-value">{{ driver.user.email }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Phone</span>
+      <span class="stat-value">{{ driver.user.profile.phone_number|default:"Not provided" }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">National ID</span>
+      <span class="stat-value">{{ driver.national_id|default:"Not provided" }}</span>
+    </div>
+  </div>
+
+  <!-- Banking Information -->
+  <form method="post">
+    {% csrf_token %}
+    <div class="info-card">
+      <h2 class="info-title">
+        <i class="fas fa-university" style="color: #eab308;"></i> Banking Information
+      </h2>
+      <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+        Update your bank details for weekly payouts
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Bank Name</label>
+        <input type="text" name="bank_name" class="form-input" 
+               value="{{ driver.bank_name }}" 
+               placeholder="Enter your bank name">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Account Number</label>
+        <input type="text" name="account_number" class="form-input" 
+               value="{{ driver.account_number }}" 
+               placeholder="Enter your account number">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Account Holder Name</label>
+        <input type="text" name="account_holder_name" class="form-input" 
+               value="{{ driver.account_holder_name }}" 
+               placeholder="Name as it appears on account">
+      </div>
+
+      <button type="submit" class="btn-save">
+        <i class="fas fa-save"></i> Save Banking Details
+      </button>
+    </div>
+  </form>
+
+  <!-- Statistics -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-chart-bar" style="color: #eab308;"></i> Performance
+    </h2>
+    <div class="stat-row">
+      <span class="stat-label">Total Rides</span>
+      <span class="stat-value">{{ driver.total_rides }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Average Rating</span>
+      <span class="stat-value">
+        <i class="fas fa-star" style="color: #fbbf24;"></i> 
+        {{ driver.average_rating|default:"N/A"|floatformat:1 }}
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Current Availability</span>
+      <span class="stat-value">
+        {% if driver.availability == 'ONLINE' %}
+          <span style="color: #10b981;">🟢 Online</span>
+        {% elif driver.availability == 'OFFLINE' %}
+          <span style="color: #ef4444;">🔴 Offline</span>
+        {% else %}
+          <span style="color: #eab308;">🟡 Busy</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="padding: 0 1rem;">
+    <button onclick="window.location.href='{% url 'accounts:pwa_profile_edit' %}'" class="btn-secondary">
+      <i class="fas fa-user-cog"></i> Edit Personal Profile
+    </button>
+    <button onclick="window.location.href='{% url 'ride_pwa:driver_dashboard' %}'" class="btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:driver_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'ride_pwa:available_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'ride_pwa:active_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-car"></i>
+    <span>Active</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-money-bill-wave"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_profile' %}" class="bottom-nav-item active">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

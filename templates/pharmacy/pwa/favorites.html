@@ -1,0 +1,72 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Favorites - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem;">
+  <h1 style="font-size: 1.75rem; font-weight: 700;">My Favorites</h1>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  {% if wishlist_items %}
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+      {% for item in wishlist_items %}
+      <a href="{% url 'pharmacy_pwa:medicine_detail' item.medicine.id %}" style="text-decoration: none;">
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+          {% if item.medicine.get_primary_image %}
+          <img src="{{ item.medicine.get_primary_image.url }}" style="width: 100%; height: 140px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 140px; background: #8b5cf6; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-pills" style="font-size: 2rem; color: #8b5cf6;"></i>
+          </div>
+          {% endif %}
+          <div style="padding: 0.75rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">{{ item.medicine.name|truncatechars:40 }}</h3>
+            <div style="font-weight: 700; color: #8b5cf6;">GHS {{ item.medicine.base_price|floatformat:2 }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="width: 100px; height: 100px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-heart" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No favorites yet</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem;">Save your favorite medicines here!</p>
+      <a href="{% url 'pharmacy_pwa:medicine_list' %}" style="display: inline-block; background: #8b5cf6; color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        Browse Medicines
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:medicine_list' %}" class="bottom-nav-item">
+    <i class="fas fa-th"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:favorites' %}" class="bottom-nav-item active">
+    <i class="fas fa-heart"></i>
+    <span>Favorites</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

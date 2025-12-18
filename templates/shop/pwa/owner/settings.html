@@ -1,0 +1,63 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Settings - Seller{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem; padding-top: calc(2rem + env(safe-area-inset-top));">
+  <h1 style="font-size: 1.5rem; font-weight: 700;">Settings</h1>
+  <p style="opacity: 0.9;">Update your profile</p>
+</div>
+
+<div style="padding: 1rem;">
+  <form method="post" style="background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); max-width: 520px;">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label class="form-label">First Name</label>
+      <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Last Name</label>
+      <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+    </div>
+
+    <div style="display:flex; gap:0.75rem;">
+      <a href="{% url 'shop_pwa:owner_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+      <button type="submit" class="btn" style="background: #8b5cf6; color: white; font-weight: 700;">Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-bag"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_products' %}" class="bottom-nav-item">
+    <i class="fas fa-box"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:analytics' %}" class="bottom-nav-item">
+    <i class="fas fa-chart-bar"></i>
+    <span>Analytics</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,1046 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Book a Ride - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+{% block login_banner_color_1 %}#eab308{% endblock %}
+{% block login_banner_color_2 %}#ffffff{% endblock %}
+
+{% block extra_head %}
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #eab308;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+  }
+
+  .vehicle-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .vehicle-card:hover {
+    border-color: #eab308;
+  }
+
+  .vehicle-card.selected {
+    border-color: #eab308;
+    background: #fff7ed;
+  }
+
+  .book-btn {
+    width: 100%;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    margin-bottom: 6rem;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .book-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+  }
+
+  .input-mode-toggle {
+    display: flex;
+    background: #f3f4f6;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 0.625rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .mode-btn.active {
+    background: #eab308;
+    color: white;
+  }
+
+  .mode-btn:not(.active) {
+    background: white;
+    color: #6b7280;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .leaflet-container {
+    font-family: inherit;
+    z-index: 1;
+  }
+
+  .pulsing-marker {
+    background: transparent;
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .leaflet-popup-content {
+    margin: 1rem;
+    font-family: inherit;
+  }
+
+  #map {
+    height: 350px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    cursor: crosshair;
+  }
+
+  /* Custom marker styles */
+  .custom-pickup-marker, .custom-destination-marker {
+    background: transparent;
+    border: none;
+  }
+
+  .marker-pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .pickup-pin {
+    color: #10b981; /* Green for pickup */
+  }
+
+  .destination-pin {
+    color: #ef4444; /* Red for destination */
+  }
+
+  .marker-pin::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Animation for pulsing user location marker */
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-map-marked-alt" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-car" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Book a Ride</h1>
+    <p class="hero-subtitle">Select locations on map or enter manually</p>
+  </div>
+</div>
+
+<!-- Interactive Map -->
+<div class="section-card">
+  <div class="section-title">
+    <i class="fas fa-map-marked-alt" style="color: #eab308;"></i> Live Map
+  </div>
+
+  <!-- Map Container -->
+  <div style="position: relative; border-radius: 1rem; overflow: hidden; border: 3px solid #fef3c7; margin-bottom: 1rem;">
+    <!-- Map Instruction Banner -->
+    <div id="mapInstruction" style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #eab308, #f59e0b); color: white; padding: 0.75rem; text-align: center; font-weight: 600; z-index: 5; font-size: 0.875rem;">
+      <i class="fas fa-hand-pointer"></i> Click on map to set pickup location first
+    </div>
+    
+    <div id="map" style="height: 350px; width: 100%;"></div>
+
+    <!-- Map Legend -->
+    <div style="position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 0.75rem; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 10; font-size: 0.75rem; pointer-events: none;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <div style="width: 10px; height: 10px; background: #10b981; border-radius: 50%; border: 2px solid white;"></div>
+        <span style="font-weight: 600; color: #1f2937;">Pickup</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; border: 2px solid white;"></div>
+        <span style="font-weight: 600; color: #1f2937;">Dropoff</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Instructions -->
+  <p style="text-align: center; color: #6b7280; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">
+    <i class="fas fa-info-circle" style="color: #eab308;"></i> Click on the map to set pickup and destination points
+  </p>
+
+  <!-- Distance and Duration -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+    <div style="background: #eab308; padding: 1rem; border-radius: 0.75rem; border: 2px solid #93c5fd;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <i class="fas fa-route" style="color: #3b82f6; font-size: 1rem;"></i>
+        <span style="color: #1e40af; font-size: 0.75rem; font-weight: 700;">Distance</span>
+      </div>
+      <div id="distance" style="font-size: 1.5rem; font-weight: 900; color: #1f2937;">-- km</div>
+    </div>
+    <div style="background: #eab308; padding: 1rem; border-radius: 0.75rem; border: 2px solid #fcd34d;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+        <i class="fas fa-clock" style="color: #eab308; font-size: 1rem;"></i>
+        <span style="color: #92400e; font-size: 0.75rem; font-weight: 700;">Time</span>
+      </div>
+      <div id="duration" style="font-size: 1.5rem; font-weight: 900; color: #1f2937;">-- min</div>
+    </div>
+  </div>
+</div>
+
+<form method="POST" action="{% url 'ride_pwa:book_ride' %}" id="rideForm">
+  {% csrf_token %}
+
+  <!-- Input Mode Toggle -->
+  <div class="section-card">
+    <div class="input-mode-toggle">
+      <button type="button" id="mapModeBtn" class="mode-btn active">
+        <i class="fas fa-map"></i>Map Selection
+      </button>
+      <button type="button" id="manualModeBtn" class="mode-btn">
+        <i class="fas fa-keyboard"></i>Manual Entry
+      </button>
+    </div>
+
+    <!-- Pickup Location -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fas fa-map-marker-alt" style="color: #10b981;"></i> Pickup Location
+      </label>
+      <input type="text" name="pickup_address" id="pickupInput" class="form-control" placeholder="Click on map to set pickup location" required readonly>
+      <input type="hidden" name="pickup_latitude" id="pickup_lat" value="0.0">
+      <input type="hidden" name="pickup_longitude" id="pickup_lng" value="0.0">
+    </div>
+
+    <!-- Dropoff Location -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fas fa-flag-checkered" style="color: #ef4444;"></i> Dropoff Location
+      </label>
+      <input type="text" name="dropoff_address" id="destinationInput" class="form-control" placeholder="Click on map to set destination" required readonly>
+      <input type="hidden" name="dropoff_latitude" id="destination_lat" value="0.0">
+      <input type="hidden" name="dropoff_longitude" id="destination_lng" value="0.0">
+    </div>
+  </div>
+
+  <input type="hidden" name="estimated_distance" id="estimated_distance_km">
+  <input type="hidden" name="estimated_duration" id="estimated_duration_minutes">
+
+  <!-- Driver Selection -->
+  <div class="section-card">
+    <div class="section-title">
+      <i class="fas fa-user-tie" style="color: #10b981;"></i> Select Driver
+    </div>
+
+    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+      {% if driver_selection_mode == 'nearby' %}
+        <i class="fas fa-map-marker-alt"></i> GPS enabled - Showing nearby drivers first
+      {% else %}
+        <i class="fas fa-info-circle"></i> Choose your driver - vehicle and fare are based on the driver's vehicle
+      {% endif %}
+    </p>
+
+    {% if has_gps and driver_selection_mode == 'nearby' %}
+      <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 0.875rem; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-map-marker-alt" style="color: #059669;"></i>
+          <span style="color: #059669; font-weight: 600; font-size: 0.875rem;">Showing drivers within 15km radius</span>
+        </div>
+      </div>
+    {% elif not has_gps %}
+      <div style="background: #fef3c7; border: 2px solid #eab308; border-radius: 0.875rem; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-info-circle" style="color: #d97706;"></i>
+            <span style="color: #d97706; font-weight: 600; font-size: 0.875rem;">Enable GPS for nearby drivers</span>
+          </div>
+          <button id="enableLocationBtn" style="background: #eab308; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-location-arrow"></i> Enable
+          </button>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if nearby_drivers and driver_selection_mode == 'nearby' %}
+      <div id="driversList" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto;">
+        {% for driver in nearby_drivers %}
+          {% with primary_vehicle=driver.vehicles.all|first %}
+          <label class="driver-card" style="cursor: pointer;" 
+                 data-category-id="{{ primary_vehicle.category.id }}" 
+                 data-base-fare="{{ primary_vehicle.category.base_fare }}"
+                 data-price-per-km="{{ primary_vehicle.category.price_per_km }}"
+                 data-price-per-minute="{{ primary_vehicle.category.price_per_minute }}">
+            <input type="radio" name="driver_id" value="{{ driver.id }}" data-category="{{ primary_vehicle.category.id }}" style="display: none;" required>
+            <input type="hidden" class="driver-vehicle-category" value="{{ primary_vehicle.category.id }}">
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.875rem; background: #eab308; transition: all 0.3s;">
+              <!-- Driver Photo -->
+              <div style="width: 50px; height: 50px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                {% if driver.profile_photo %}
+                  <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <i class="fas fa-user" style="color: #3b82f6; font-size: 1.5rem;"></i>
+                {% endif %}
+              </div>
+
+              <!-- Driver Info -->
+              <div style="flex: 1;">
+                <div style="font-weight: 800; color: #1f2937; font-size: 0.9375rem; margin-bottom: 0.25rem;">
+                  {{ driver.user.get_full_name|default:driver.user.username }}
+                </div>
+                <div style="display: flex; gap: 0.75rem; font-size: 0.8125rem; color: #6b7280; font-weight: 600; flex-wrap: wrap;">
+                  {% if primary_vehicle %}
+                    <span><i class="fas fa-car" style="color: #eab308; margin-right: 0.25rem;"></i>{{ primary_vehicle.category.name }}</span>
+                    <span><i class="fas fa-money-bill-wave" style="color: #10b981; margin-right: 0.25rem;"></i>GHS {{ primary_vehicle.category.base_fare }}</span>
+                  {% endif %}
+                  <span><i class="fas fa-star" style="color: #fbbf24; margin-right: 0.25rem;"></i>{{ driver.avg_rating|floatformat:1|default:"New" }}</span>
+                  {% if driver.distance_from_user %}
+                    <span><i class="fas fa-map-marker-alt" style="color: #10b981; margin-right: 0.25rem;"></i>{{ driver.distance_from_user }} km away</span>
+                  {% endif %}
+                </div>
+                <div style="margin-top: 0.5rem;">
+                  <button type="button" onclick="event.stopPropagation(); window.open('tel:{{ driver.user.phone_number }}', '_self');" 
+                          style="background: #10b981; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; margin-right: 0.5rem;">
+                    <i class="fas fa-phone"></i> Call Driver
+                  </button>
+                </div>
+              </div>
+
+              <!-- Check Icon -->
+              <div class="driver-check" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+                <i class="fas fa-check" style="color: transparent; font-size: 0.875rem;"></i>
+              </div>
+            </div>
+          </label>
+          {% endwith %}
+        {% endfor %}
+      </div>
+      
+      <!-- Switch to random drivers option -->
+      {% if random_drivers %}
+      <div style="margin-top: 1rem; text-align: center;">
+        <button type="button" id="showRandomDriversBtn" 
+                style="background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          <i class="fas fa-shuffle"></i> Show All Available Drivers ({{ random_drivers|length }})
+        </button>
+      </div>
+      {% endif %}
+      
+    {% elif random_drivers %}
+      <div style="background: #fee2e2; border: 2px solid #fca5a5; border-radius: 0.875rem; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-info-circle" style="color: #dc2626;"></i>
+          <span style="color: #dc2626; font-weight: 600; font-size: 0.875rem;">
+            {% if has_gps %}
+              No drivers found within 15km. Showing all available drivers with flat rate pricing.
+            {% else %}
+              GPS disabled - Showing all available drivers with flat rate pricing.
+            {% endif %}
+          </span>
+        </div>
+      </div>
+      
+      <div id="randomDriversList" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto;">
+        {% for driver in random_drivers %}
+          {% with primary_vehicle=driver.vehicles.all|first %}
+          <label class="driver-card" style="cursor: pointer;" 
+                 data-category-id="flat-rate" 
+                 data-base-fare="25.00"
+                 data-price-per-km="0"
+                 data-price-per-minute="0">
+            <input type="radio" name="driver_id" value="{{ driver.id }}" data-category="flat-rate" style="display: none;" required>
+            <input type="hidden" class="driver-vehicle-category" value="flat-rate">
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.875rem; background: #f8fafc; transition: all 0.3s;">
+              <!-- Driver Photo -->
+              <div style="width: 50px; height: 50px; background: #6b7280; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                {% if driver.profile_photo %}
+                  <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #6b7280; color: white; font-weight: 700; font-size: 1.25rem;">
+                    {{ driver.user.first_name|first|default:driver.user.username|first|upper }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Driver Info -->
+              <div style="flex: 1;">
+                <div style="font-weight: 800; color: #1f2937; font-size: 0.9375rem; margin-bottom: 0.25rem;">
+                  {{ driver.user.get_full_name|default:driver.user.username }}
+                </div>
+                <div style="display: flex; gap: 0.75rem; font-size: 0.8125rem; color: #6b7280; font-weight: 600; flex-wrap: wrap;">
+                  {% if primary_vehicle %}
+                    <span><i class="fas fa-car" style="color: #6b7280; margin-right: 0.25rem;"></i>{{ primary_vehicle.category.name }}</span>
+                    <span><i class="fas fa-money-bill-wave" style="color: #dc2626; margin-right: 0.25rem;"></i>Flat Rate GHS 25.00</span>
+                  {% endif %}
+                  <span><i class="fas fa-star" style="color: #fbbf24; margin-right: 0.25rem;"></i>{{ driver.avg_rating|floatformat:1|default:"New" }}</span>
+                  {% if driver.distance_from_user %}
+                    <span><i class="fas fa-map-marker-alt" style="color: #6b7280; margin-right: 0.25rem;"></i>{{ driver.distance_from_user }} km away</span>
+                  {% else %}
+                    <span><i class="fas fa-map-marker-alt" style="color: #6b7280; margin-right: 0.25rem;"></i>Location unknown</span>
+                  {% endif %}
+                </div>
+                <div style="margin-top: 0.5rem;">
+                  <button type="button" onclick="event.stopPropagation(); window.open('tel:{{ driver.user.phone_number }}', '_self');" 
+                          style="background: #10b981; color: white; border: none; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 600; margin-right: 0.5rem;">
+                    <i class="fas fa-phone"></i> Call Driver
+                  </button>
+                  <span style="background: #fee2e2; color: #dc2626; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                    Flat Rate: GHS 25.00
+                  </span>
+                </div>
+              </div>
+
+              <!-- Check Icon -->
+              <div class="driver-check" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+                <i class="fas fa-check" style="color: transparent; font-size: 0.875rem;"></i>
+              </div>
+            </div>
+          </label>
+          {% endwith %}
+        {% endfor %}
+      </div>
+      
+    {% else %}
+      <div style="background: #fee2e2; border: 2px solid #fca5a5; border-radius: 0.875rem; padding: 1.5rem; text-align: center;">
+        <i class="fas fa-car-slash" style="color: #dc2626; font-size: 2rem; margin-bottom: 0.5rem;"></i>
+        <p style="color: #dc2626; font-weight: 600; margin: 0;">No drivers currently online.</p>
+        <p style="color: #6b7280; margin: 0.5rem 0 0 0; font-size: 0.875rem;">Your ride request will be sent when drivers come online.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Estimated Fare Card -->
+  <div class="section-card" id="fareCard" style="display: none; background: #eab308; border: 2px solid #10b981;">
+    <div class="section-title" style="color: #065f46;">
+      <i class="fas fa-money-bill-wave" style="color: #10b981;"></i> Estimated Fare
+    </div>
+
+    <div style="background: white; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+        <span style="color: #6b7280; font-size: 0.875rem;">Base Fare</span>
+        <span id="baseFareDisplay" style="font-weight: 600; color: #1f2937;">GHS 0.00</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+        <span style="color: #6b7280; font-size: 0.875rem;">Distance (<span id="fareDistanceDisplay">0</span> km)</span>
+        <span id="distanceFareDisplay" style="font-weight: 600; color: #1f2937;">GHS 0.00</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+        <span style="color: #6b7280; font-size: 0.875rem;">Time (<span id="fareDurationDisplay">0</span> min)</span>
+        <span id="timeFareDisplay" style="font-weight: 600; color: #1f2937;">GHS 0.00</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.5rem;">
+        <span style="font-weight: 700; color: #065f46; font-size: 1.125rem;">Total Fare</span>
+        <span id="totalFareDisplay" style="font-weight: 800; color: #10b981; font-size: 1.5rem;">GHS 0.00</span>
+      </div>
+    </div>
+
+    <div style="background: #fef3c7; border-radius: 8px; padding: 0.875rem; font-size: 0.8125rem; color: #78350f;">
+      <i class="fas fa-info-circle" style="color: #eab308;"></i>
+      <strong>Note:</strong> This is an estimated fare. The final amount may vary based on actual distance, time, and surge pricing.
+    </div>
+  </div>
+
+  <!-- Ride Details -->
+  <div class="section-card">
+    <div class="section-title">
+      <i class="fas fa-info-circle" style="color: #3b82f6;"></i> Ride Details
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Number of Passengers</label>
+      <select name="passenger_count" class="form-control" required>
+        <option value="1">1 Passenger</option>
+        <option value="2">2 Passengers</option>
+        <option value="3">3 Passengers</option>
+        <option value="4">4 Passengers</option>
+        <option value="5">5+ Passengers</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Special Requests (Optional)</label>
+      <textarea name="special_requests" class="form-control" rows="3" placeholder="Any special requests or notes for the driver..."></textarea>
+    </div>
+
+    <input type="hidden" name="estimated_distance" value="5.0">
+    <input type="hidden" name="estimated_duration" value="15">
+  </div>
+
+  <div style="padding: 0 1rem;">
+    <button type="submit" class="book-btn">
+      <i class="fas fa-check-circle"></i> Book Ride Now
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'ride_pwa:book_ride' %}" class="bottom-nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Book</span>
+  </a>
+  <a href="{% url 'ride_pwa:ride_list' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Rides</span>
+  </a>
+  <a href="{% url 'ride_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+<script>
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Utility functions
+  window.callDriver = function(phoneNumber) {
+    window.location.href = 'tel:' + phoneNumber;
+  };
+
+  // Check if Leaflet is loaded
+  if (typeof L === 'undefined') {
+    console.error('Leaflet library failed to load');
+    document.getElementById('map').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #ef4444;"><p><i class="fas fa-exclamation-triangle"></i> Map failed to load. Please refresh the page.</p></div>';
+    return;
+  }
+
+  // Initialize the map centered on Accra, Ghana
+  const map = L.map('map').setView([5.6037, -0.1870], 13);
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Custom icons using CSS-based markers
+  const pickupIcon = L.divIcon({
+    className: 'custom-pickup-marker',
+    html: '<div class="marker-pin pickup-pin"><i class="fas fa-map-marker-alt"></i></div>',
+    iconSize: [30, 42],
+    iconAnchor: [15, 42],
+    popupAnchor: [0, -42]
+  });
+
+  const destinationIcon = L.divIcon({
+    className: 'custom-destination-marker',
+    html: '<div class="marker-pin destination-pin"><i class="fas fa-map-marker-alt"></i></div>',
+    iconSize: [30, 42],
+    iconAnchor: [15, 42],
+    popupAnchor: [0, -42]
+  });
+
+  let pickupMarker = null;
+  let destinationMarker = null;
+  let routeLine = null;
+  let clickCount = 0;
+
+  // Handle map clicks
+  map.on('click', function(e) {
+    if (inputMode !== 'map') return;
+    
+    if (clickCount === 0) {
+      // Set pickup location
+      if (pickupMarker) {
+        map.removeLayer(pickupMarker);
+      }
+      pickupMarker = L.marker(e.latlng, {icon: pickupIcon})
+        .addTo(map)
+        .bindPopup('<strong>Pickup Location</strong><br>Click map again for destination')
+        .openPopup();
+
+      document.getElementById('pickup_lat').value = e.latlng.lat;
+      document.getElementById('pickup_lng').value = e.latlng.lng;
+      document.getElementById('pickupInput').value = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`;
+
+      // Update instruction banner
+      document.getElementById('mapInstruction').innerHTML = '<i class="fas fa-hand-pointer"></i> Now click on map to set destination';
+      document.getElementById('mapInstruction').style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+
+      clickCount = 1;
+    } else if (clickCount === 1) {
+      // Set destination
+      if (destinationMarker) {
+        map.removeLayer(destinationMarker);
+      }
+      destinationMarker = L.marker(e.latlng, {icon: destinationIcon})
+        .addTo(map)
+        .bindPopup('<strong>Destination</strong>')
+        .openPopup();
+
+      document.getElementById('destination_lat').value = e.latlng.lat;
+      document.getElementById('destination_lng').value = e.latlng.lng;
+      document.getElementById('destinationInput').value = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`;
+
+      // Draw route line
+      if (routeLine) {
+        map.removeLayer(routeLine);
+      }
+      routeLine = L.polyline([pickupMarker.getLatLng(), destinationMarker.getLatLng()], {
+        color: '#eab308',
+        weight: 4,
+        opacity: 0.7,
+        dashArray: '10, 10'
+      }).addTo(map);
+
+      // Calculate distance
+      const distance = pickupMarker.getLatLng().distanceTo(destinationMarker.getLatLng()) / 1000;
+      const duration = Math.round(distance * 3); // Rough estimate: 3 min per km
+
+      document.getElementById('distance').textContent = distance.toFixed(2) + ' km';
+      document.getElementById('duration').textContent = duration + ' min';
+
+      // Store distance and duration for form submission
+      document.getElementById('estimated_distance_km').value = distance.toFixed(2);
+      document.getElementById('estimated_duration_minutes').value = duration;
+
+      // Hide instruction banner
+      document.getElementById('mapInstruction').style.display = 'none';
+
+      // Fit bounds to show both markers
+      const bounds = L.latLngBounds([pickupMarker.getLatLng(), destinationMarker.getLatLng()]);
+      map.fitBounds(bounds, {padding: [50, 50]});
+
+      // Calculate fare if driver is selected
+      calculateFare();
+
+      clickCount = 0;
+    }
+  });
+
+
+
+  // Use current location as pickup
+
+
+  // Show notification helper function
+
+
+  // Input mode switching (simplified version from main template)
+  let inputMode = 'map'; // default
+
+  function switchInputMode(mode) {
+    inputMode = mode;
+    const pickupInput = document.getElementById('pickupInput');
+    const destinationInput = document.getElementById('destinationInput');
+    const mapModeBtn = document.getElementById('mapModeBtn');
+    const manualModeBtn = document.getElementById('manualModeBtn');
+
+    if (mode === 'map') {
+      // Map mode
+      pickupInput.readOnly = true;
+      destinationInput.readOnly = true;
+      pickupInput.placeholder = 'Click on map to set pickup location';
+      destinationInput.placeholder = 'Click on map to set destination';
+      
+      // Update button styles
+      mapModeBtn.classList.add('active');
+      manualModeBtn.classList.remove('active');
+    } else {
+      // Manual mode
+      pickupInput.readOnly = false;
+      destinationInput.readOnly = false;
+      pickupInput.placeholder = 'Enter pickup address';
+      destinationInput.placeholder = 'Enter destination address';
+      
+      // Update button styles  
+      manualModeBtn.classList.add('active');
+      mapModeBtn.classList.remove('active');
+    }
+  }
+
+  // Set up mode buttons
+  document.getElementById('mapModeBtn').addEventListener('click', () => switchInputMode('map'));
+  document.getElementById('manualModeBtn').addEventListener('click', () => switchInputMode('manual'));
+
+  // Geocode address to coordinates (for manual entry)
+  async function geocodeAddress(address, type) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+
+        if (type === 'pickup') {
+          document.getElementById('pickup_lat').value = lat;
+          document.getElementById('pickup_lng').value = lng;
+
+          if (pickupMarker) map.removeLayer(pickupMarker);
+          pickupMarker = L.marker([lat, lng], {icon: pickupIcon})
+            .addTo(map)
+            .bindPopup('<strong>Pickup Location</strong>')
+            .openPopup();
+          map.setView([lat, lng], 15);
+
+        } else if (type === 'destination') {
+          document.getElementById('destination_lat').value = lat;
+          document.getElementById('destination_lng').value = lng;
+
+          if (destinationMarker) map.removeLayer(destinationMarker);
+          destinationMarker = L.marker([lat, lng], {icon: destinationIcon})
+            .addTo(map)
+            .bindPopup('<strong>Destination</strong>')
+            .openPopup();
+
+          // Draw route if both locations are set
+          const pickupLat = document.getElementById('pickup_lat').value;
+          if (pickupLat && pickupMarker) {
+            if (routeLine) map.removeLayer(routeLine);
+            routeLine = L.polyline([pickupMarker.getLatLng(), [lat, lng]], {
+              color: '#059669',
+              weight: 4,
+              opacity: 0.7,
+              dashArray: '10, 10'
+            }).addTo(map);
+
+            // Calculate distance
+            const distance = pickupMarker.getLatLng().distanceTo(L.latLng(lat, lng)) / 1000;
+            const duration = Math.round(distance * 3);
+
+            document.getElementById('distance').textContent = distance.toFixed(2) + ' km';
+            document.getElementById('duration').textContent = duration + ' min';
+            document.getElementById('estimated_distance_km').value = distance.toFixed(2);
+            document.getElementById('estimated_duration_minutes').value = duration;
+
+            // Fit bounds
+            const bounds = L.latLngBounds([pickupMarker.getLatLng(), [lat, lng]]);
+            map.fitBounds(bounds, {padding: [50, 50]});
+          }
+        }
+      } else {
+        alert('Address not found. Please try a different address or use map selection.');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      alert('Error finding address. Please try again.');
+    }
+  }
+
+  // Add blur event listeners for manual entry
+  document.getElementById('pickupInput').addEventListener('blur', async function() {
+    if (this.value && inputMode === 'manual') {
+      await geocodeAddress(this.value, 'pickup');
+    }
+  });
+
+  document.getElementById('destinationInput').addEventListener('blur', async function() {
+    if (this.value && inputMode === 'manual') {
+      await geocodeAddress(this.value, 'destination');
+    }
+  });
+
+  // Vehicle card selection
+  document.querySelectorAll('.vehicle-card').forEach(card => {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.vehicle-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      this.querySelector('input[type="radio"]').checked = true;
+    });
+  });
+
+  // Driver card selection
+  document.querySelectorAll('.driver-card').forEach(card => {
+    card.addEventListener('click', function() {
+      // Remove selection from all driver cards
+      document.querySelectorAll('.driver-card').forEach(c => {
+        const cardDiv = c.querySelector('div');
+        cardDiv.style.borderColor = '#e5e7eb';
+        cardDiv.style.background = '#f9fafb';
+        const checkDiv = c.querySelector('.driver-check');
+        checkDiv.style.background = 'transparent';
+        checkDiv.style.borderColor = '#e5e7eb';
+        checkDiv.querySelector('i').style.color = 'transparent';
+      });
+
+      // Add selection to clicked card
+      const cardDiv = this.querySelector('div');
+      cardDiv.style.borderColor = '#10b981';
+      cardDiv.style.background = '#d1fae5';
+      const checkDiv = this.querySelector('.driver-check');
+      checkDiv.style.background = '#10b981';
+      checkDiv.style.borderColor = '#10b981';
+      checkDiv.querySelector('i').style.color = 'white';
+      
+      // Check the radio button
+      this.querySelector('input[type="radio"]').checked = true;
+      
+      // Calculate fare
+      calculateFare();
+      
+      // Show clear button
+      const clearBtn = document.getElementById('clearDriverBtn');
+      if (clearBtn) {
+        clearBtn.style.display = 'block';
+      }
+    });
+  });
+
+  // Function to calculate fare
+  function calculateFare() {
+    const selectedDriver = document.querySelector('input[name="driver_id"]:checked');
+    const distance = parseFloat(document.getElementById('estimated_distance_km').value) || 0;
+    const duration = parseFloat(document.getElementById('estimated_duration_minutes').value) || 0;
+    
+    if (!selectedDriver || distance === 0) {
+      document.getElementById('fareCard').style.display = 'none';
+      return;
+    }
+    
+    const driverCard = selectedDriver.closest('.driver-card');
+    const baseFare = parseFloat(driverCard.dataset.baseFare) || 0;
+    const pricePerKm = parseFloat(driverCard.dataset.pricePerKm) || 0;
+    const pricePerMinute = parseFloat(driverCard.dataset.pricePerMinute) || 0;
+    
+    // Calculate fare components
+    const distanceFare = distance * pricePerKm;
+    const timeFare = duration * pricePerMinute;
+    const totalFare = baseFare + distanceFare + timeFare;
+    
+    // Update display
+    document.getElementById('baseFareDisplay').textContent = 'GHS ' + baseFare.toFixed(2);
+    document.getElementById('fareDistanceDisplay').textContent = distance.toFixed(2);
+    document.getElementById('distanceFareDisplay').textContent = 'GHS ' + distanceFare.toFixed(2);
+    document.getElementById('fareDurationDisplay').textContent = duration.toFixed(0);
+    document.getElementById('timeFareDisplay').textContent = 'GHS ' + timeFare.toFixed(2);
+    document.getElementById('totalFareDisplay').textContent = 'GHS ' + totalFare.toFixed(2);
+    
+    // Show fare card
+    document.getElementById('fareCard').style.display = 'block';
+    
+    // Smooth scroll to fare card
+    setTimeout(() => {
+      document.getElementById('fareCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+
+  // Clear driver selection
+  const clearDriverBtn = document.getElementById('clearDriverBtn');
+  if (clearDriverBtn) {
+    clearDriverBtn.addEventListener('click', function() {
+      // Uncheck all driver radio buttons
+      document.querySelectorAll('input[name="driver_id"]').forEach(radio => {
+        radio.checked = false;
+      });
+      
+      // Remove visual selection from all driver cards
+      document.querySelectorAll('.driver-card').forEach(c => {
+        const cardDiv = c.querySelector('div');
+        cardDiv.style.borderColor = '#e5e7eb';
+        cardDiv.style.background = '#f9fafb';
+        const checkDiv = c.querySelector('.driver-check');
+        checkDiv.style.background = 'transparent';
+        checkDiv.style.borderColor = '#e5e7eb';
+        checkDiv.querySelector('i').style.color = 'transparent';
+      });
+      
+      // Hide fare card when driver is cleared
+      document.getElementById('fareCard').style.display = 'none';
+      
+      // Hide clear button
+      this.style.display = 'none';
+    });
+  }
+
+  // Form validation
+  document.getElementById('rideForm').addEventListener('submit', function(e) {
+    const pickupLat = document.getElementById('pickup_lat').value;
+    const destLat = document.getElementById('destination_lat').value;
+
+    if (!pickupLat || pickupLat === '0.0' || !destLat || destLat === '0.0') {
+      e.preventDefault();
+      alert('Please select both pickup and destination locations on the map or enter valid addresses');
+      return false;
+    }
+
+    return true;
+  });
+}); // End DOMContentLoaded
+</script>
+{% endblock %}

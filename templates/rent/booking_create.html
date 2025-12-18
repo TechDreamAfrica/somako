@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}{% if property %}{% if property.listing_type == 'for_sale' %}Purchase{% else %}Rent{% endif %} {{ property.title }}{% else %}{% if equipment.listing_type == 'for_sale' %}Purchase{% else %}Rent{% endif %} {{ equipment.name }}{% endif %} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #14b8a6; padding: 3rem 0;">
+  <div class="container">
+    <a href="{% if property %}{% url 'rent:property_detail' property.id %}{% else %}{% url 'rent:equipment_detail' equipment.id %}{% endif %}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: white; text-decoration: none; font-weight: 600; margin-bottom: 1.25rem; opacity: 0.9; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+      <i class="fas fa-arrow-left"></i>Back
+    </a>
+    <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; margin-bottom: 0.5rem;">
+      {% if property %}
+        {% if property.listing_type == 'for_sale' %}Complete Your Purchase{% else %}Complete Your Booking{% endif %}
+      {% else %}
+        {% if equipment.listing_type == 'for_sale' %}Complete Your Purchase{% else %}Complete Your Booking{% endif %}
+      {% endif %}
+    </h1>
+    <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.125rem;">
+      Fill in the details below to {% if property %}{% if property.listing_type == 'for_sale' %}purchase{% else %}reserve{% endif %}{% else %}{% if equipment.listing_type == 'for_sale' %}purchase{% else %}reserve{% endif %}{% endif %} {% if property %}{{ property.title }}{% else %}{{ equipment.name }}{% endif %}
+    </p>
+  </div>
+</section>
+
+<!-- Booking Form Section -->
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column - Form -->
+      <div class="col-lg-8">
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb;">
+          <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 2rem;">
+            <i class="fas fa-calendar-check" style="color: #059669;"></i>Booking Information
+          </h2>
+
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- Date Selection (only for rentals) -->
+            {% if property %}
+              {% if property.listing_type != 'for_sale' %}
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                  Start Date <span style="color: #ffffff;">*</span>
+                </label>
+                <input type="date" name="start_date" required min="{{ today|date:'Y-m-d' }}" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                  End Date <span style="color: #ffffff;">*</span>
+                </label>
+                <input type="date" name="end_date" required min="{{ today|date:'Y-m-d' }}" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+              </div>
+            </div>
+
+            <!-- Rental Years (for property rentals only) -->
+            <div class="mb-4">
+              <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                Number of Years <span style="color: #ffffff;">*</span>
+              </label>
+              <select name="rental_years" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                {% for year in "0123456789X"|make_list %}
+                  {% if forloop.counter >= property.minimum_rental_years and forloop.counter <= 10 %}
+                    <option value="{{ forloop.counter }}" {% if forloop.counter == property.minimum_rental_years %}selected{% endif %}>
+                      {{ forloop.counter }} Year{% if forloop.counter > 1 %}s{% endif %}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              <small style="display: block; color: #6b7280; margin-top: 0.5rem; font-size: 0.875rem;">
+                <i class="fas fa-info-circle"></i> Minimum rental period: {{ property.minimum_rental_years }} year{% if property.minimum_rental_years > 1 %}s{% endif %}
+              </small>
+            </div>
+              {% else %}
+                <!-- Hidden fields for purchases - set to today -->
+                <input type="hidden" name="start_date" value="{{ today|date:'Y-m-d' }}">
+                <input type="hidden" name="end_date" value="{{ today|date:'Y-m-d' }}">
+                <input type="hidden" name="rental_years" value="1">
+
+                <div class="mb-4" style="background: #14b8a6; padding: 1.5rem; border-radius: 0.875rem; border: 2px solid #5eead4;">
+                  <div style="display: flex; align-items: start; gap: 1rem;">
+                    <i class="fas fa-shopping-cart" style="color: #2563eb; font-size: 1.5rem; margin-top: 0.25rem;"></i>
+                    <div>
+                      <h4 style="color: #115e59; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.125rem;">Purchasing This Property</h4>
+                      <p style="color: #1e3a8a; margin: 0; line-height: 1.6;">
+                        You are purchasing this property outright. No rental period or dates are required.
+                        The total purchase price is <strong>{{ property.currency }} {{ property.price_per_period|floatformat:2 }}</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% elif equipment %}
+              {% if equipment.listing_type != 'for_sale' %}
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                  Start Date <span style="color: #ffffff;">*</span>
+                </label>
+                <input type="date" name="start_date" required min="{{ today|date:'Y-m-d' }}" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                  End Date <span style="color: #ffffff;">*</span>
+                </label>
+                <input type="date" name="end_date" required min="{{ today|date:'Y-m-d' }}" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+              </div>
+            </div>
+              {% else %}
+                <!-- Hidden fields for purchases - set to today -->
+                <input type="hidden" name="start_date" value="{{ today|date:'Y-m-d' }}">
+                <input type="hidden" name="end_date" value="{{ today|date:'Y-m-d' }}">
+
+                <div class="mb-4" style="background: #14b8a6; padding: 1.5rem; border-radius: 0.875rem; border: 2px solid #5eead4;">
+                  <div style="display: flex; align-items: start; gap: 1rem;">
+                    <i class="fas fa-shopping-cart" style="color: #2563eb; font-size: 1.5rem; margin-top: 0.25rem;"></i>
+                    <div>
+                      <h4 style="color: #115e59; font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.125rem;">Purchasing This Equipment</h4>
+                      <p style="color: #1e3a8a; margin: 0; line-height: 1.6;">
+                        You are purchasing this equipment outright. No rental period or dates are required.
+                        The unit price is <strong>{{ equipment.currency }} {{ equipment.price_per_period|floatformat:2 }}</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endif %}
+
+            <!-- Quantity (for equipment only) -->
+            {% if equipment %}
+            <div class="mb-4">
+              <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                Quantity <span style="color: #ffffff;">*</span>
+              </label>
+              <input type="number" name="quantity" value="1" min="1" max="10" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+            </div>
+            {% endif %}
+
+            <!-- Notes -->
+            <div class="mb-4">
+              <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+                Additional Notes (Optional)
+              </label>
+              <textarea name="notes" rows="4" placeholder="Any special requests or additional information..." style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; resize: vertical; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 4px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'"></textarea>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="mb-4">
+              <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 1rem; font-size: 0.9375rem;">
+                Payment Method <span style="color: #ffffff;">*</span>
+              </label>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: #14b8a6; border: 2px solid #059669; border-radius: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <input type="radio" name="payment_method" value="paystack" checked style="width: 20px; height: 20px; accent-color: #059669;">
+                    <div style="flex: 1;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #047857; font-size: 1rem; margin-bottom: 0.25rem;">
+                        <i class="fas fa-credit-card"></i>Paystack
+                      </div>
+                      <div style="color: #065f46; font-size: 0.8125rem;">Pay securely online</div>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="col-md-6">
+                  <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: white; border: 2px solid #e5e7eb; border-radius: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0, 0, 0, 0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <input type="radio" name="payment_method" value="cash" style="width: 20px; height: 20px; accent-color: #059669;">
+                    <div style="flex: 1;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #1f2937; font-size: 1rem; margin-bottom: 0.25rem;">
+                        <i class="fas fa-money-bill-wave"></i>Cash
+                      </div>
+                      <div style="color: #6b7280; font-size: 0.8125rem;">Pay on arrival</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms -->
+            <div style="background: #f9fafb; border-radius: 0.875rem; padding: 1.25rem; margin-bottom: 2rem; border: 2px solid #e5e7eb;">
+              <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer;">
+                <input type="checkbox" required style="width: 20px; height: 20px; accent-color: #059669; margin-top: 0.25rem; flex-shrink: 0;">
+                <span style="color: #4b5563; font-size: 0.9375rem; line-height: 1.6;">
+                  I agree to the <a href="#" style="color: #059669; font-weight: 600; text-decoration: none;">terms and conditions</a> and understand that my booking is subject to owner approval.
+                </span>
+              </label>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button type="submit" style="flex: 1; min-width: 200px; padding: 1.125rem; background: #14b8a6; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'">
+                <i class="fas fa-check-circle"></i>Confirm Booking
+              </button>
+
+              <a href="{% if property %}{% url 'rent:property_detail' property.id %}{% else %}{% url 'rent:equipment_detail' equipment.id %}{% endif %}" style="padding: 1.125rem 2rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.875rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 0.625rem;" onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#d1d5db'" onmouseout="this.style.background='white'; this.style.borderColor='#e5e7eb'">
+                <i class="fas fa-times"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column - Summary Card -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb;">
+            <h3 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-info-circle" style="color: #059669;"></i>Booking Summary
+            </h3>
+
+            {% if property %}
+            <!-- Property Image -->
+            {% if property.propertyimage_set.first %}
+            <div style="margin-bottom: 1.5rem; border-radius: 1rem; overflow: hidden; border: 2px solid #e5e7eb;">
+              <img src="{{ property.propertyimage_set.first.get_image_url }}" alt="{{ property.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom: 1.5rem;">
+              <h4 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">{{ property.title }}</h4>
+              <p style="color: #6b7280; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <i class="fas fa-map-marker-alt" style="color: #059669;"></i>{{ property.city }}, {{ property.state }}
+              </p>
+            </div>
+
+            <div style="background: #14b8a6; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid #a7f3d0;">
+              {% if property.listing_type == 'for_sale' %}
+              <div style="text-align: center;">
+                <div style="color: #047857; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.375rem;">Purchase Price</div>
+                <div style="font-size: 2.25rem; font-weight: 900; color: #059669;">GHS {{ property.price_per_period }}</div>
+              </div>
+              {% else %}
+              <div style="text-align: center;">
+                <div style="color: #047857; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.375rem;">Rental Rate</div>
+                <div style="font-size: 2.25rem; font-weight: 900; color: #059669;">GHS {{ property.price_per_period }}</div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">per {{ property.rental_period }}</div>
+              </div>
+              {% endif %}
+            </div>
+
+            {% if property.bedrooms or property.bathrooms %}
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+              {% if property.bedrooms %}
+              <div style="flex: 1; text-align: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
+                <i class="fas fa-bed" style="color: #059669; font-size: 1.25rem; margin-bottom: 0.375rem;"></i>
+                <div style="font-weight: 700; color: #1f2937;">{{ property.bedrooms }}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">Beds</div>
+              </div>
+              {% endif %}
+              {% if property.bathrooms %}
+              <div style="flex: 1; text-align: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
+                <i class="fas fa-bath" style="color: #059669; font-size: 1.25rem; margin-bottom: 0.375rem;"></i>
+                <div style="font-weight: 700; color: #1f2937;">{{ property.bathrooms }}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">Baths</div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- Equipment Info -->
+            <div style="margin-bottom: 1.5rem;">
+              <h4 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">{{ equipment.name }}</h4>
+              <p style="color: #6b7280; font-size: 0.875rem;">{{ equipment.category.name }}</p>
+            </div>
+
+            <div style="background: #14b8a6; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid #a7f3d0; text-align: center;">
+              <div style="color: #047857; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.375rem;">Rental Rate</div>
+              <div style="font-size: 2.25rem; font-weight: 900; color: #059669;">GHS {{ equipment.price_per_period }}</div>
+              <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">per {{ equipment.rental_period }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Important Notes -->
+            <div style="background: #fef3c7; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #fcd34d;">
+              <h5 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 700; color: #92400e; margin-bottom: 1rem;">
+                <i class="fas fa-exclamation-triangle"></i>Important
+              </h5>
+              <ul style="margin: 0; padding-left: 1.25rem; color: #78350f; font-size: 0.875rem; line-height: 1.7;">
+                <li style="margin-bottom: 0.5rem;">Your booking requires owner approval</li>
+                <li style="margin-bottom: 0.5rem;">You'll receive confirmation via email</li>
+                <li style="margin-bottom: 0.5rem;">Cancellation policy applies</li>
+                <li>Payment is processed securely</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if property %}
+<script>
+// Auto-calculate end date based on rental years for properties
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.querySelector('input[name="start_date"]');
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    const rentalYearsSelect = document.querySelector('select[name="rental_years"]');
+    const form = document.querySelector('form');
+
+    // Function to calculate end date based on start date and years
+    function calculateEndDate() {
+        if (startDateInput.value && rentalYearsSelect.value) {
+            const startDate = new Date(startDateInput.value);
+            const years = parseInt(rentalYearsSelect.value);
+
+            // Add the number of years
+            const endDate = new Date(startDate);
+            endDate.setFullYear(startDate.getFullYear() + years);
+
+            // Format date as YYYY-MM-DD for input value
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+            endDateInput.value = formattedEndDate;
+
+            // Update end date min attribute
+            endDateInput.min = formattedEndDate;
+
+            // Show info message
+            showDateInfo(years);
+        }
+    }
+
+    // Function to show date calculation info
+    function showDateInfo(years) {
+        // Remove existing info if any
+        const existingInfo = document.getElementById('dateCalcInfo');
+        if (existingInfo) {
+            existingInfo.remove();
+        }
+
+        // Create info message
+        const infoDiv = document.createElement('div');
+        infoDiv.id = 'dateCalcInfo';
+        infoDiv.style.cssText = 'background: #ccfbf1; border: 2px solid #14b8a6; border-radius: 0.75rem; padding: 1rem; margin-top: 1rem; color: #115e59; font-size: 0.875rem;';
+        infoDiv.innerHTML = `
+            <i class="fas fa-info-circle"></i> End date automatically set to ${years} year${years > 1 ? 's' : ''} from start date.
+        `;
+
+        endDateInput.parentElement.parentElement.appendChild(infoDiv);
+
+        // Remove after 5 seconds
+        setTimeout(() => {
+            if (infoDiv.parentElement) {
+                infoDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Function to validate date range matches rental years
+    function validateDateRange() {
+        if (startDateInput.value && endDateInput.value && rentalYearsSelect.value) {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            const selectedYears = parseInt(rentalYearsSelect.value);
+
+            // Calculate the difference in years
+            const diffTime = endDate - startDate;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            const diffYears = diffDays / 365.25; // Account for leap years
+
+            // Check if the difference is approximately the selected years (±7 days tolerance)
+            const expectedDays = selectedYears * 365.25;
+            const tolerance = 7; // 7 days tolerance
+
+            if (Math.abs(diffDays - expectedDays) > tolerance) {
+                // Show warning and auto-correct
+                showDateWarning(selectedYears);
+                calculateEndDate(); // Auto-correct the end date
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Function to show warning message
+    function showDateWarning(years) {
+        // Remove existing warning if any
+        const existingWarning = document.getElementById('dateWarning');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+
+        // Create warning message
+        const warningDiv = document.createElement('div');
+        warningDiv.id = 'dateWarning';
+        warningDiv.style.cssText = 'background: #fef3c7; border: 2px solid #ffffff; border-radius: 0.75rem; padding: 1rem; margin-top: 1rem; color: #92400e; font-size: 0.875rem;';
+        warningDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i> <strong>Date Range Adjusted!</strong><br>
+            The end date has been automatically set to match the selected ${years} year${years > 1 ? 's' : ''} rental period.
+        `;
+
+        endDateInput.parentElement.parentElement.appendChild(warningDiv);
+
+        // Remove after 7 seconds
+        setTimeout(() => {
+            if (warningDiv.parentElement) {
+                warningDiv.remove();
+            }
+        }, 7000);
+    }
+
+    // Event listeners
+    startDateInput.addEventListener('change', function() {
+        calculateEndDate();
+    });
+
+    rentalYearsSelect.addEventListener('change', function() {
+        calculateEndDate();
+    });
+
+    endDateInput.addEventListener('change', function() {
+        validateDateRange();
+    });
+
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        if (!validateDateRange()) {
+            e.preventDefault();
+            alert('Please ensure the date range matches the selected rental period. The end date has been automatically corrected.');
+            return false;
+        }
+    });
+
+    // Initial calculation if start date is already set
+    if (startDateInput.value) {
+        calculateEndDate();
+    }
+});
+</script>
+{% endif %}
+
+{% endblock %}

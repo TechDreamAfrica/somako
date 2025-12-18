@@ -1,0 +1,506 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Earnings - Express Rider{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .page-header {
+    background: white;
+    padding: 0;
+    margin: 1rem 0 1.5rem 0;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hero-stat-number {
+    font-size: 1.3rem;
+    font-weight: 900;
+    margin-bottom: 0.25rem;
+    color: white;
+  }
+
+  .hero-stat-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #10b981;
+  }
+
+  .payment-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 0.75rem;
+    border: 2px solid #f3f4f6;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .payment-card:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .payout-section {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    color: white;
+  }
+
+  .payout-button {
+    background: white;
+    color: #1d4ed8;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .payout-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.3);
+  }
+
+  .analytics-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .performance-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .performance-metric:last-child {
+    margin-bottom: 0;
+  }
+
+  .metric-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+  }
+
+  .metric-value {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #10b981;
+  }
+
+  .payment-method-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #f59e0b;
+  }
+
+  .payment-method-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #fffbeb;
+    border-radius: 12px;
+    border: 1px solid #fed7aa;
+    margin-bottom: 0.75rem;
+  }
+
+  .payment-method-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .add-method-button {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .add-method-button:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="banner-container">
+    <div style="text-align: center;">
+      <h1 class="page-title">
+        <i class="fas fa-wallet"></i>
+        My Earnings
+      </h1>
+      <p class="page-subtitle">Commission: {{ commission_rate|floatformat:0 }}% per delivery</p>
+    </div>
+  </div>
+</div>
+
+<!-- Earnings Summary & Breakdown -->
+<div class="info-card">
+  <h2 class="card-title">
+    <i class="fas fa-calculator" style="color: #10b981;"></i>
+    Earnings Breakdown
+  </h2>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+    <div style="padding: 1rem; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
+      <div style="font-size: 0.875rem; color: #065f46; font-weight: 600;">Total Revenue Generated</div>
+      <div style="font-size: 1.5rem; font-weight: 700; color: #047857;">GH₵{{ earnings_stats.total.revenue|default:0|floatformat:2 }}</div>
+    </div>
+    <div style="padding: 1rem; background: #eff6ff; border-radius: 12px; border: 1px solid #bfdbfe;">
+      <div style="font-size: 0.875rem; color: #1e40af; font-weight: 600;">Your Commission ({{ commission_rate|floatformat:0 }}%)</div>
+      <div style="font-size: 1.5rem; font-weight: 700; color: #1d4ed8;">GH₵{{ earnings_stats.total.total|default:0|floatformat:2 }}</div>
+    </div>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+    <div style="text-align: center; padding: 1rem; background: #fefce8; border-radius: 8px;">
+      <div style="font-size: 0.75rem; color: #a16207; font-weight: 600; margin-bottom: 0.25rem;">TODAY</div>
+      <div style="font-size: 1.125rem; font-weight: 700; color: #ca8a04;">GH₵{{ earnings_stats.today.total|default:0|floatformat:0 }}</div>
+    </div>
+    <div style="text-align: center; padding: 1rem; background: #f3e8ff; border-radius: 8px;">
+      <div style="font-size: 0.75rem; color: #7c2d12; font-weight: 600; margin-bottom: 0.25rem;">THIS WEEK</div>
+      <div style="font-size: 1.125rem; font-weight: 700; color: #a855f7;">GH₵{{ earnings_stats.week.total|default:0|floatformat:0 }}</div>
+    </div>
+    <div style="text-align: center; padding: 1rem; background: #fef2f2; border-radius: 8px;">
+      <div style="font-size: 0.75rem; color: #991b1b; font-weight: 600; margin-bottom: 0.25rem;">THIS MONTH</div>
+      <div style="font-size: 1.125rem; font-weight: 700; color: #dc2626;">GH₵{{ earnings_stats.month.total|default:0|floatformat:0 }}</div>
+    </div>
+  </div>
+  
+  {% if pending_payout_amount > 0 %}
+  <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 12px; border: 1px solid #fcd34d;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 0.875rem; color: #92400e; font-weight: 600;">
+        <i class="fas fa-clock" style="margin-right: 0.5rem;"></i>
+        Pending Payout
+      </span>
+      <span style="font-weight: 700; color: #d97706;">GH₵{{ pending_payout_amount|floatformat:2 }}</span>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Quick Stats Overview -->
+<div class="info-card">
+  <h2 class="card-title">
+    <i class="fas fa-tachometer-alt" style="color: #3b82f6;"></i>
+    Quick Stats
+  </h2>
+  
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; color: white;">
+      <div style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">{{ total_completed_deliveries }}</div>
+      <div style="font-size: 0.875rem; opacity: 0.9;">Completed Deliveries</div>
+    </div>
+    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
+      <div style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">{{ success_rate|floatformat:0 }}%</div>
+      <div style="font-size: 0.875rem; opacity: 0.9;">Success Rate</div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Methods Section -->
+<div class="payment-method-section">
+  <h2 class="card-title">
+    <i class="fas fa-credit-card" style="color: #f59e0b;"></i>
+    Payment Methods
+  </h2>
+  {% if driver_profile.mobile_money_number %}
+  <div class="payment-method-item">
+    <div>
+      <div style="font-weight: 600; color: #1f2937;">Mobile Money</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">{{ driver_profile.mobile_money_number }}</div>
+    </div>
+    <i class="fas fa-mobile-alt" style="color: #f59e0b; font-size: 1.25rem;"></i>
+  </div>
+  {% endif %}
+  {% if not driver_profile.mobile_money_number %}
+  <div style="text-align: center; padding: 2rem 0; color: #6b7280;">
+    <i class="fas fa-wallet" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+    <p style="margin: 0;">No payment methods added yet</p>
+  </div>
+  {% endif %}
+  <button class="add-method-button" onclick="window.location.href='{% url 'express_pwa:rider_profile' %}'">
+    <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+    Add Payment Method
+  </button>
+</div>
+
+<!-- Performance Analytics -->
+<div class="analytics-section">
+  <h2 class="card-title">
+    <i class="fas fa-chart-line" style="color: #10b981;"></i>
+    Performance Analytics
+  </h2>
+  <div class="performance-metric">
+    <span class="metric-label">
+      <i class="fas fa-star" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+      Average Rating
+    </span>
+    <span class="metric-value">{{ driver_profile.average_rating|default:"0.0"|floatformat:1 }}/5.0</span>
+  </div>
+  <div class="performance-metric">
+    <span class="metric-label">
+      <i class="fas fa-clock" style="color: #3b82f6; margin-right: 0.5rem;"></i>
+      Avg. Delivery Time
+    </span>
+    <span class="metric-value">-- mins</span>
+  </div>
+  <div class="performance-metric">
+    <span class="metric-label">
+      <i class="fas fa-route" style="color: #8b5cf6; margin-right: 0.5rem;"></i>
+      Total Distance
+    </span>
+    <span class="metric-value">-- km</span>
+  </div>
+  <div class="performance-metric">
+    <span class="metric-label">
+      <i class="fas fa-percentage" style="color: #ef4444; margin-right: 0.5rem;"></i>
+      Success Rate
+    </span>
+    <span class=\"metric-value\">{{ success_rate|floatformat:0 }}%</span>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  {% if recent_items %}
+  <div class="info-card">
+    <h2 class="card-title">
+      <i class="fas fa-history" style="color: #10b981;"></i>
+      Recent Deliveries
+    </h2>
+    {% for item in recent_items %}
+    <div class="payment-card">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span style="font-weight: 600; color: #1f2937;">{{ item.order.order_number }} - {{ item.item_number }}</span>
+        <span style="font-weight: 700; color: #10b981;">GH₵{{ item.driver_commission|floatformat:2 }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #6b7280;">
+        <span>{{ item.created_at|date:"M d, Y H:i" }}</span>
+        <span>Revenue: GH₵{{ item.estimated_cost|floatformat:2 }}</span>
+      </div>
+      <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">
+        {{ item.pickup_area.name|default:"Unknown" }} → {{ item.delivery_area.name|default:"Unknown" }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="info-card" style="text-align: center;">
+    <i class="fas fa-wallet" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+    <h3 style="margin-bottom: 0.5rem; color: #1f2937;">No Earnings Yet</h3>
+    <p style="color: #6b7280; margin: 0;">Complete order items to start earning money!</p>
+  </div>
+  {% endif %}
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function requestPayout() {
+    const availableBalance = parseFloat('{{ earnings_stats.total.total|default:0 }}');
+    
+    if (availableBalance <= 0) {
+        alert('No available balance for payout.');
+        return;
+    }
+    
+    if (availableBalance < 10) {
+        alert('Minimum payout amount is GH₵10.00');
+        return;
+    }
+    
+    // Check if payment method is configured
+    const hasPaymentMethod = '{{ driver_profile.mobile_money_number|yesno:"true,false" }}' === 'true';
+    
+    if (!hasPaymentMethod) {
+        if (confirm('Please add a payment method first. Go to profile?')) {
+            window.location.href = '{% url "express_pwa:rider_profile" %}';
+        }
+        return;
+    }
+    
+    // Show payout confirmation
+    const confirmMessage = `Request payout of GH₵${availableBalance.toFixed(2)}?\n\nFunds will be sent to your registered mobile money number.`;
+    
+    if (confirm(confirmMessage)) {
+        // Create payout request form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "express_pwa:request_payout" %}';
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfToken) {
+            form.appendChild(csrfToken.cloneNode(true));
+        } else {
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+        }
+        
+        const amountInput = document.createElement('input');
+        amountInput.type = 'hidden';
+        amountInput.name = 'amount';
+        amountInput.value = availableBalance.toFixed(2);
+        form.appendChild(amountInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Add loading states and animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stats on load
+    const stats = document.querySelectorAll('.hero-stat-number');
+    stats.forEach((stat, index) => {
+        setTimeout(() => {
+            stat.style.opacity = '0';
+            stat.style.transform = 'translateY(10px)';
+            stat.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                stat.style.opacity = '1';
+                stat.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item"><i class="fas fa-search"></i><span>Available</span></a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item"><i class="fas fa-box"></i><span>Deliveries</span></a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item active"><i class="fas fa-wallet"></i><span>Earnings</span></a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load image_extras %}
+
+{% block title %}Favorites - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block shop_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero-header {
+    background: #8b5cf6;
+    padding: 1.5rem 1rem 1rem;
+    text-align: center;
+  }
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.025em;
+  }
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+  <h1 class="hero-title">
+    <i class="fas fa-heart"></i> My Favorites
+  </h1>
+  <p class="hero-subtitle">Your saved products and wishlist</p>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  {% if wishlist_items %}
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+      {% for item in wishlist_items %}
+      <a href="{% url 'shop_pwa:product_detail' item.product.id %}" style="text-decoration: none;">
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+          {% if item.product.get_primary_image_url %}
+          <img src="{{ item.product.get_primary_image_url|external_image }}" alt="{{ item.product.name }}" style="width: 100%; height: 140px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div style="width: 100%; height: 140px; background: #ddd6fe; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-box" style="font-size: 2rem; color: #8b5cf6;"></i>
+          </div>
+          {% else %}
+          <div style="width: 100%; height: 140px; background: #ddd6fe; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-box" style="font-size: 2rem; color: #8b5cf6;"></i>
+          </div>
+          {% endif %}
+          <div style="padding: 0.75rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">{{ item.product.name|truncatechars:40 }}</h3>
+            <div style="font-weight: 700; color: #8b5cf6;">GHS {{ item.product.base_price|floatformat:2 }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="width: 100px; height: 100px; background: #ddd6fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-heart" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No favorites yet</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem;">Save your favorite products here!</p>
+      <a href="{% url 'shop_pwa:product_list' %}" style="display: inline-block; background: #8b5cf6; color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        Browse Products
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'shop_pwa:product_list' %}" class="bottom-nav-item">
+    <i class="fas fa-th"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:favorites' %}" class="bottom-nav-item active">
+    <i class="fas fa-heart"></i>
+    <span>Favorites</span>
+  </a>
+  <a href="{% url 'shop_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

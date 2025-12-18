@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Notification Preferences - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 0;">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- Header -->
+      <div style="margin-bottom: 2.5rem;">
+        <a href="{% url 'accounts:notifications' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #059669; text-decoration: none; font-weight: 600; margin-bottom: 1.25rem; opacity: 0.9; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+          <i class="fas fa-arrow-left"></i>Back to Notifications
+        </a>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-cog" style="color: #059669;"></i>Notification Preferences
+        </h1>
+        <p style="color: #6b7280; font-size: 1.125rem;">Customize how you receive notifications</p>
+      </div>
+
+      <!-- Notification Channels -->
+      <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #e5e7eb;">
+        <h3 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+          <i class="fas fa-bell" style="color: #059669;"></i>Notification Channels
+        </h3>
+
+        <form method="post" action="{% url 'accounts:update_notification_preferences' %}">
+          {% csrf_token %}
+
+          <!-- In-App Notifications -->
+          <div style="padding: 1.5rem; background: #f9fafb; border-radius: 1rem; margin-bottom: 1.5rem; border: 2px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                  <div style="width: 45px; height: 45px; background: #ecfdf5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-bell" style="color: #059669; font-size: 1.25rem;"></i>
+                  </div>
+                  <h4 style="font-weight: 700; color: #1f2937; font-size: 1.125rem; margin: 0;">In-App Notifications</h4>
+                </div>
+                <p style="color: #6b7280; font-size: 0.9375rem; margin-left: 3.75rem;">Receive notifications within the Soma Ko platform</p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 60px; height: 34px; margin: 0;">
+                <input type="checkbox" name="in_app_enabled" {% if user.notification_preferences.in_app_enabled %}checked{% endif %} style="opacity: 0; width: 0; height: 0;" onchange="this.nextElementSibling.style.background = this.checked ? '#059669' : '#ccc'">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if user.notification_preferences.in_app_enabled %}#059669{% else %}#ccc{% endif %}; transition: 0.4s; border-radius: 34px;"></span>
+                <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: 0.4s; border-radius: 50%;"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SMS Notifications -->
+          <div style="padding: 1.5rem; background: #f9fafb; border-radius: 1rem; margin-bottom: 1.5rem; border: 2px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                  <div style="width: 45px; height: 45px; background: #dbeafe; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-mobile-alt" style="color: #3b82f6; font-size: 1.25rem;"></i>
+                  </div>
+                  <h4 style="font-weight: 700; color: #1f2937; font-size: 1.125rem; margin: 0;">SMS Notifications</h4>
+                </div>
+                <p style="color: #6b7280; font-size: 0.9375rem; margin-left: 3.75rem;">Get text messages for important updates</p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 60px; height: 34px; margin: 0;">
+                <input type="checkbox" name="sms_enabled" {% if user.notification_preferences.sms_enabled %}checked{% endif %} style="opacity: 0; width: 0; height: 0;" onchange="this.nextElementSibling.style.background = this.checked ? '#059669' : '#ccc'">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if user.notification_preferences.sms_enabled %}#059669{% else %}#ccc{% endif %}; transition: 0.4s; border-radius: 34px;"></span>
+                <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: 0.4s; border-radius: 50%;"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Email Notifications -->
+          <div style="padding: 1.5rem; background: #f9fafb; border-radius: 1rem; margin-bottom: 2rem; border: 2px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                  <div style="width: 45px; height: 45px; background: #fee2e2; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-envelope" style="color: #ef4444; font-size: 1.25rem;"></i>
+                  </div>
+                  <h4 style="font-weight: 700; color: #1f2937; font-size: 1.125rem; margin: 0;">Email Notifications</h4>
+                </div>
+                <p style="color: #6b7280; font-size: 0.9375rem; margin-left: 3.75rem;">Receive notifications via email</p>
+              </div>
+              <label style="position: relative; display: inline-block; width: 60px; height: 34px; margin: 0;">
+                <input type="checkbox" name="email_enabled" {% if user.notification_preferences.email_enabled %}checked{% endif %} style="opacity: 0; width: 0; height: 0;" onchange="this.nextElementSibling.style.background = this.checked ? '#059669' : '#ccc'">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if user.notification_preferences.email_enabled %}#059669{% else %}#ccc{% endif %}; transition: 0.4s; border-radius: 34px;"></span>
+                <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: 0.4s; border-radius: 50%;"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <button type="submit" style="width: 100%; padding: 1.125rem; background: #059669; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'">
+            <i class="fas fa-save"></i> Save Preferences
+          </button>
+        </form>
+      </div>
+
+      <!-- Information Box -->
+      <div style="background: #fef3c7; border-radius: 1.25rem; padding: 1.75rem; border: 2px solid #f59e0b;">
+        <div style="display: flex; gap: 1rem;">
+          <div style="flex-shrink: 0;">
+            <i class="fas fa-info-circle" style="font-size: 1.75rem; color: #d97706;"></i>
+          </div>
+          <div>
+            <h4 style="font-weight: 700; color: #78350f; font-size: 1.0625rem; margin-bottom: 0.5rem;">About Notifications</h4>
+            <p style="color: #92400e; font-size: 0.9375rem; line-height: 1.6; margin: 0;">
+              You can customize how you receive notifications from Soma Ko. Choose which channels work best for you. SMS and email notifications may incur additional charges from your provider.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Custom toggle switch styles */
+input:checked + span + span {
+  transform: translateX(26px);
+}
+</style>
+{% endblock %}

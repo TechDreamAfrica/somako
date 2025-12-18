@@ -1,0 +1,1285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Soma Ko{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="container-fluid px-3 px-md-4 px-lg-5" style="margin-top: 2rem;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="background: #6366f1; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; position: relative; overflow: hidden;">
+                <!-- Decorative background -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 150px; background: #6366f1; opacity: 0.1;"></div>
+
+                <div class="row align-items-center position-relative" style="z-index: 1;">
+                    <div class="col-12 col-md-3 col-lg-2 text-center mb-3 mb-md-0">
+                        <div style="position: relative; display: inline-block;">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture }}" alt="Profile Picture" id="currentProfilePicture" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 5px solid white; box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);">
+                            {% else %}
+                                <div style="width: 140px; height: 140px; border-radius: 50%; background: #059669; display: flex; align-items: center; justify-content: center; border: 5px solid white; box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);">
+                                    <i class="fas fa-user" style="font-size: 3.5rem; color: white;"></i>
+                                </div>
+                            {% endif %}
+                            <div style="position: absolute; bottom: 5px; right: 5px; width: 25px; height: 25px; background: #10b981; border-radius: 50%; border: 3px solid white;"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-9 col-lg-10">
+                        <h1 style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">{{ user.get_full_name|default:user.username }}</h1>
+                        <p style="font-size: 1rem; color: #6b7280; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                            <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-envelope" style="color: #059669;"></i>{{ user.email }}
+                            </span>
+                            {% if user.service_roles == 'general' %}
+                                <span style="background: #ecfdf5; color: #047857; padding: 0.375rem 1rem; border-radius: 2rem; font-weight: 600; font-size: 0.875rem; border: 1px solid #059669;">
+                                    <i class="fas fa-briefcase" style="margin-right: 0.375rem;"></i>General User
+                                </span>
+                            {% else %}
+                                <span style="background: #dbeafe; color: #1e40af; padding: 0.375rem 1rem; border-radius: 2rem; font-weight: 600; font-size: 0.875rem; border: 1px solid #3b82f6;">
+                                    <i class="fas fa-user-tie" style="margin-right: 0.375rem;"></i>Provider
+                                </span>
+                            {% endif %}
+                        </p>
+                        {% if user.location %}
+                            <p style="font-size: 0.9375rem; color: #6b7280; margin-bottom: 0.5rem;">
+                                <i class="fas fa-map-marker-alt" style="color: #059669; margin-right: 0.5rem;"></i>{{ user.location }}
+                            </p>
+                        {% endif %}
+                        {% if user.bio %}
+                            <p style="font-size: 0.9375rem; color: #4b5563; margin-top: 1rem; line-height: 1.6;">{{ user.bio }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-3 px-md-4 px-lg-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid #e5e7eb; gap: 0.5rem;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" style="border: none; border-bottom: 3px solid transparent; padding: 0.875rem 1.5rem; font-weight: 600; color: #6b7280; background: transparent; transition: all 0.3s ease; border-radius: 0.5rem 0.5rem 0 0;">
+                        <i class="fas fa-user me-2" style="color: #059669;"></i>Basic Information
+                    </button>
+                </li>
+
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" style="border: none; border-bottom: 3px solid transparent; padding: 0.875rem 1.5rem; font-weight: 600; color: #6b7280; background: transparent; transition: all 0.3s ease; border-radius: 0.5rem 0.5rem 0 0;">
+                        <i class="fas fa-lock me-2" style="color: #059669;"></i>Security
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" style="border: none; border-bottom: 3px solid transparent; padding: 0.875rem 1.5rem; font-weight: 600; color: #6b7280; background: transparent; transition: all 0.3s ease; border-radius: 0.5rem 0.5rem 0 0;">
+                        <i class="fas fa-cog me-2" style="color: #059669;"></i>Settings
+                    </button>
+                </li>
+            </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Basic Information Tab -->
+        <div class="tab-pane fade show active" id="basic" role="tabpanel">
+            <div class="card" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <form method="post" enctype="multipart/form-data" id="basicForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="basic">
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="first_name" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="email" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Email Address *</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone_number" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Phone Number</label>
+                            <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}" class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="location" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Location</label>
+                        <input type="text" id="location" name="location" value="{{ user.location|default:'' }}" placeholder="City, Country" class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="bio" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Bio</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..." class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9375rem; transition: all 0.3s ease; resize: vertical;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">{{ user.bio|default:'' }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="profile_picture" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Profile Picture</label>
+                        <div class="file-upload-area" onclick="document.getElementById('profile_picture').click()" style="border: 2px dashed #d1d5db; border-radius: 0.75rem; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; background: #f9fafb;" onmouseover="this.style.borderColor='#059669'; this.style.background='#ecfdf5'" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #059669; margin-bottom: 1rem; display: block;"></i>
+                            <p style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Click to upload or drag & drop</p>
+                            <small style="color: #6b7280;">JPG, PNG, GIF up to 5MB</small>
+                        </div>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display: none;">
+                        <div id="imagePreview" class="mt-3"></div>
+                    </div>
+
+                    <button type="submit" class="btn" style="background: #059669; color: white; border: none; padding: 0.875rem 2rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'">
+                        <i class="fas fa-save me-2"></i>Update Basic Information
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if user.user_type == 'worker' %}
+        <!-- Professional Information Tab -->
+        <div id="professional" role="tabpanel">
+            <div>
+                <form method="post" enctype="multipart/form-data" id="professionalForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="professional">
+                    
+                    <div>
+                        <div>
+                            <label for="profession">Profession</label>
+                            <input type="text" id="profession" name="profession" value="{{ worker_profile.profession|default:'' }}" placeholder="e.g., Electrician, Plumber">
+                        </div>
+                        <div>
+                            <label for="experience_level">Experience Level</label>
+                            <select id="experience_level" name="experience_level">
+                                <option value="entry" {% if worker_profile.experience_level == 'entry' %}selected{% endif %}>Entry Level (0-2 years)</option>
+                                <option value="intermediate" {% if worker_profile.experience_level == 'intermediate' %}selected{% endif %}>Intermediate (3-5 years)</option>
+                                <option value="experienced" {% if worker_profile.experience_level == 'experienced' %}selected{% endif %}>Experienced (6-10 years)</option>
+                                <option value="expert" {% if worker_profile.experience_level == 'expert' %}selected{% endif %}>Expert (10+ years)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div>
+                            <label for="experience_years">Years of Experience</label>
+                            <input type="number" id="experience_years" name="experience_years" value="{{ worker_profile.experience_years|default:0 }}" min="0" max="50">
+                        </div>
+                        <div>
+                            <label for="hourly_rate">Hourly Rate ($)</label>
+                            <input type="number" id="hourly_rate" name="hourly_rate" value="{{ worker_profile.hourly_rate|default:'' }}" min="5" max="1000" step="0.01">
+                        </div>
+                        <div>
+                            <label for="minimum_project_budget">Minimum Project Budget ($)</label>
+                            <input type="number" id="minimum_project_budget" name="minimum_project_budget" value="{{ worker_profile.minimum_project_budget|default:'' }}" min="10" max="100000" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div>
+                            <label for="availability_type">Availability Type</label>
+                            <select id="availability_type" name="availability_type">
+                                <option value="freelance" {% if worker_profile.availability_type == 'freelance' %}selected{% endif %}>Freelance</option>
+                                <option value="part_time" {% if worker_profile.availability_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                                <option value="full_time" {% if worker_profile.availability_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                                <option value="contract" {% if worker_profile.availability_type == 'contract' %}selected{% endif %}>Contract</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="availability_hours">Available Hours</label>
+                            <input type="text" id="availability_hours" name="availability_hours" value="{{ worker_profile.availability_hours|default:'' }}" placeholder="e.g., Mon-Fri 9AM-5PM">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div>
+                            <input type="checkbox" id="availability" name="availability" {% if worker_profile.availability %}checked{% endif %}>
+                            <label for="availability">
+                                Currently available for new projects
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="languages">Languages</label>
+                        <input type="text" id="languages" name="languages" value="{{ worker_profile.languages|default:'' }}" placeholder="e.g., English, French, Spanish">
+                    </div>
+                    
+                    <div>
+                        <label for="portfolio">Portfolio URL</label>
+                        <input type="url" id="portfolio" name="portfolio" value="{{ worker_profile.portfolio|default:'' }}" placeholder="https://yourportfolio.com">
+                    </div>
+                    
+                    <div>
+                        <label for="previous_work">Previous Work Experience</label>
+                        <textarea id="previous_work" name="previous_work" rows="4" placeholder="Describe your previous work experience...">{{ worker_profile.previous_work|default:'' }}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="resume">Resume/CV</label>
+                        {% if worker_profile.resume %}
+                            <div>
+                                <i></i>
+                                <a href="{{ worker_profile.resume.url }}" target="_blank">Current Resume</a>
+                            </div>
+                        {% endif %}
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+                        <small>PDF, DOC, DOCX up to 5MB</small>
+                    </div>
+                    
+                    <!-- Skills Selection -->
+                    <div>
+                        <label>Skills</label>
+                        <div>
+                            {% for skill in all_skills %}
+                                <div>
+                                    <label>
+                                        <input type="checkbox" name="skills" value="{{ skill.id }}" 
+                                               {% if skill in worker_profile.skills.all %}checked{% endif %}>
+                                        {{ skill.name }}
+                                    </label>
+                                </div>
+                            {% empty %}
+                                <p>No skills available. Contact administrator.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <button type="submit">
+                        <i></i>Update Professional Information
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Portfolio Tab -->
+        <div id="portfolio" role="tabpanel">
+            <div>
+                <!-- Add Portfolio Item Form -->
+                <form method="post" enctype="multipart/form-data" id="portfolioForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="portfolio">
+
+                    <h5><i></i>Add Portfolio Item</h5>
+
+                    <div>
+                        <div>
+                            <label for="portfolio_title">Project Title *</label>
+                            <input type="text" id="portfolio_title" name="title" placeholder="e.g., Modern Website Design" required>
+                        </div>
+                        <div>
+                            <label for="project_type">Project Type *</label>
+                            <select id="project_type" name="project_type" required>
+                                <option value="web">Web Development</option>
+                                <option value="mobile">Mobile App</option>
+                                <option value="design">Design Project</option>
+                                <option value="repair">Repair/Maintenance</option>
+                                <option value="construction">Construction</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="portfolio_description">Description *</label>
+                        <textarea id="portfolio_description" name="description" rows="4" placeholder="Describe the project, your role, challenges, and outcomes..." required></textarea>
+                    </div>
+
+                    <div>
+                        <div>
+                            <label for="portfolio_image">Project Image *</label>
+                            <input type="file" id="portfolio_image" name="image" accept="image/*" required>
+                            <small>JPG, PNG, GIF up to 5MB</small>
+                        </div>
+                        <div>
+                            <label for="project_url">Project URL</label>
+                            <input type="url" id="project_url" name="project_url" placeholder="https://example.com">
+                            <small>Link to live project (if applicable)</small>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <label for="client_name">Client Name</label>
+                            <input type="text" id="client_name" name="client_name" placeholder="Client or company name">
+                        </div>
+                        <div>
+                            <label for="completion_date">Completion Date</label>
+                            <input type="date" id="completion_date" name="completion_date">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <label for="duration_days">Duration (Days)</label>
+                            <input type="number" id="duration_days" name="duration_days" min="1" placeholder="e.g., 30">
+                        </div>
+                        <div>
+                            <label for="budget_range">Budget Range</label>
+                            <input type="text" id="budget_range" name="budget_range" placeholder="e.g., $500-1000">
+                        </div>
+                        <div>
+                            <label for="technologies">Technologies Used</label>
+                            <input type="text" id="technologies" name="technologies" placeholder="e.g., React, Node.js">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>
+                                <input type="checkbox" id="is_featured" name="is_featured">
+                                <label for="is_featured">
+                                    <strong>Featured Project</strong>
+                                    <small>Display prominently on your profile</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <input type="checkbox" id="is_public" name="is_public" checked>
+                                <label for="is_public">
+                                    <strong>Public Visibility</strong>
+                                    <small>Visible to clients browsing profiles</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit">
+                        <i></i>Add Portfolio Item
+                    </button>
+                </form>
+
+                <hr>
+
+                <!-- Portfolio Items Display -->
+                <h5><i></i>Your Portfolio</h5>
+
+                {% if portfolio_items %}
+                    <div>
+                        {% for item in portfolio_items %}
+                            <div>
+                                <div>
+                                    {% if item.is_featured %}
+                                        <div>
+                                            <span>
+                                                <i></i>Featured
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    {% if not item.is_public %}
+                                        <div>
+                                            <span>
+                                                <i></i>Private
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                                    {% else %}
+                                        <div>
+                                            <i></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div>
+                                            <h6>{{ item.title }}</h6>
+                                            <span>{{ item.get_project_type_display }}</span>
+                                        </div>
+                                        {% if item.description %}
+                                            <p>{{ item.description|truncatewords:20 }}</p>
+                                        {% endif %}
+                                        {% if item.client_name %}
+                                            <p>
+                                                <i></i>Client: {{ item.client_name }}
+                                            </p>
+                                        {% endif %}
+                                        {% if item.completion_date %}
+                                            <p>
+                                                <i></i>{{ item.completion_date|date:"M Y" }}
+                                            </p>
+                                        {% endif %}
+                                        {% if item.budget_range %}
+                                            <p>
+                                                <i></i>{{ item.budget_range }}
+                                            </p>
+                                        {% endif %}
+                                        {% if item.technologies %}
+                                            <p>
+                                                <i></i>{{ item.technologies|truncatewords:5 }}
+                                            </p>
+                                        {% endif %}
+                                        {% if item.project_url %}
+                                            <a href="{{ item.project_url }}" target="_blank">
+                                                <i></i>View Project
+                                            </a>
+                                        {% endif %}
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#editPortfolio{{ item.id }}">
+                                            <i></i>Edit
+                                        </button>
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="delete_portfolio">
+                                            <input type="hidden" name="portfolio_id" value="{{ item.id }}">
+                                            <button type="submit" onclick="return confirm('Are you sure you want to delete this portfolio item?')">
+                                                <i></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Edit Portfolio Modal -->
+                            <div id="editPortfolio{{ item.id }}" tabindex="-1">
+                                <div>
+                                    <div>
+                                        <div>
+                                            <h5>Edit Portfolio Item</h5>
+                                            <button type="button" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="edit_portfolio">
+                                            <input type="hidden" name="portfolio_id" value="{{ item.id }}">
+                                            <div>
+                                                <div>
+                                                    <div>
+                                                        <label>Project Title *</label>
+                                                        <input type="text" name="title" value="{{ item.title }}" required>
+                                                    </div>
+                                                    <div>
+                                                        <label>Project Type *</label>
+                                                        <select name="project_type" required>
+                                                            <option value="web" {% if item.project_type == 'web' %}selected{% endif %}>Web Development</option>
+                                                            <option value="mobile" {% if item.project_type == 'mobile' %}selected{% endif %}>Mobile App</option>
+                                                            <option value="design" {% if item.project_type == 'design' %}selected{% endif %}>Design Project</option>
+                                                            <option value="repair" {% if item.project_type == 'repair' %}selected{% endif %}>Repair/Maintenance</option>
+                                                            <option value="construction" {% if item.project_type == 'construction' %}selected{% endif %}>Construction</option>
+                                                            <option value="other" {% if item.project_type == 'other' %}selected{% endif %}>Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label>Description</label>
+                                                    <textarea name="description" rows="3">{{ item.description }}</textarea>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <label>Update Image</label>
+                                                        <input type="file" name="image" accept="image/*">
+                                                        <small>Leave empty to keep current image</small>
+                                                    </div>
+                                                    <div>
+                                                        <label>Project URL</label>
+                                                        <input type="url" name="project_url" value="{{ item.project_url|default:'' }}">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <label>Client Name</label>
+                                                        <input type="text" name="client_name" value="{{ item.client_name|default:'' }}">
+                                                    </div>
+                                                    <div>
+                                                        <label>Completion Date</label>
+                                                        <input type="date" name="completion_date" value="{{ item.completion_date|date:'Y-m-d' }}">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <label>Duration (Days)</label>
+                                                        <input type="number" name="duration_days" value="{{ item.duration_days|default:'' }}">
+                                                    </div>
+                                                    <div>
+                                                        <label>Budget Range</label>
+                                                        <input type="text" name="budget_range" value="{{ item.budget_range|default:'' }}">
+                                                    </div>
+                                                    <div>
+                                                        <label>Technologies</label>
+                                                        <input type="text" name="technologies" value="{{ item.technologies|default:'' }}">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <div>
+                                                            <input type="checkbox" name="is_featured" {% if item.is_featured %}checked{% endif %}>
+                                                            <label>
+                                                                <strong>Featured Project</strong>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div>
+                                                            <input type="checkbox" name="is_public" {% if item.is_public %}checked{% endif %}>
+                                                            <label>
+                                                                <strong>Public Visibility</strong>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <button type="button" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit">
+                                                    <i></i>Save Changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div>
+                        <i></i>
+                        <h5>No Portfolio Items Yet</h5>
+                        <p>Add your first portfolio item to showcase your work!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Education Tab -->
+        <div id="education" role="tabpanel">
+            <div>
+                <!-- Add Education Form -->
+                <form method="post" id="educationForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="education">
+                    
+                    <h5>Add Education</h5>
+                    
+                    <div>
+                        <div>
+                            <label for="institution">Institution *</label>
+                            <input type="text" id="institution" name="institution" placeholder="School or University name" required>
+                        </div>
+                        <div>
+                            <label for="degree_type">Degree Type *</label>
+                            <select id="degree_type" name="degree_type" required>
+                                <option value="high_school">High School</option>
+                                <option value="certificate">Certificate Program</option>
+                                <option value="diploma">Diploma</option>
+                                <option value="associate">Associate Degree</option>
+                                <option value="bachelor" selected>Bachelor's Degree</option>
+                                <option value="master">Master's Degree</option>
+                                <option value="doctorate">Doctorate</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <label for="field_of_study">Field of Study *</label>
+                            <input type="text" id="field_of_study" name="field_of_study" placeholder="e.g., Computer Science, ICT" required>
+                        </div>
+                        <div>
+                            <label for="grade_gpa">Grade/GPA</label>
+                            <input type="text" id="grade_gpa" name="grade_gpa" placeholder="e.g., 3.8, First Class">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" name="start_date">
+                        </div>
+                        <div>
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" name="end_date">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="2" placeholder="Additional details, achievements, honors, etc."></textarea>
+                    </div>
+
+                    <div>
+                        <div>
+                            <input type="checkbox" id="is_completed" name="is_completed" checked>
+                            <label for="is_completed">
+                                Completed
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">
+                        <i></i>Add Education
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <!-- Education Records Display -->
+                <h5>Your Education</h5>
+                
+                {% if education_records %}
+                    {% for education in education_records %}
+                        <div>
+                            <div>
+                                <div>
+                                    <div>
+                                        <div>
+                                            <h6>{{ education.get_degree_type_display }}</h6>
+                                            {% if education.is_completed %}
+                                                <span>Completed</span>
+                                            {% else %}
+                                                <span>In Progress</span>
+                                            {% endif %}
+                                        </div>
+                                        <p>
+                                            <strong>{{ education.institution }}</strong><br>
+                                            {% if education.field_of_study %}<i></i>{{ education.field_of_study }}<br>{% endif %}
+                                            {% if education.grade_gpa %}<i></i>{{ education.grade_gpa }}<br>{% endif %}
+                                            <small>
+                                                <i></i>
+                                                {% if education.start_date %}{{ education.start_date|date:"M Y" }}{% else %}N/A{% endif %} -
+                                                {% if education.is_completed %}
+                                                    {% if education.end_date %}{{ education.end_date|date:"M Y" }}{% else %}N/A{% endif %}
+                                                {% else %}
+                                                    Present
+                                                {% endif %}
+                                            </small>
+                                            {% if education.description %}
+                                                <br><small>{{ education.description|truncatewords:30 }}</small>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="delete_education">
+                                        <input type="hidden" name="education_id" value="{{ education.id }}">
+                                        <button type="submit" onclick="return confirm('Are you sure you want to delete this education record?')">
+                                            <i></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div>
+                        <i></i>
+                        <h5>No Education Records Yet</h5>
+                        <p>Add your educational background!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Certifications Tab -->
+        <div id="certifications" role="tabpanel">
+            <div>
+                <!-- Add Certification Form -->
+                <form method="post" enctype="multipart/form-data" id="certificationForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="certification">
+                    
+                    <h5>Add Certification</h5>
+                    
+                    <div>
+                        <div>
+                            <label for="cert_name">Certification Name *</label>
+                            <input type="text" id="cert_name" name="name" required>
+                        </div>
+                        <div>
+                            <label for="issuing_organization">Issuing Organization *</label>
+                            <input type="text" id="issuing_organization" name="issuing_organization" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div>
+                            <label for="issue_date">Issue Date</label>
+                            <input type="date" id="issue_date" name="issue_date">
+                        </div>
+                        <div>
+                            <label for="expiry_date">Expiry Date</label>
+                            <input type="date" id="expiry_date" name="expiry_date">
+                        </div>
+                        <div>
+                            <label for="credential_id">Credential ID</label>
+                            <input type="text" id="credential_id" name="credential_id">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="cert_file">Certificate File</label>
+                        <input type="file" id="cert_file" name="certificate_file" accept=".pdf,.jpg,.jpeg,.png">
+                        <small>PDF, JPG, PNG up to 5MB</small>
+                    </div>
+                    
+                    <button type="submit">
+                        <i></i>Add Certification
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <!-- Certifications Display -->
+                <h5>Your Certifications</h5>
+                
+                {% if certifications %}
+                    {% for cert in certifications %}
+                        <div>
+                            <div>
+                                <div>
+                                    <div>
+                                        <h6>{{ cert.name }}</h6>
+                                        <p>
+                                            <strong>{{ cert.issuing_organization }}</strong><br>
+                                            {% if cert.credential_id %}<small>ID: {{ cert.credential_id }}</small><br>{% endif %}
+                                            <small>
+                                                Issued: {{ cert.issue_date|date:"M Y" }}
+                                                {% if cert.expiry_date %} - Expires: {{ cert.expiry_date|date:"M Y" }}{% endif %}
+                                            </small>
+                                        </p>
+                                        {% if cert.certificate_file %}
+                                            <a href="{{ cert.certificate_file.url }}" target="_blank">
+                                                <i></i>View Certificate
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="delete_certification">
+                                        <input type="hidden" name="certification_id" value="{{ cert.id }}">
+                                        <button type="submit" onclick="return confirm('Are you sure you want to delete this certification?')">
+                                            <i></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div>
+                        <i></i>
+                        <h5>No Certifications Yet</h5>
+                        <p>Add your professional certifications!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Security Tab -->
+        <div class="tab-pane fade" id="security" role="tabpanel">
+            <div class="card" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                    <div style="width: 48px; height: 48px; background: #ecfdf5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-lock" style="color: #059669; font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h5 style="margin: 0; color: #111827; font-weight: 700;">Change Password</h5>
+                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Update your password to keep your account secure</p>
+                    </div>
+                </div>
+
+                <form method="post" id="passwordForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="password">
+
+                    <div class="mb-4">
+                        <label for="current_password" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Current Password *</label>
+                        <div style="position: relative;">
+                            <input type="password" id="current_password" name="current_password" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; padding-left: 2.75rem; font-size: 0.9375rem; transition: all 0.3s ease; width: 100%;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                            <i class="fas fa-key" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="new_password" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">New Password *</label>
+                        <div style="position: relative;">
+                            <input type="password" id="new_password" name="new_password" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; padding-left: 2.75rem; font-size: 0.9375rem; transition: all 0.3s ease; width: 100%;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                            <i class="fas fa-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        </div>
+                        <small style="color: #6b7280; font-size: 0.875rem; margin-top: 0.375rem; display: block;">Must be at least 8 characters long</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem; display: block;">Confirm New Password *</label>
+                        <div style="position: relative;">
+                            <input type="password" id="confirm_password" name="confirm_password" required class="form-control" style="border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; padding-left: 2.75rem; font-size: 0.9375rem; transition: all 0.3s ease; width: 100%;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+                            <i class="fas fa-lock-open" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" style="background: #059669; color: white; border: none; padding: 0.875rem 2rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'">
+                        <i class="fas fa-shield-alt me-2"></i>Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-pane fade" id="settings" role="tabpanel">
+            <div class="card" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                    <div style="width: 48px; height: 48px; background: #ecfdf5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-cog" style="color: #059669; font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h5 style="margin: 0; color: #111827; font-weight: 700;">Account Settings</h5>
+                        <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Manage your account preferences</p>
+                    </div>
+                </div>
+
+                <form method="post" id="settingsForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="settings">
+
+                    <div class="mb-4" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1fae5'; this.style.background='#ecfdf5'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                        <div class="form-check" style="display: flex; align-items: flex-start; gap: 0.875rem;">
+                            <input type="checkbox" id="email_notifications" name="email_notifications" {% if user.email_notifications %}checked{% endif %} class="form-check-input" style="width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; margin-top: 0.25rem; transition: all 0.3s ease;" onchange="this.style.background=this.checked?'#059669':'white'; this.style.borderColor=this.checked?'#059669':'#d1d5db'">
+                            <label for="email_notifications" class="form-check-label" style="cursor: pointer; flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.375rem;">
+                                    <i class="fas fa-envelope" style="color: #059669; font-size: 1.125rem;"></i>
+                                    <strong style="color: #111827; font-size: 1rem;">Email Notifications</strong>
+                                </div>
+                                <small style="color: #6b7280; font-size: 0.875rem; line-height: 1.5;">Receive notifications about your account activity, new messages, and job updates</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1fae5'; this.style.background='#ecfdf5'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                        <div class="form-check" style="display: flex; align-items: flex-start; gap: 0.875rem;">
+                            <input type="checkbox" id="profile_visibility" name="profile_visibility" {% if user.profile_visibility %}checked{% endif %} class="form-check-input" style="width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; margin-top: 0.25rem; transition: all 0.3s ease;" onchange="this.style.background=this.checked?'#059669':'white'; this.style.borderColor=this.checked?'#059669':'#d1d5db'">
+                            <label for="profile_visibility" class="form-check-label" style="cursor: pointer; flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.375rem;">
+                                    <i class="fas fa-eye" style="color: #059669; font-size: 1.125rem;"></i>
+                                    <strong style="color: #111827; font-size: 1rem;">Public Profile</strong>
+                                </div>
+                                <small style="color: #6b7280; font-size: 0.875rem; line-height: 1.5;">Make your profile visible to other users and appear in search results</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" style="background: #059669; color: white; border: none; padding: 0.875rem 2rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'">
+                        <i class="fas fa-save me-2"></i>Save Settings
+                    </button>
+                </form>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card danger-zone" style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div style="width: 48px; height: 48px; background: #fee2e2; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444;">
+                        <i class="fas fa-exclamation-triangle" style="color: #dc2626; font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h5 style="margin: 0; color: #991b1b; font-weight: 700;">Danger Zone</h5>
+                        <p style="margin: 0; color: #b91c1c; font-size: 0.875rem;">Irreversible and destructive actions</p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div style="background: white; border: 2px solid #fecaca; border-radius: 0.75rem; padding: 1.5rem; height: 100%;">
+                            <h6 style="color: #dc2626; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-pause-circle"></i>Deactivate Account
+                            </h6>
+                            <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 1.25rem; line-height: 1.6;">Temporarily disable your account. You can reactivate it later by logging in again.</p>
+                            <form method="post" onsubmit="return confirm('Are you sure you want to deactivate your account?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="deactivate">
+                                <button type="submit" style="background: #f97316; color: white; border: none; padding: 0.625rem 1.5rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3); width: 100%;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(249, 115, 22, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(249, 115, 22, 0.3)'">
+                                    <i class="fas fa-pause me-2"></i>Deactivate Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div style="background: white; border: 2px solid #fecaca; border-radius: 0.75rem; padding: 1.5rem; height: 100%;">
+                            <h6 style="color: #dc2626; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-trash-alt"></i>Delete Account
+                            </h6>
+                            <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 1.25rem; line-height: 1.6;">Permanently delete your account and all data. This action cannot be undone.</p>
+                            <form method="post" onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone!')">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="delete">
+                                <button type="submit" style="background: #ef4444; color: white; border: none; padding: 0.625rem 1.5rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); width: 100%;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(239, 68, 68, 0.3)'">
+                                    <i class="fas fa-trash-alt me-2"></i>Delete Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* Tab styling */
+.nav-tabs .nav-link.active {
+    color: #059669 !important;
+    background: #ecfdf5 !important;
+    border-bottom: 3px solid #059669 !important;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #059669 !important;
+    background: rgba(236, 253, 245, 0.5) !important;
+}
+
+/* Form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+}
+
+/* Card hover effect */
+.card {
+    transition: all 0.3s ease;
+}
+
+/* File upload dragover state */
+.file-upload-area.dragover {
+    border-color: #059669;
+    background: #ecfdf5;
+}
+
+/* Image preview styling */
+#imagePreview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    object-fit: cover;
+}
+
+/* Portfolio grid */
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Portfolio card */
+.portfolio-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.portfolio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Badge styling */
+.badge-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-featured {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.badge-private {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+}
+
+.badge-completed {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #059669;
+}
+
+.badge-progress {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #3b82f6;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.empty-state h5 {
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Danger zone styling */
+.danger-zone {
+    border: 2px solid #fee2e2;
+    background: #fef2f2;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.danger-zone h6 {
+    color: #991b1b;
+    font-weight: 700;
+}
+
+.danger-zone button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.danger-zone button:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Profile picture upload preview
+    const profilePictureInput = document.getElementById('profile_picture');
+    const imagePreview = document.getElementById('imagePreview');
+    const currentProfilePicture = document.getElementById('currentProfilePicture');
+    
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    this.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <p><strong>New image selected:</strong> ${file.name}</p>
+                    `;
+                    
+                    // Update current profile picture preview
+                    if (currentProfilePicture) {
+                        currentProfilePicture.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // File upload drag and drop
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    if (fileUploadArea) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            fileUploadArea.classList.add('dragover');
+        }
+        
+        function unhighlight(e) {
+            fileUploadArea.classList.remove('dragover');
+        }
+        
+        fileUploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                profilePictureInput.files = files;
+                profilePictureInput.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+    
+    // Form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const formType = form.querySelector('input[name="form_type"]')?.value;
+            
+            if (formType === 'basic') {
+                const firstName = form.querySelector('#first_name').value.trim();
+                const lastName = form.querySelector('#last_name').value.trim();
+                const email = form.querySelector('#email').value.trim();
+                
+                if (!firstName || !lastName || !email) {
+                    e.preventDefault();
+                    alert('First name, last name, and email are required.');
+                    return;
+                }
+                
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+            }
+            
+            if (formType === 'password') {
+                const currentPassword = form.querySelector('#current_password').value;
+                const newPassword = form.querySelector('#new_password').value;
+                const confirmPassword = form.querySelector('#confirm_password').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    e.preventDefault();
+                    alert('All password fields are required.');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    alert('New passwords do not match.');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    e.preventDefault();
+                    alert('New password must be at least 8 characters long.');
+                    return;
+                }
+            }
+        });
+    });
+    
+    // Education form - handle completion checkbox
+    const isCompletedCheckbox = document.getElementById('is_completed');
+    const endDateInput = document.getElementById('end_date');
+
+    if (isCompletedCheckbox && endDateInput) {
+        isCompletedCheckbox.addEventListener('change', function() {
+            if (!this.checked) {
+                endDateInput.value = '';
+                endDateInput.disabled = true;
+            } else {
+                endDateInput.disabled = false;
+            }
+        });
+    }
+
+    // Initialize checkbox styling on page load
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            checkbox.style.background = '#059669';
+            checkbox.style.borderColor = '#059669';
+        }
+    });
+
+    // Password strength indicator
+    const newPasswordInput = document.getElementById('new_password');
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+            if (password.match(/[$@#&!]+/)) strength++;
+
+            let strengthText = '';
+            let strengthColor = '';
+
+            if (strength <= 2) {
+                strengthText = 'Weak';
+                strengthColor = '#ef4444';
+            } else if (strength === 3) {
+                strengthText = 'Medium';
+                strengthColor = '#f59e0b';
+            } else {
+                strengthText = 'Strong';
+                strengthColor = '#059669';
+            }
+
+            let strengthIndicator = document.getElementById('password-strength');
+            if (!strengthIndicator && password.length > 0) {
+                strengthIndicator = document.createElement('small');
+                strengthIndicator.id = 'password-strength';
+                strengthIndicator.style.display = 'block';
+                strengthIndicator.style.marginTop = '0.375rem';
+                strengthIndicator.style.fontWeight = '600';
+                this.parentElement.parentElement.appendChild(strengthIndicator);
+            }
+
+            if (strengthIndicator) {
+                if (password.length === 0) {
+                    strengthIndicator.remove();
+                } else {
+                    strengthIndicator.textContent = `Password strength: ${strengthText}`;
+                    strengthIndicator.style.color = strengthColor;
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

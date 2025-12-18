@@ -1,0 +1,150 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load image_extras %}
+
+{% block title %}Manage Properties - Landlord{% endblock %}
+{% block theme_color %}#3b82f6{% endblock %}
+
+{% block content %}
+<div style="background: #3b82f6; color: white; padding: 2rem 1rem; padding-top: calc(2rem + env(safe-area-inset-top));">
+  <h1 style="font-size: 1.5rem; font-weight: 700;">Manage Properties</h1>
+  <p style="opacity: 0.9;">{{ landlord_name }}</p>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 5rem;">
+  <!-- Actions -->
+  <div style="display:flex; gap:0.75rem; margin-bottom: 1rem;">
+    <a href="{% url 'rent_pwa:add_property' %}" class="btn" style="background:#3b82f6; color: white; font-weight: 700;">
+      <i class="fas fa-plus"></i> Add Property
+    </a>
+    <a href="{% url 'rent_pwa:owner_dashboard' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
+    <select name="status" class="form-select" onchange="this.form.submit()">
+      <option value="" {% if not status_filter %}selected{% endif %}>All Status</option>
+      <option value="available" {% if status_filter == 'available' %}selected{% endif %}>Available</option>
+      <option value="rented" {% if status_filter == 'rented' %}selected{% endif %}>Rented</option>
+      <option value="maintenance" {% if status_filter == 'maintenance' %}selected{% endif %}>Maintenance</option>
+    </select>
+
+    <select name="type" class="form-select" onchange="this.form.submit()">
+      <option value="" {% if not type_filter %}selected{% endif %}>All Types</option>
+      <option value="apartment" {% if type_filter == 'apartment' %}selected{% endif %}>Apartment</option>
+      <option value="house" {% if type_filter == 'house' %}selected{% endif %}>House</option>
+      <option value="commercial" {% if type_filter == 'commercial' %}selected{% endif %}>Commercial</option>
+      <option value="land" {% if type_filter == 'land' %}selected{% endif %}>Land</option>
+    </select>
+  </form>
+
+  {% if properties %}
+  <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
+    {% for property in properties %}
+    <div style="background: white; border-radius: 12px; padding: 0.75rem; display:flex; gap:0.75rem; align-items:center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <div style="width:80px; height:80px; border-radius: 10px; overflow:hidden; background: #f3f4f6; display:flex; align-items:center; justify-content:center;">
+        {% if property.get_primary_image %}
+        <img src="{{ property.get_primary_image.url|external_image }}" alt="{{ property.title }}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-building\' style=\'color:#3b82f6; font-size:1.5rem;\'></i>'">
+        {% else %}
+        <i class="fas fa-building" style="color:#3b82f6; font-size:1.5rem;"></i>
+        {% endif %}
+      </div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.25rem;">
+          <div style="font-weight: 700; color: #1f2937; flex: 1;">{{ property.title }}</div>
+          {% if property.status == 'available' %}
+          <span class="badge" style="background:#dbeafe; color:#1e40af;">Available</span>
+          {% elif property.status == 'rented' %}
+          <span class="badge" style="background:#fef3c7; color:#92400e;">Rented</span>
+          {% else %}
+          <span class="badge" style="background:#fee2e2; color:#ffffff;">{{ property.get_status_display }}</span>
+          {% endif %}
+        </div>
+        <div style="color:#6b7280; font-size: 0.875rem; margin-bottom: 0.25rem;">
+          <i class="fas fa-map-marker-alt"></i> {{ property.city }}, {{ property.region }}
+        </div>
+        <div style="color:#3b82f6; font-weight: 700; margin-bottom: 0.5rem;">
+          GHS {{ property.price|floatformat:2 }}/{{ property.get_price_period_display }}
+        </div>
+        <div style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <a href="{% url 'rent_pwa:edit_property' property.id %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <a href="{% url 'rent_pwa:property_detail' property.id %}" class="btn btn-sm btn-outline-secondary" target="_blank">
+            <i class="fas fa-eye"></i> View
+          </a>
+          {% if property.status == 'available' %}
+          <form method="POST" action="{% url 'rent_pwa:toggle_property' property.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-warning">
+              <i class="fas fa-pause"></i> Pause
+            </button>
+          </form>
+          {% else %}
+          <form method="POST" action="{% url 'rent_pwa:toggle_property' property.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-success">
+              <i class="fas fa-play"></i> Activate
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">Previous</a>
+    {% endif %}
+    <span class="btn btn-outline-secondary disabled">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">Next</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div style="text-align:center; background:white; padding:3rem 1rem; border-radius:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+    <div style="width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="fas fa-building" style="font-size: 2rem; color: #3b82f6;"></i>
+    </div>
+    <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No Properties Yet</h3>
+    <p style="color:#6b7280; margin-bottom: 1.5rem;">Add your first property to start renting.</p>
+    <a href="{% url 'rent_pwa:add_property' %}" class="btn" style="background:#3b82f6; color:white; font-weight:700;">
+      <i class="fas fa-plus"></i> Add Property
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_bookings' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-check"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_properties' %}" class="bottom-nav-item active">
+    <i class="fas fa-building"></i>
+    <span>Properties</span>
+  </a>
+  <a href="{% url 'rent_pwa:analytics' %}" class="bottom-nav-item">
+    <i class="fas fa-chart-bar"></i>
+    <span>Analytics</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

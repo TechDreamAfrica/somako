@@ -1,0 +1,394 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Become a Rider - Express{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero-header {
+    background: #1d4ed8;
+    padding: 2rem 1rem;
+    color: white;
+    border-radius: 0 0 24px 24px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .hero-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+  }
+
+  .form-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-label.required::after {
+    content: '*';
+    color: #1d4ed8;
+    margin-left: 0.25rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .file-input {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .file-input:hover {
+    border-color: #1d4ed8;
+    background: #fef2f2;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .benefits-list li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .benefit-icon {
+    width: 36px;
+    height: 36px;
+    background: #fee2e2;
+    color: #1d4ed8;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .help-text {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+  <div class="hero-icon">
+    <i class="fas fa-motorcycle"></i>
+  </div>
+  <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">Become a Delivery Rider</h1>
+  <p style="opacity: 0.9;">Join our team and start earning today!</p>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Benefits -->
+  <div class="form-section">
+    <h2 class="section-title">
+      <i class="fas fa-star" style="color: #fbbf24;"></i>
+      Why Join Express?
+    </h2>
+
+    <ul class="benefits-list">
+      <li>
+        <div class="benefit-icon"><i class="fas fa-coins"></i></div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Competitive Earnings</div>
+          <div style="font-size: 0.875rem; color: #6b7280;">Earn up to 80% commission on each delivery</div>
+        </div>
+      </li>
+      <li>
+        <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Flexible Hours</div>
+          <div style="font-size: 0.875rem; color: #6b7280;">Work when you want, where you want</div>
+        </div>
+      </li>
+      <li>
+        <div class="benefit-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Easy App</div>
+          <div style="font-size: 0.875rem; color: #6b7280;">Simple, user-friendly rider app</div>
+        </div>
+      </li>
+      <li>
+        <div class="benefit-icon"><i class="fas fa-wallet"></i></div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Fast Payouts</div>
+          <div style="font-size: 0.875rem; color: #6b7280;">Weekly payments directly to your account</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Registration Form -->
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Personal Information -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-user" style="color: #1d4ed8;"></i>
+        License Information
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label required" for="license_number">Driver's License Number</label>
+        <input type="text" id="license_number" name="license_number" class="form-input"
+               placeholder="e.g., GH-123456789" required pattern="[A-Z0-9-]+"
+               style="text-transform: uppercase;">
+        <div class="help-text">Enter your license number in uppercase (letters, numbers, and hyphens only)</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required" for="license_expiry">License Expiry Date</label>
+        <input type="date" id="license_expiry" name="license_expiry" class="form-input" required>
+        <div class="help-text">Your license must be valid for at least 6 months</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required" for="license_document">License Document (Photo/Scan)</label>
+        <input type="file" id="license_document" name="license_document" class="form-input file-input"
+               accept="image/*,.pdf" required>
+        <div class="help-text">Upload a clear photo or scan of your driver's license</div>
+      </div>
+    </div>
+
+    <!-- Documents -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-id-card" style="color: #1d4ed8;"></i>
+        Identity Verification
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label required" for="national_id">National ID/Passport</label>
+        <input type="file" id="national_id" name="national_id" class="form-input file-input"
+               accept="image/*,.pdf" required>
+        <div class="help-text">Ghana Card, Voter ID, or International Passport</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile_photo">Profile Photo</label>
+        <input type="file" id="profile_photo" name="profile_photo" class="form-input file-input"
+               accept="image/*">
+        <div class="help-text">A clear passport-style photo (optional but recommended)</div>
+      </div>
+    </div>
+
+    <!-- Payment Information -->
+    <div class="form-section">
+      <h2 class="section-title">
+        <i class="fas fa-wallet" style="color: #1d4ed8;"></i>
+        Payment Information
+      </h2>
+
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <div style="font-weight: 600; color: #92400e; margin-bottom: 0.5rem;">
+          <i class="fas fa-info-circle"></i> Choose Your Payment Method
+        </div>
+        <div style="font-size: 0.875rem; color: #78350f;">
+          You can choose Mobile Money or Bank Transfer for receiving your earnings.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mobile_money_provider">Mobile Money Provider</label>
+        <select id="mobile_money_provider" name="mobile_money_provider" class="form-input">
+          <option value="">Select Provider</option>
+          <option value="MTN">MTN Mobile Money</option>
+          <option value="Vodafone">Vodafone Cash</option>
+          <option value="AirtelTigo">AirtelTigo Money</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="mobile_money_number">Mobile Money Number</label>
+        <input type="tel" id="mobile_money_number" name="mobile_money_number" class="form-input"
+               placeholder="0XX XXX XXXX">
+        <div class="help-text">10-digit Ghana phone number registered with Mobile Money</div>
+      </div>
+
+      <div style="text-align: center; margin: 1.5rem 0; color: #6b7280; font-weight: 600;">
+        OR
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="bank_name">Bank Name</label>
+        <input type="text" id="bank_name" name="bank_name" class="form-input"
+               placeholder="e.g., Access Bank">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="account_number">Account Number</label>
+        <input type="text" id="account_number" name="account_number" class="form-input"
+               placeholder="Enter your account number">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="account_holder_name">Account Holder Name</label>
+        <input type="text" id="account_holder_name" name="account_holder_name" class="form-input"
+               placeholder="Name as it appears on account">
+      </div>
+    </div>
+
+    <!-- Terms & Submit -->
+    <div class="form-section">
+      <div style="background: #f3f4f6; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+        <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer;">
+          <input type="checkbox" required style="margin-top: 0.25rem; width: 18px; height: 18px;">
+          <span style="font-size: 0.875rem; color: #374151; line-height: 1.5;">
+            I confirm that all information provided is accurate and I agree to the
+            <a href="#" style="color: #1d4ed8; font-weight: 600;">Terms of Service</a> and
+            <a href="#" style="color: #1d4ed8; font-weight: 600;">Privacy Policy</a>.
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-check-circle"></i> Submit Application
+      </button>
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="{% url 'express_pwa:dashboard' %}" style="color: #6b7280; font-size: 0.875rem;">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </form>
+
+  <!-- What Happens Next -->
+  <div class="form-section">
+    <h2 class="section-title">
+      <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
+      What Happens Next?
+    </h2>
+
+    <div style="padding-left: 1.5rem; border-left: 3px solid #1d4ed8;">
+      <div style="margin-bottom: 1rem;">
+        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+          <i class="fas fa-check-circle" style="color: #10b981;"></i> 1. Application Review
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280; margin-left: 1.5rem;">
+          Our team will review your documents within 24-48 hours
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+          <i class="fas fa-check-circle" style="color: #10b981;"></i> 2. Account Activation
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280; margin-left: 1.5rem;">
+          Once approved, your rider account will be activated
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+          <i class="fas fa-check-circle" style="color: #10b981;"></i> 3. Start Earning
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280; margin-left: 1.5rem;">
+          Go online and start accepting delivery requests!
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Format phone number input
+document.getElementById('mobile_money_number').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, '');
+  if (value.length > 10) value = value.substr(0, 10);
+  e.target.value = value;
+});
+
+// License number uppercase
+document.getElementById('license_number').addEventListener('input', function(e) {
+  e.target.value = e.target.value.toUpperCase();
+});
+</script>
+{% endblock %}

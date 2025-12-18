@@ -1,0 +1,513 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .order-detail-container {
+    padding: 0 1rem;
+    margin-bottom: 6rem;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    margin: 1rem 0;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    background: #e5e7eb;
+  }
+
+  .order-header {
+    background: #f97316;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+  }
+
+  .order-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .order-time {
+    opacity: 0.9;
+    font-size: 0.875rem;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-top: 0.75rem;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #dbeafe; color: #1e3a8a; }
+  .status-preparing { background: #e0e7ff; color: #3730a3; }
+  .status-ready { background: #bbf7d0; color: #166534; }
+  .status-picked_up { background: #d1fae5; color: #065f46; }
+  .status-on_the_way { background: #bfdbfe; color: #1e40af; }
+  .status-delivered { background: #86efac; color: #166534; }
+  .status-cancelled { background: #fecaca; color: #991b1b; }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-card-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #1f2937;
+    text-align: right;
+  }
+
+  .order-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .item-details {
+    flex: 1;
+  }
+
+  .item-name {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .item-options {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+
+  .item-quantity {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .item-price {
+    font-weight: 700;
+    color: #f97316;
+    align-self: flex-start;
+  }
+
+  .price-breakdown {
+    padding-top: 1rem;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+  }
+
+  .price-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0 0 0;
+    margin-top: 0.5rem;
+    border-top: 2px solid #e5e7eb;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1f2937;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
+  .btn-primary {
+    background: #f97316;
+    color: white;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.4);
+  }
+
+  .btn-success {
+    background: #f97316;
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-danger {
+    background: #f97316;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .payment-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .payment-pending { background: #fef3c7; color: #92400e; }
+  .payment-paid { background: #d1fae5; color: #065f46; }
+  .payment-failed { background: #fecaca; color: #991b1b; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-detail-container">
+  <a href="{% url 'food_pwa:manage_orders' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to Orders
+  </a>
+
+  <div class="order-header">
+    <div class="order-number">
+      <i class="fas fa-receipt"></i> Order #{{ order.order_number }}
+    </div>
+    <div class="order-time">
+      <i class="far fa-clock"></i> {{ order.created_at|date:"M d, Y - h:i A" }}
+    </div>
+    <span class="status-badge status-{{ order.status }}">
+      {{ order.get_status_display }}
+    </span>
+  </div>
+
+  <!-- Customer Information -->
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-user"></i> Customer Information
+    </div>
+    <div class="info-row">
+      <span class="info-label">Name</span>
+      <span class="info-value">{{ order.customer.get_full_name|default:order.customer.username }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Phone</span>
+      <span class="info-value">{{ order.delivery_phone }}</span>
+    </div>
+    {% if order.customer.email %}
+    <div class="info-row">
+      <span class="info-label">Email</span>
+      <span class="info-value">{{ order.customer.email }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Delivery Information -->
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-map-marker-alt"></i> Delivery Information
+    </div>
+    <div class="info-row">
+      <span class="info-label">Method</span>
+      <span class="info-value">{{ order.get_delivery_method_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Address</span>
+      <span class="info-value">{{ order.delivery_address|striptags }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">City</span>
+      <span class="info-value">{{ order.delivery_city }}</span>
+    </div>
+    {% if order.delivery_instructions %}
+    <div class="info-row">
+      <span class="info-label">Instructions</span>
+      <span class="info-value">{{ order.delivery_instructions }}</span>
+    </div>
+    {% endif %}
+    {% if order.estimated_delivery_time %}
+    <div class="info-row">
+      <span class="info-label">Est. Delivery</span>
+      <span class="info-value">{{ order.estimated_delivery_time|date:"h:i A" }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Payment Information -->
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-credit-card"></i> Payment Information
+    </div>
+    <div class="info-row">
+      <span class="info-label">Method</span>
+      <span class="info-value">{{ order.get_payment_method_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value">
+        <span class="payment-badge payment-{{ order.payment_status }}">
+          {{ order.get_payment_status_display }}
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Order Items -->
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-utensils"></i> Order Items ({{ order_items.count }})
+    </div>
+
+    {% for item in order_items %}
+    <div class="order-item">
+      {% if item.menu_item.image %}
+      <img src="{{ item.menu_item.get_image_url }}" alt="{{ item.menu_item.name }}" class="item-image">
+      {% else %}
+      <div class="item-image" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-utensils" style="color: white; font-size: 2rem;"></i>
+      </div>
+      {% endif %}
+
+      <div class="item-details">
+        <div class="item-name">{{ item.menu_item.name }}</div>
+        {% if item.selected_options %}
+        <div class="item-options">
+          <i class="fas fa-sliders-h"></i> {{ item.selected_options|striptags }}
+        </div>
+        {% endif %}
+        <div class="item-quantity">
+          <i class="fas fa-times"></i> {{ item.quantity }}
+        </div>
+      </div>
+
+      <div class="item-price">
+        GHS {{ item.total_price }}
+      </div>
+    </div>
+    {% empty %}
+    <p style="text-align: center; color: #6b7280; padding: 2rem;">No items in this order</p>
+    {% endfor %}
+
+    <!-- Price Breakdown -->
+    <div class="price-breakdown">
+      <div class="price-row">
+        <span>Subtotal</span>
+        <span>GHS {{ order.subtotal }}</span>
+      </div>
+      {% if order.delivery_fee > 0 %}
+      <div class="price-row">
+        <span>Delivery Fee</span>
+        <span>GHS {{ order.delivery_fee }}</span>
+      </div>
+      {% endif %}
+      {% if order.tax > 0 %}
+      <div class="price-row">
+        <span>Tax</span>
+        <span>GHS {{ order.tax }}</span>
+      </div>
+      {% endif %}
+      {% if order.discount > 0 %}
+      <div class="price-row" style="color: #10b981;">
+        <span>Discount</span>
+        <span>- GHS {{ order.discount }}</span>
+      </div>
+      {% endif %}
+      <div class="price-total">
+        <span>Total</span>
+        <span>GHS {{ order.total_amount }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Notes -->
+  {% if order.notes %}
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-sticky-note"></i> Order Notes
+    </div>
+    <p style="color: #6b7280; margin: 0;">{{ order.notes }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  <div class="info-card">
+    <div class="info-card-title">
+      <i class="fas fa-tasks"></i> Quick Actions
+    </div>
+
+    <div class="action-buttons">
+      {% if order.status == 'pending' %}
+        <div class="btn-group">
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="margin: 0;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="confirmed">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-check"></i> Confirm Order
+            </button>
+          </form>
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="margin: 0;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="cancelled">
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-times"></i> Cancel Order
+            </button>
+          </form>
+        </div>
+      {% elif order.status == 'confirmed' %}
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="preparing">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-fire"></i> Start Preparing
+          </button>
+        </form>
+      {% elif order.status == 'preparing' %}
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="ready">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check-circle"></i> Mark as Ready
+          </button>
+        </form>
+      {% elif order.status == 'ready' %}
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="picked_up">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-hand-holding"></i> Mark as Picked Up
+          </button>
+        </form>
+      {% elif order.status == 'picked_up' or order.status == 'on_the_way' %}
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="delivered">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check-double"></i> Mark as Delivered
+          </button>
+        </form>
+      {% elif order.status == 'delivered' %}
+        <div style="text-align: center; padding: 1rem; background: #d1fae5; border-radius: 12px; color: #065f46;">
+          <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+          <div style="font-weight: 700;">Order Completed!</div>
+        </div>
+      {% elif order.status == 'cancelled' %}
+        <div style="text-align: center; padding: 1rem; background: #fecaca; border-radius: 12px; color: #991b1b;">
+          <i class="fas fa-times-circle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+          <div style="font-weight: 700;">Order Cancelled</div>
+          {% if order.cancellation_reason %}
+          <div style="font-size: 0.875rem; margin-top: 0.5rem;">{{ order.cancellation_reason }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item active">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

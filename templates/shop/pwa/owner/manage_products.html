@@ -1,0 +1,99 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load image_extras %}
+
+{% block title %}Manage Products - Seller{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem; padding-top: calc(2rem + env(safe-area-inset-top));">
+  <h1 style="font-size: 1.5rem; font-weight: 700;">Manage Products</h1>
+  <p style="opacity: 0.9;">{{ seller_name }}</p>
+</div>
+
+<div style="padding: 1rem;">
+  <!-- Actions -->
+  <div style="display:flex; gap:0.75rem; margin-bottom: 1rem;">
+    <a href="{% url 'shop_pwa:add_product' %}" class="btn" style="background:#8b5cf6; color: white; font-weight: 700;">Add Product</a>
+    <a href="{% url 'shop_pwa:owner_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
+    <select name="status" class="form-select" onchange="this.form.submit()">
+      <option value="" {% if not status_filter %}selected{% endif %}>All Status</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+
+    <select name="category" class="form-select" onchange="this.form.submit()">
+      <option value="" {% if not category_filter %}selected{% endif %}>All Categories</option>
+      {% for cat in categories %}
+      <option value="{{ cat.slug }}" {% if category_filter == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  {% if products %}
+  <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
+    {% for product in products %}
+    <div style="background: white; border-radius: 12px; padding: 0.75rem; display:flex; gap:0.75rem; align-items:center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <div style="width:72px; height:72px; border-radius: 10px; overflow:hidden; background: #f3f4f6; display:flex; align-items:center; justify-content:center;">
+        {% if product.get_primary_image_url %}
+        <img src="{{ product.get_primary_image_url|external_image }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-box\' style=\'color:#8b5cf6; font-size:1.25rem;\'></i>'">
+        {% else %}
+        <i class="fas fa-box" style="color:#8b5cf6; font-size:1.25rem;"></i>
+        {% endif %}
+      </div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-weight: 700; color: #1f2937;">{{ product.name }}</div>
+          {% if product.is_active %}
+          <span class="badge" style="background:#d1fae5; color:#059669;">Active</span>
+          {% else %}
+          <span class="badge" style="background:#fee2e2; color:#dc2626;">Inactive</span>
+          {% endif %}
+        </div>
+        <div style="color:#6b7280; font-size: 0.875rem;">GHS {{ product.base_price|floatformat:2 }} · {{ product.category.name }}</div>
+        <div style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <a href="{% url 'shop_pwa:edit_product' product.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <a href="{% url 'shop_pwa:toggle_product' product.id %}" class="btn btn-sm btn-outline-secondary">{% if product.is_active %}Deactivate{% else %}Activate{% endif %}</a>
+          <a href="{% url 'shop_pwa:delete_product' product.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align:center; background:white; padding:2rem; border-radius:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+    <p style="color:#6b7280;">No products yet. Add your first product to start selling.</p>
+    <a href="{% url 'shop_pwa:add_product' %}" class="btn" style="background:#8b5cf6; color:white; font-weight:700;">Add Product</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-bag"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_products' %}" class="bottom-nav-item active">
+    <i class="fas fa-box"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:analytics' %}" class="bottom-nav-item">
+    <i class="fas fa-chart-bar"></i>
+    <span>Analytics</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

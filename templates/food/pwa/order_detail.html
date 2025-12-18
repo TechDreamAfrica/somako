@@ -1,0 +1,302 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load food_extras %}
+
+{% block title %}Order #{{ order.order_number }} - Food PWA{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block food_active %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #dbeafe; color: #1e40af; }
+  .status-preparing { background: #fce7f3; color: #be123c; }
+  .status-ready { background: #e0e7ff; color: #4338ca; }
+  .status-out_for_delivery { background: #ddd6fe; color: #6d28d9; }
+  .status-delivered { background: #d1fae5; color: #065f46; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+  .order-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-primary {
+    background: #f97316;
+    color: white;
+  }
+
+  .btn-outline {
+    background: white;
+    color: #f97316;
+    border: 2px solid #f97316;
+  }
+
+  .btn-danger {
+    background: white;
+    color: #ef4444;
+    border: 2px solid #ef4444;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-file-invoice" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-file-invoice" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Order #{{ order.order_number }}</h1>
+    <div class="hero-info">
+      <span class="status-badge status-{{ order.status }}">
+        {{ order.get_status_display }}
+      </span>
+      <span class="order-time">
+        <i class="far fa-calendar"></i> {{ order.created_at|date:"M d, h:i A" }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  <!-- Restaurant Info -->
+  <div class="info-card">
+    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+      <i class="fas fa-store" style="color: #f97316;"></i> Restaurant
+    </h2>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      {% if order.restaurant.logo %}
+      <img src="{{ order.restaurant.logo|gdrive_direct_url }}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
+      {% else %}
+      <div style="width: 60px; height: 60px; border-radius: 8px; background: #f97316; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-utensils" style="color: #dc2626; font-size: 1.5rem;"></i>
+      </div>
+      {% endif %}
+      <div>
+        <div style="font-weight: 600; color: #1f2937;">{{ order.restaurant.name }}</div>
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          <i class="fas fa-phone"></i> {{ order.restaurant.phone }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Items -->
+  <div class="info-card">
+    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+      <i class="fas fa-utensils" style="color: #f97316;"></i> Order Items
+    </h2>
+    {% for item in order_items %}
+    <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; {% if not forloop.last %}border-bottom: 1px solid #e5e7eb;{% endif %}">
+      <div style="flex: 1;">
+        <div style="font-weight: 600; color: #1f2937;">{{ item.menu_item.name }}</div>
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          Qty: {{ item.quantity }} × GHS {{ item.price|floatformat:2 }}
+        </div>
+        {% if item.special_instructions %}
+        <div style="color: #9ca3af; font-size: 0.75rem; font-style: italic; margin-top: 0.25rem;">
+          Note: {{ item.special_instructions }}
+        </div>
+        {% endif %}
+      </div>
+      <div style="font-weight: 600; color: #f97316;">
+        GHS {{ item.get_subtotal|floatformat:2 }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Delivery Address -->
+  <div class="info-card">
+    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+      <i class="fas fa-map-marker-alt" style="color: #f97316;"></i> Delivery Address
+    </h2>
+    <p style="color: #6b7280; margin-bottom: 0.5rem;">{{ order.delivery_address }}</p>
+    <p style="color: #6b7280;">
+      <i class="fas fa-phone"></i> {{ order.delivery_phone }}
+    </p>
+  </div>
+
+  <!-- Payment Details -->
+  <div class="info-card">
+    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+      <i class="fas fa-receipt" style="color: #f97316;"></i> Payment Details
+    </h2>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+      <span style="color: #6b7280;">Subtotal</span>
+      <span style="font-weight: 600;">GHS {{ order.subtotal|floatformat:2 }}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+      <span style="color: #6b7280;">Delivery Fee</span>
+      <span style="font-weight: 600;">GHS {{ order.delivery_fee|floatformat:2 }}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+      <span style="color: #6b7280;">Tax</span>
+      <span style="font-weight: 600;">GHS {{ order.tax|floatformat:2 }}</span>
+    </div>
+    <div style="border-top: 2px solid #e5e7eb; margin: 0.75rem 0; padding-top: 0.75rem; display: flex; justify-content: space-between;">
+      <span style="font-weight: 700; font-size: 1.125rem;">Total</span>
+      <span style="font-weight: 700; color: #f97316; font-size: 1.25rem;">GHS {{ order.total_amount|floatformat:2 }}</span>
+    </div>
+
+    <div style="margin-top: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px;">
+      <div style="font-size: 0.875rem; color: #6b7280;">Payment Method</div>
+      <div style="font-weight: 600; color: #1f2937; text-transform: capitalize;">
+        {{ order.get_payment_method_display }}
+      </div>
+    </div>
+  </div>
+
+  {% if order.special_instructions %}
+  <!-- Special Instructions -->
+  <div class="info-card">
+    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.75rem;">
+      <i class="fas fa-comment-dots" style="color: #f97316;"></i> Special Instructions
+    </h2>
+    <p style="color: #6b7280;">{{ order.special_instructions }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Actions -->
+  <div style="margin-top: 1.5rem;">
+    <button onclick="window.location.href='{% url 'food_pwa:track_order' order.order_number %}'" class="action-btn btn-primary">
+      <i class="fas fa-map-marked-alt"></i> Track Order
+    </button>
+
+    {% if can_cancel %}
+    <form method="POST" action="{% url 'food_pwa:cancel_order' order.order_number %}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+      {% csrf_token %}
+      <button type="submit" class="action-btn btn-danger">
+        <i class="fas fa-times-circle"></i> Cancel Order
+      </button>
+    </form>
+    {% endif %}
+
+    {% if order.status == 'delivered' %}
+    <button onclick="window.location.href='{% url 'food_pwa:reorder' order.order_number %}'" class="action-btn btn-outline">
+      <i class="fas fa-redo"></i> Reorder
+    </button>
+    {% endif %}
+
+    <button onclick="window.location.href='{% url 'food_pwa:order_list' %}'" class="action-btn btn-outline">
+      <i class="fas fa-list"></i> View All Orders
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_list' %}" class="bottom-nav-item">
+    <i class="fas fa-store"></i>
+    <span>Restaurants</span>
+  </a>
+  <a href="{% url 'food_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'food_pwa:order_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

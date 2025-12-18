@@ -1,0 +1,176 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Add Menu Item - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    padding: 0 1rem;
+    margin-bottom: 6rem;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-primary {
+    background: #f97316;
+    color: white;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(234, 88, 12, 0.4);
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+
+  .image-preview {
+    margin-top: 0.75rem;
+  }
+
+  .image-preview img {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h1 style="font-size: 1.875rem; font-weight: 800; margin: 1.5rem 0; color: #1f2937;">
+    <i class="fas fa-lock"></i> Add Menu Item
+  </h1>
+
+  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <i class="fas fa-info-circle" style="color: #f59e0b; font-size: 1.5rem; margin-top: 0.25rem;"></i>
+      <div>
+        <h3 style="color: #92400e; font-weight: 700; margin-bottom: 0.5rem;">Access Restricted</h3>
+        <p style="color: #92400e; font-size: 0.875rem; margin-bottom: 1rem;">
+          Adding menu items is currently restricted to administrators only. This ensures consistency and quality across all restaurant listings.
+        </p>
+        <p style="color: #92400e; font-size: 0.875rem;">
+          If you need to add new menu items or make changes to your menu, please contact our support team and they will assist you promptly.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card" style="text-align: center; padding: 3rem 1.5rem;">
+    <i class="fas fa-utensils" style="font-size: 4rem; color: #f97316; opacity: 0.3; margin-bottom: 1.5rem;"></i>
+    <h2 style="color: #1f2937; font-weight: 700; margin-bottom: 0.75rem;">Need to Update Your Menu?</h2>
+    <p style="color: #6b7280; margin-bottom: 2rem;">Contact our support team for assistance with adding or modifying menu items.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+      <a href="mailto:support@somako.com" style="display: block; padding: 1rem; background: #f97316; color: white; border-radius: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);">
+        <i class="fas fa-envelope"></i> Email Support
+      </a>
+      <a href="{% url 'food_pwa:manage_menu' %}" style="display: block; padding: 1rem; background: #f3f4f6; color: #374151; border-radius: 12px; font-weight: 600; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i> Back to Menu
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item active">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

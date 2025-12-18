@@ -1,0 +1,348 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Available Rides - Driver - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .ride-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s;
+  }
+
+  .ride-card:active {
+    transform: scale(0.98);
+  }
+
+  .ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+  }
+
+  .ride-id {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  .fare-badge {
+    background: #eab308;
+    color: #92400e;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .location-info {
+    margin-bottom: 1rem;
+  }
+
+  .location-row {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .location-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pickup-icon {
+    background: #eab308;
+  }
+
+  .dropoff-icon {
+    background: #eab308;
+  }
+
+  .location-text {
+    flex: 1;
+  }
+
+  .location-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .location-address {
+    color: #1f2937;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .ride-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .btn-accept {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-accept:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-reject {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #eab308;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-header {
+    background: white;
+    padding: 1.5rem 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Available Rides</h1>
+  <p class="page-subtitle">Accept rides to start earning</p>
+</div>
+
+{% if not is_online %}
+<div style="background: #eab308; padding: 1rem 1.5rem; margin: 0 1rem 1rem 1rem; border-radius: 12px; border-left: 4px solid #eab308;">
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <svg class="w-6 h-6 text-amber-700" fill="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px; flex-shrink: 0;">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </svg>
+    <div>
+      <div style="font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">You're Currently {{ driver.availability }}</div>
+      <div style="font-size: 0.875rem; color: #78350f;">
+        {% if driver.availability == 'OFFLINE' %}
+        Go to your dashboard and set your status to ONLINE to accept rides.
+        {% elif driver.availability == 'BUSY' %}
+        You cannot accept new rides while you have an active ride. Complete your current ride first.
+        {% endif %}
+      </div>
+      <a href="{% url 'ride_pwa:driver_dashboard' %}" style="display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1rem; background: #eab308; color: white; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        Go to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="pwa-container">
+  {% if rides %}
+    {% for ride in rides %}
+    <div class="ride-card">
+      <div class="ride-header">
+        <span class="ride-id">Ride #{{ ride.ride_id|slice:":8" }}</span>
+        <span class="fare-badge">GHS {{ ride.total_fare|floatformat:2 }}</span>
+      </div>
+
+      {% if ride.driver.id == driver.id %}
+      <div style="background: #eab308; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #eab308;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg style="width: 20px; height: 20px; color: #92400e;" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span style="font-weight: 600; color: #92400e; font-size: 0.875rem;">🎯 Requested from YOU</span>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="location-info">
+        <div class="location-row">
+          <div class="location-icon pickup-icon">
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+              <circle cx="12" cy="12" r="8"/>
+            </svg>
+          </div>
+          <div class="location-text">
+            <div class="location-label">PICKUP</div>
+            <div class="location-address">{{ ride.pickup_address|truncatewords:8 }}</div>
+          </div>
+        </div>
+
+        <div class="location-row">
+          <div class="location-icon dropoff-icon">
+            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="location-text">
+            <div class="location-label">DROPOFF</div>
+            <div class="location-address">{{ ride.dropoff_address|truncatewords:8 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ride-stats">
+        <div class="stat-item">
+          <div class="stat-value">{{ ride.estimated_distance_km }} km</div>
+          <div class="stat-label">Distance</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ ride.estimated_duration_minutes }} min</div>
+          <div class="stat-label">Duration</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ ride.passenger_count }}</div>
+          <div class="stat-label">Passengers</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <form method="post" action="{% url 'ride_pwa:accept_ride' ride.id %}" style="flex: 1;">
+          {% csrf_token %}
+          <button type="submit" class="btn-accept" {% if not is_online %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+            ✓ Accept Ride
+          </button>
+        </form>
+        
+        {% if ride.driver.id == driver.id %}
+        <form method="post" action="{% url 'ride_pwa:reject_ride' ride.id %}" style="flex: 1;">
+          {% csrf_token %}
+          <button type="submit" class="btn-reject" onclick="return confirm('Are you sure you want to decline this ride request?')">
+            ✕ Decline
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">
+        No Available Rides
+      </h2>
+      <p style="color: #6b7280; margin-bottom: 1rem;">
+        There are no ride requests at the moment. New requests will appear here.
+      </p>
+      <p style="color: #6b7280; font-size: 0.875rem; background: #fef3c7; padding: 1rem; border-radius: 8px; text-align: left;">
+        <strong style="color: #92400e;">📍 How it works:</strong><br>
+        • Passengers select you when booking a ride<br>
+        • Ride requests appear here with a "Requested from YOU" badge<br>
+        • Accept to start the ride or Decline if you're unable<br>
+        • Accepted rides move to <a href="{% url 'ride_pwa:active_rides' %}" style="color: #eab308; text-decoration: underline;">Active Rides</a>
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:driver_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'ride_pwa:available_rides' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'ride_pwa:active_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-car"></i>
+    <span>Active</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-money-bill-wave"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

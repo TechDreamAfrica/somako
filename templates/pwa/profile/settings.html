@@ -1,0 +1,371 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Settings - {{ service_name|default:"Soma Ko" }}{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+{% block pwa_app_name %}profile{% endblock %}
+
+{% block auth_banner %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f9fafb;
+  }
+
+  .edit-header {
+    background: #6366f1;
+    padding: 1.5rem 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .settings-container {
+    padding: 1rem;
+  }
+
+  .settings-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .setting-item:last-child {
+    border-bottom: none;
+  }
+
+  .setting-info {
+    flex: 1;
+  }
+
+  .setting-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .setting-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: {{ app_color|default:"#059669" }};
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+
+  /* Select Dropdown */
+  .setting-select {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.875rem;
+    color: #1f2937;
+    font-weight: 600;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280'%3E%3Cpath d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+  }
+
+  .setting-select:focus {
+    outline: none;
+    border-color: {{ app_color|default:"#059669" }};
+  }
+
+  .message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .message.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .content-spacer {
+    height: 80px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-header">
+  <a href="{% url 'accounts:pwa_profile' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <div class="header-title">App Settings</div>
+</div>
+
+<div class="settings-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">
+        <i class="fas fa-check-circle"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" id="settingsForm">
+    {% csrf_token %}
+
+    <!-- Appearance Settings -->
+    <div class="settings-section">
+      <div class="section-title">Appearance</div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Theme</div>
+          <div class="setting-description">Choose your app theme</div>
+        </div>
+        <select name="theme" class="setting-select">
+          <option value="light" {% if settings.theme == 'light' %}selected{% endif %}>Light</option>
+          <option value="dark" {% if settings.theme == 'dark' %}selected{% endif %}>Dark</option>
+          <option value="auto" {% if settings.theme == 'auto' %}selected{% endif %}>Auto</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Compact View</div>
+          <div class="setting-description">Show more items on screen</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="compact_view" {% if settings.compact_view %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="settings-section">
+      <div class="section-title">Notifications</div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Push Notifications</div>
+          <div class="setting-description">Receive updates and alerts</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="push_notifications" {% if settings.push_notifications %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Email Notifications</div>
+          <div class="setting-description">Get updates via email</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">SMS Notifications</div>
+          <div class="setting-description">Receive text messages</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="sms_notifications" {% if settings.sms_notifications %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Privacy Settings -->
+    <div class="settings-section">
+      <div class="section-title">Privacy</div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Location Services</div>
+          <div class="setting-description">Allow location-based features</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="location_services" {% if settings.location_services %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Activity Status</div>
+          <div class="setting-description">Show when you're active</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="activity_status" {% if settings.activity_status %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Language & Region -->
+    <div class="settings-section">
+      <div class="section-title">Language & Region</div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Language</div>
+          <div class="setting-description">App display language</div>
+        </div>
+        <select name="language" class="setting-select">
+          <option value="en" {% if settings.language == 'en' %}selected{% endif %}>English</option>
+          <option value="yo" {% if settings.language == 'yo' %}selected{% endif %}>Yoruba</option>
+          <option value="ig" {% if settings.language == 'ig' %}selected{% endif %}>Igbo</option>
+          <option value="ha" {% if settings.language == 'ha' %}selected{% endif %}>Hausa</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Currency</div>
+          <div class="setting-description">Preferred currency</div>
+        </div>
+        <select name="currency" class="setting-select">
+          <option value="NGN" {% if settings.currency == 'NGN' %}selected{% endif %}>₦ Naira (NGN)</option>
+          <option value="USD" {% if settings.currency == 'USD' %}selected{% endif %}>$ Dollar (USD)</option>
+          <option value="GBP" {% if settings.currency == 'GBP' %}selected{% endif %}>£ Pound (GBP)</option>
+          <option value="EUR" {% if settings.currency == 'EUR' %}selected{% endif %}>€ Euro (EUR)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Data & Storage -->
+    <div class="settings-section">
+      <div class="section-title">Data & Storage</div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Auto-play Videos</div>
+          <div class="setting-description">Play videos automatically</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="autoplay_videos" {% if settings.autoplay_videos %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Data Saver</div>
+          <div class="setting-description">Reduce data usage</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="data_saver" {% if settings.data_saver %}checked{% endif %}>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="content-spacer"></div>
+
+<script>
+// Auto-save on change
+const form = document.getElementById('settingsForm');
+const inputs = form.querySelectorAll('input, select');
+
+inputs.forEach(input => {
+  input.addEventListener('change', function() {
+    // Add a small delay for better UX
+    setTimeout(() => {
+      form.submit();
+    }, 300);
+  });
+});
+</script>
+{% endblock %}

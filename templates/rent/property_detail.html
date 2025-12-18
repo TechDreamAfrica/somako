@@ -1,0 +1,415 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}{{ property.title }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Property Hero Section -->
+<section style="background: #14b8a6; padding: 3rem 0; position: relative; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 300px;">
+        <a href="{% url 'rent:property_list' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: white; text-decoration: none; font-weight: 600; margin-bottom: 1.25rem; opacity: 0.9; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+          <i class="fas fa-arrow-left"></i>Back to Properties
+        </a>
+        <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; margin-bottom: 1rem; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">{{ property.title }}</h1>
+        <p style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255, 255, 255, 0.95); font-size: 1.125rem;">
+          <i class="fas fa-map-marker-alt"></i>{{ property.city }}, {{ property.state }}
+        </p>
+      </div>
+      <div>
+        <span style="display: inline-block; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.625rem 1.5rem; border-radius: 50px; font-size: 1rem; font-weight: 700; color: white; border: 2px solid rgba(255, 255, 255, 0.3);">{{ property.category.name }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column - Images & Details -->
+      <div class="col-lg-8">
+        <!-- Main Property Image -->
+        <div style="margin-bottom: 2rem;">
+          {% if property.get_main_image_url %}
+          <div style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb;">
+            <img src="{{ property.get_main_image_url }}" alt="{{ property.title }}" style="width: 100%; height: 500px; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.style.background='#ecfdf5'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.style.height='500px'; var icon=document.createElement('i'); icon.className='fas fa-home'; icon.style.cssText='font-size: 6rem; color: #059669; opacity: 0.3;'; this.parentElement.appendChild(icon);">
+          </div>
+          {% else %}
+          <div style="background: #14b8a6; border-radius: 1.5rem; height: 500px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb;">
+            <i class="fas fa-home" style="font-size: 6rem; color: #059669; opacity: 0.3;"></i>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Gallery Images Slider -->
+        {% if property.images.all %}
+        <div style="margin-bottom: 2.5rem;">
+          <h3 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.625rem;">
+            <i class="fas fa-images" style="color: #059669;"></i>Gallery
+          </h3>
+          <div style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb; padding: 1.5rem;">
+            <div class="carousel slide" id="galleryCarousel" data-bs-ride="false">
+              <div class="carousel-inner">
+                {% for image in property.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ image.get_image_url }}" alt="{{ image.caption|default:property.title }}" style="width: 100%; height: 350px; object-fit: cover; border-radius: 0.75rem;">
+                  {% if image.caption %}
+                  <div style="text-align: center; margin-top: 1rem; color: #6b7280; font-size: 0.9375rem; font-style: italic;">{{ image.caption }}</div>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+              {% if property.images.count > 1 %}
+              <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev" style="width: 60px;">
+                <span style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);"><i class="fas fa-chevron-left" style="color: #059669; font-size: 1.125rem;"></i></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next" style="width: 60px;">
+                <span style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);"><i class="fas fa-chevron-right" style="color: #059669; font-size: 1.125rem;"></i></span>
+              </button>
+              <div class="carousel-indicators" style="margin-bottom: 0; position: static; margin-top: 1rem;">
+                {% for image in property.images.all %}
+                <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %} aria-current="{% if forloop.first %}true{% endif %}" style="width: 12px; height: 12px; border-radius: 50%; background: {% if forloop.first %}#059669{% else %}#d1d5db{% endif %}; border: none; margin: 0 0.25rem;"></button>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Property Description -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+          <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-info-circle" style="color: #059669;"></i>About This Property
+          </h2>
+          <p style="color: #4b5563; line-height: 1.8; font-size: 1rem; margin-bottom: 2rem;">{{ property.description }}</p>
+
+          <!-- Property Features Grid -->
+          <div class="row g-3 mb-4">
+            {% if property.bedrooms %}
+            <div class="col-md-4">
+              <div style="background: #14b8a6; border-radius: 1rem; padding: 1.5rem; text-align: center; border: 2px solid #a7f3d0; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);">
+                  <i class="fas fa-bed" style="font-size: 1.75rem; color: #059669;"></i>
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; color: #047857; margin-bottom: 0.375rem;">{{ property.bedrooms }}</div>
+                <div style="color: #047857; font-weight: 600; font-size: 0.9375rem;">Bedrooms</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if property.bathrooms %}
+            <div class="col-md-4">
+              <div style="background: #14b8a6; border-radius: 1rem; padding: 1.5rem; text-align: center; border: 2px solid #a7f3d0; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);">
+                  <i class="fas fa-bath" style="font-size: 1.75rem; color: #059669;"></i>
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; color: #047857; margin-bottom: 0.375rem;">{{ property.bathrooms }}</div>
+                <div style="color: #047857; font-weight: 600; font-size: 0.9375rem;">Bathrooms</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if property.square_feet %}
+            <div class="col-md-4">
+              <div style="background: #14b8a6; border-radius: 1rem; padding: 1.5rem; text-align: center; border: 2px solid #a7f3d0; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);">
+                  <i class="fas fa-expand-arrows-alt" style="font-size: 1.75rem; color: #059669;"></i>
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; color: #047857; margin-bottom: 0.375rem;">{{ property.square_feet }}</div>
+                <div style="color: #047857; font-weight: 600; font-size: 0.9375rem;">Sq Ft</div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Address -->
+          <div style="background: #f9fafb; border-radius: 1rem; padding: 1.75rem; border: 2px solid #e5e7eb;">
+            <h3 style="display: flex; align-items: center; gap: 0.625rem; font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">
+              <i class="fas fa-map-marker-alt" style="color: #059669;"></i>Location
+            </h3>
+            <p style="color: #6b7280; font-size: 1rem; margin: 0;">{{ property.address }}, {{ property.city }}, {{ property.state }}</p>
+          </div>
+        </div>
+
+        <!-- Amenities Section -->
+        {% if property.amenities %}
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+          <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-star" style="color: #059669;"></i>Amenities
+          </h2>
+          <div style="color: #4b5563; line-height: 1.8; font-size: 1rem;">{{ property.amenities }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Owner Info -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+          <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-user-tie" style="color: #059669;"></i>Property Owner
+          </h2>
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 70px; height: 70px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: white; box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);">
+              {{ property.owner.get_full_name.0|upper }}
+            </div>
+            <div>
+              <div style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">{{ property.owner.get_full_name }}</div>
+              <div style="color: #6b7280; font-size: 0.9375rem; font-weight: 600;">Property Owner</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Booking Card (Sticky) -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <!-- Price -->
+            <div style="text-align: center; padding-bottom: 1.75rem; margin-bottom: 1.75rem; border-bottom: 2px solid #f3f4f6;">
+              {% if property.listing_type == 'for_sale' %}
+              <div style="display: inline-block; background: #14b8a6; color: #115e59; padding: 0.5rem 1.25rem; border-radius: 50px; font-size: 0.875rem; font-weight: 700; border: 2px solid #14b8a6; margin-bottom: 1rem;">FOR SALE</div>
+              <div style="font-size: 3rem; font-weight: 900; color: #14b8a6; margin-bottom: 0.375rem; font-family: 'Inter', sans-serif;">GHS {{ property.price_per_period }}</div>
+              <div style="color: #6b7280; font-size: 1rem; font-weight: 600;">Total Price</div>
+              {% else %}
+              <div style="display: inline-block; background: #14b8a6; color: #047857; padding: 0.5rem 1.25rem; border-radius: 50px; font-size: 0.875rem; font-weight: 700; border: 2px solid #059669; margin-bottom: 1rem;">FOR RENT</div>
+              <div style="font-size: 3rem; font-weight: 900; color: #059669; margin-bottom: 0.375rem; font-family: 'Inter', sans-serif;">GHS {{ property.price_per_period }}</div>
+              <div style="color: #6b7280; font-size: 1rem; font-weight: 600;">per {{ property.rental_period }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Availability Status -->
+            <div style="margin-bottom: 1.75rem;">
+              {% if property.is_available %}
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.625rem; background: #14b8a6; padding: 1rem; border-radius: 0.875rem; border: 2px solid #6ee7b7;">
+                <i class="fas fa-check-circle" style="color: #047857; font-size: 1.25rem;"></i>
+                <span style="font-weight: 700; color: #047857; font-size: 1rem;">Available Now</span>
+              </div>
+              {% else %}
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.625rem; background: #14b8a6; padding: 1rem; border-radius: 0.875rem; border: 2px solid #fca5a5;">
+                <i class="fas fa-times-circle" style="color: #991b1b; font-size: 1.25rem;"></i>
+                <span style="font-weight: 700; color: #991b1b; font-size: 1rem;">Not Available</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Action Button -->
+            {% if property.is_available %}
+              {% if property.listing_type == 'for_sale' %}
+              <a href="{% url 'rent:booking_create' %}?property={{ property.id }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: #14b8a6; color: white; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1rem; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(59, 130, 246, 0.3)'">
+                <i class="fas fa-shopping-cart"></i>Buy Property
+              </a>
+              {% else %}
+              <a href="{% url 'rent:booking_create' %}?property={{ property.id }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: #14b8a6; color: white; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1rem; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'">
+                <i class="fas fa-calendar-check"></i>Rent Property
+              </a>
+              {% endif %}
+            {% else %}
+            <button disabled style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: #e5e7eb; color: #9ca3af; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1rem; cursor: not-allowed;">
+              <i class="fas fa-ban"></i>Not Available
+            </button>
+            {% endif %}
+
+            <!-- Chat with Owner Button -->
+            {% if user.is_authenticated and user != property.owner %}
+            <a href="{% url 'rent:chat_thread' %}?property={{ property.id }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: white; color: #059669; border: 2px solid #059669; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1.75rem; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#047857'" onmouseout="this.style.background='white'; this.style.borderColor='#059669'">
+              <i class="fas fa-comments"></i>Chat with Owner
+            </a>
+            {% elif not user.is_authenticated %}
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: white; color: #059669; border: 2px solid #059669; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1.75rem; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#047857'" onmouseout="this.style.background='white'; this.style.borderColor='#059669'">
+              <i class="fas fa-comments"></i>Login to Chat
+            </a>
+            {% endif %}
+
+            <!-- Property Details List -->
+            <div style="margin-bottom: 1.75rem;">
+              <h3 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1.25rem;">Property Details</h3>
+
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="width: 40px; height: 40px; background: #14b8a6; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-shield-alt" style="color: #059669; font-size: 1.125rem;"></i>
+                </div>
+                <div style="flex: 1;">
+                  <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.25rem;">Security Deposit</div>
+                  <div style="color: #1f2937; font-weight: 700; font-size: 0.9375rem;">GHS {{ property.security_deposit|default:"N/A" }}</div>
+                </div>
+              </div>
+
+              {% if property.minimum_stay %}
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="width: 40px; height: 40px; background: #14b8a6; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-calendar-alt" style="color: #059669; font-size: 1.125rem;"></i>
+                </div>
+                <div style="flex: 1;">
+                  <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.25rem;">Minimum Stay</div>
+                  <div style="color: #1f2937; font-weight: 700; font-size: 0.9375rem;">{{ property.minimum_stay }}</div>
+                </div>
+              </div>
+              {% endif %}
+
+              <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem;">
+                <div style="width: 40px; height: 40px; background: #14b8a6; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-hashtag" style="color: #059669; font-size: 1.125rem;"></i>
+                </div>
+                <div style="flex: 1;">
+                  <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.25rem;">Property ID</div>
+                  <div style="color: #1f2937; font-weight: 700; font-size: 0.9375rem;">#{{ property.id }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Actions -->
+            <div class="row g-2">
+              <div class="col-6">
+                {% if property.owner.phone_number %}
+                <a href="tel:{{ property.owner.phone_number }}" style="width: 100%; padding: 0.875rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.background='white'; this.style.borderColor='#d1fae5'">
+                  <i class="fas fa-phone"></i>Call
+                </a>
+                {% else %}
+                <button disabled style="width: 100%; padding: 0.875rem; background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                  <i class="fas fa-phone-slash"></i>No Phone
+                </button>
+                {% endif %}
+              </div>
+              <div class="col-6">
+                {% if user.is_authenticated %}
+                <button id="savePropertyBtn" data-property-id="{{ property.id }}" data-is-saved="{{ is_saved|yesno:'true,false' }}" style="width: 100%; padding: 0.875rem; background: {% if is_saved %}#ffffff{% else %}white{% endif %}; color: {% if is_saved %}white{% else %}#ffffff{% endif %}; border: 2px solid {% if is_saved %}#ffffff{% else %}#fecaca{% endif %}; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                  <i class="{% if is_saved %}fas{% else %}far{% endif %} fa-heart" id="saveIcon"></i><span id="saveText">{% if is_saved %}Saved{% else %}Save{% endif %}</span>
+                </button>
+                {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="width: 100%; padding: 0.875rem; background: white; color: #ffffff; border: 2px solid #fecaca; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;" onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#fca5a5'" onmouseout="this.style.background='white'; this.style.borderColor='#fecaca'">
+                  <i class="far fa-heart"></i>Save
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Properties Section -->
+    {% if related_properties %}
+    <div class="container" style="margin-top: 3rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+        <h2 style="font-size: 2rem; font-weight: 900; color: #1f2937; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-home" style="color: #059669;"></i>Similar Properties
+        </h2>
+      </div>
+
+      <div class="row g-4">
+        {% for related in related_properties %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <a href="{% url 'rent:property_detail' related.id %}" style="text-decoration: none;">
+            <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 12px 30px rgba(5, 150, 105, 0.15)'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#f3f4f6'">
+              <!-- Image -->
+              <div style="position: relative; height: 200px; overflow: hidden;">
+                <img src="{{ related.get_main_image_url }}" alt="{{ related.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; top: 0.75rem; left: 0.75rem; background: #14b8a6; color: #047857; padding: 0.5rem 0.875rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; border: 2px solid #6ee7b7;">
+                  {{ related.category.name }}
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div style="padding: 1.5rem;">
+                <h3 style="font-size: 1.0625rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;">{{ related.title }}</h3>
+
+                <p style="color: #6b7280; font-size: 0.8125rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fas fa-map-marker-alt" style="color: #059669;"></i>{{ related.city }}, {{ related.state }}
+                </p>
+
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                  {% if related.bedrooms %}
+                  <div style="display: flex; align-items: center; gap: 0.375rem; color: #6b7280; font-size: 0.8125rem;">
+                    <i class="fas fa-bed" style="color: #059669;"></i>
+                    <span style="font-weight: 600;">{{ related.bedrooms }}</span>
+                  </div>
+                  {% endif %}
+                  {% if related.bathrooms %}
+                  <div style="display: flex; align-items: center; gap: 0.375rem; color: #6b7280; font-size: 0.8125rem;">
+                    <i class="fas fa-bath" style="color: #059669;"></i>
+                    <span style="font-weight: 600;">{{ related.bathrooms }}</span>
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div style="border-top: 2px solid #f3f4f6; padding-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #059669;">GHS {{ related.price_per_period }}</div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 600;">per {{ related.rental_period }}</div>
+                  </div>
+                  {% if related.is_available %}
+                  <span style="background: #14b8a6; color: #047857; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">Available</span>
+                  {% else %}
+                  <span style="background: #fee2e2; color: #ffffff; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">Rented</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+// Save/Unsave Property Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const saveBtn = document.getElementById('savePropertyBtn');
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+            const propertyId = this.dataset.propertyId;
+            const isSaved = this.dataset.isSaved === 'true';
+            const saveIcon = document.getElementById('saveIcon');
+            const saveText = document.getElementById('saveText');
+
+            // Send AJAX request
+            fetch(`/rent/property/${propertyId}/save/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle save state
+                    if (data.is_saved) {
+                        // Now saved
+                        this.style.background = '#ffffff';
+                        this.style.color = 'white';
+                        this.style.borderColor = '#ffffff';
+                        saveIcon.classList.remove('far');
+                        saveIcon.classList.add('fas');
+                        saveText.textContent = 'Saved';
+                        this.dataset.isSaved = 'true';
+                    } else {
+                        // Now unsaved
+                        this.style.background = 'white';
+                        this.style.color = '#ffffff';
+                        this.style.borderColor = '#fecaca';
+                        saveIcon.classList.remove('fas');
+                        saveIcon.classList.add('far');
+                        saveText.textContent = 'Save';
+                        this.dataset.isSaved = 'false';
+                    }
+
+                    // Show success message (optional)
+                    console.log(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

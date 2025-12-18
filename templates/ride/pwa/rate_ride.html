@@ -1,0 +1,497 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Rate Your Ride - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .rating-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+  }
+
+  .rating-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+  }
+
+  .driver-info {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+    margin-bottom: 1.5rem;
+  }
+
+  .driver-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1rem;
+    border: 3px solid #eab308;
+  }
+
+  .driver-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .vehicle-info {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .rating-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .star {
+    font-size: 3rem;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .star.active,
+  .star:hover {
+    color: #fbbf24;
+    transform: scale(1.1);
+  }
+
+  .star.active {
+    animation: starPulse 0.3s ease;
+  }
+
+  @keyframes starPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .rating-text {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: -1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detailed-ratings {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .detail-rating-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .detail-rating-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .detail-label {
+    font-size: 0.875rem;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .mini-stars {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .mini-star {
+    font-size: 1.25rem;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .mini-star.active,
+  .mini-star:hover {
+    color: #fbbf24;
+  }
+
+  .review-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.3s;
+  }
+
+  .review-textarea:focus {
+    outline: none;
+    border-color: #fbbf24;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+  }
+
+  .btn-submit:active {
+    transform: translateY(0);
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-skip {
+    width: 100%;
+    padding: 0.875rem;
+    background: transparent;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.938rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+
+  .btn-skip:hover {
+    border-color: #9ca3af;
+    color: #4b5563;
+  }
+
+  .ride-summary-mini {
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-mini-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-mini-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .summary-mini-label {
+    color: #059669;
+    font-weight: 500;
+  }
+
+  .summary-mini-value {
+    color: #064e3b;
+    font-weight: 600;
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rating-container">
+  <div class="page-header">
+    <h1 class="page-title">Rate Your Ride</h1>
+    <p class="page-subtitle">Help us improve your experience</p>
+  </div>
+
+  <div class="rating-card">
+    <!-- Driver Info -->
+    <div class="driver-info">
+      {% if ride.driver.user.profile.profile_image %}
+        <img src="{{ ride.driver.user.profile.profile_image.url }}" alt="{{ ride.driver.user.get_full_name }}" class="driver-avatar">
+      {% else %}
+        <div class="driver-avatar" style="background: #eab308; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #92400e;">
+          {{ ride.driver.user.first_name|first }}{{ ride.driver.user.last_name|first }}
+        </div>
+      {% endif %}
+      <div class="driver-name">{{ ride.driver.user.get_full_name }}</div>
+      <div class="vehicle-info">{{ ride.driver.vehicle.make }} {{ ride.driver.vehicle.model }} • {{ ride.driver.vehicle.license_plate }}</div>
+    </div>
+
+    <!-- Ride Summary -->
+    <div class="ride-summary-mini">
+      <div class="summary-mini-row">
+        <span class="summary-mini-label">Ride Date:</span>
+        <span class="summary-mini-value">{{ ride.requested_at|date:"M d, Y" }}</span>
+      </div>
+      <div class="summary-mini-row">
+        <span class="summary-mini-label">Total Fare:</span>
+        <span class="summary-mini-value">GHS {{ ride.total_fare|floatformat:2 }}</span>
+      </div>
+      <div class="summary-mini-row">
+        <span class="summary-mini-label">Distance:</span>
+        <span class="summary-mini-value">{{ ride.estimated_distance_km }} km</span>
+      </div>
+    </div>
+
+    <!-- Rating Form -->
+    <form method="post" id="ratingForm">
+      {% csrf_token %}
+      
+      <!-- Overall Rating -->
+      <div class="rating-section">
+        <div class="section-title">Overall Rating</div>
+        <div class="star-rating" id="overallRating">
+          <span class="star" data-rating="1">★</span>
+          <span class="star" data-rating="2">★</span>
+          <span class="star" data-rating="3">★</span>
+          <span class="star" data-rating="4">★</span>
+          <span class="star" data-rating="5">★</span>
+        </div>
+        <div class="rating-text" id="ratingText">Tap to rate</div>
+        <input type="hidden" name="rating" id="ratingValue" value="5" required>
+      </div>
+
+      <!-- Detailed Ratings -->
+      <div class="rating-section">
+        <div class="section-title">Rate specific aspects (Optional)</div>
+        <div class="detailed-ratings">
+          <div class="detail-rating-row">
+            <span class="detail-label">
+              <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
+              Cleanliness
+            </span>
+            <div class="mini-stars" data-rating-name="cleanliness_rating">
+              <span class="mini-star" data-value="1">★</span>
+              <span class="mini-star" data-value="2">★</span>
+              <span class="mini-star" data-value="3">★</span>
+              <span class="mini-star" data-value="4">★</span>
+              <span class="mini-star" data-value="5">★</span>
+            </div>
+            <input type="hidden" name="cleanliness_rating" value="5">
+          </div>
+
+          <div class="detail-rating-row">
+            <span class="detail-label">
+              <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
+              Punctuality
+            </span>
+            <div class="mini-stars" data-rating-name="punctuality_rating">
+              <span class="mini-star" data-value="1">★</span>
+              <span class="mini-star" data-value="2">★</span>
+              <span class="mini-star" data-value="3">★</span>
+              <span class="mini-star" data-value="4">★</span>
+              <span class="mini-star" data-value="5">★</span>
+            </div>
+            <input type="hidden" name="punctuality_rating" value="5">
+          </div>
+
+          <div class="detail-rating-row">
+            <span class="detail-label">
+              <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+              </svg>
+              Communication
+            </span>
+            <div class="mini-stars" data-rating-name="communication_rating">
+              <span class="mini-star" data-value="1">★</span>
+              <span class="mini-star" data-value="2">★</span>
+              <span class="mini-star" data-value="3">★</span>
+              <span class="mini-star" data-value="4">★</span>
+              <span class="mini-star" data-value="5">★</span>
+            </div>
+            <input type="hidden" name="communication_rating" value="5">
+          </div>
+
+          <div class="detail-rating-row">
+            <span class="detail-label">
+              <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+              </svg>
+              Driving Skills
+            </span>
+            <div class="mini-stars" data-rating-name="driving_rating">
+              <span class="mini-star" data-value="1">★</span>
+              <span class="mini-star" data-value="2">★</span>
+              <span class="mini-star" data-value="3">★</span>
+              <span class="mini-star" data-value="4">★</span>
+              <span class="mini-star" data-value="5">★</span>
+            </div>
+            <input type="hidden" name="driving_rating" value="5">
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Text -->
+      <div class="rating-section">
+        <div class="section-title">Write a Review (Optional)</div>
+        <textarea 
+          name="review" 
+          class="review-textarea" 
+          placeholder="Share your experience with other passengers..."
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-submit" id="submitBtn">
+        Submit Rating
+      </button>
+    </form>
+
+    <!-- Skip Link -->
+    <a href="{% url 'ride_pwa:ride_detail' ride.id %}" class="btn-skip">
+      Skip for Now
+    </a>
+  </div>
+</div>
+
+<script>
+// Overall rating
+const stars = document.querySelectorAll('#overallRating .star');
+const ratingValue = document.getElementById('ratingValue');
+const ratingText = document.getElementById('ratingText');
+const submitBtn = document.getElementById('submitBtn');
+
+const ratingTexts = {
+  1: '⭐ Poor',
+  2: '⭐⭐ Fair',
+  3: '⭐⭐⭐ Good',
+  4: '⭐⭐⭐⭐ Very Good',
+  5: '⭐⭐⭐⭐⭐ Excellent'
+};
+
+let currentRating = 5;
+
+// Set initial rating to 5 stars
+stars.forEach((star, index) => {
+  if (index < 5) {
+    star.classList.add('active');
+  }
+});
+ratingText.textContent = ratingTexts[5];
+
+stars.forEach(star => {
+  star.addEventListener('click', function() {
+    currentRating = parseInt(this.dataset.rating);
+    ratingValue.value = currentRating;
+    ratingText.textContent = ratingTexts[currentRating];
+    
+    stars.forEach((s, index) => {
+      if (index < currentRating) {
+        s.classList.add('active');
+      } else {
+        s.classList.remove('active');
+      }
+    });
+  });
+});
+
+// Detailed ratings
+document.querySelectorAll('.mini-stars').forEach(container => {
+  const ratingName = container.dataset.ratingName;
+  const input = document.querySelector(`input[name="${ratingName}"]`);
+  const miniStars = container.querySelectorAll('.mini-star');
+  
+  // Set initial rating to 5 stars
+  miniStars.forEach((star, index) => {
+    if (index < 5) {
+      star.classList.add('active');
+    }
+  });
+  
+  miniStars.forEach(miniStar => {
+    miniStar.addEventListener('click', function() {
+      const value = parseInt(this.dataset.value);
+      input.value = value;
+      
+      miniStars.forEach((s, index) => {
+        if (index < value) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+    });
+  });
+});
+
+// Form validation
+document.getElementById('ratingForm').addEventListener('submit', function(e) {
+  if (!ratingValue.value || ratingValue.value < 1 || ratingValue.value > 5) {
+    e.preventDefault();
+    alert('Please select a rating');
+    return false;
+  }
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+});
+</script>
+{% endblock %}

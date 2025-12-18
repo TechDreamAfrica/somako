@@ -1,0 +1,205 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load image_extras %}
+
+{% block title %}Browse Products - Shop{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block shop_active %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  .hero-header {
+    background: #8b5cf6;
+    color: white;
+    padding: 1.5rem 1rem;
+    margin-bottom: 0;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    opacity: 0.9;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .filter-chip.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+  }
+
+  .product-card:active {
+    transform: scale(0.98);
+  }
+
+  .product-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="hero-header">
+  <h1 class="hero-title">
+    <i class="fas fa-shopping-bag"></i> Browse Products
+  </h1>
+  <p class="hero-subtitle">Discover amazing deals on quality products</p>
+</div>
+
+<!-- Search Bar -->
+<div class="search-bar">
+  <form method="GET" action="{% url 'shop_pwa:search' %}">
+    <div style="position: relative;">
+      <input
+        type="text"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="Search products..."
+        style="width: 100%; padding: 0.875rem 1rem 0.875rem 3rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem;"
+      >
+      <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+    </div>
+  </form>
+</div>
+
+<!-- Filter Chips -->
+<div class="filter-chips">
+  <a href="?sort=newest" class="filter-chip {% if selected_sort == 'newest' or not selected_sort %}active{% endif %}">
+    <i class="fas fa-star"></i> Newest
+  </a>
+  <a href="?sort=price_low" class="filter-chip {% if selected_sort == 'price_low' %}active{% endif %}">
+    <i class="fas fa-arrow-down"></i> Low Price
+  </a>
+  <a href="?sort=price_high" class="filter-chip {% if selected_sort == 'price_high' %}active{% endif %}">
+    <i class="fas fa-arrow-up"></i> High Price
+  </a>
+  <a href="?sort=rating" class="filter-chip {% if selected_sort == 'rating' %}active{% endif %}">
+    <i class="fas fa-trophy"></i> Top Rated
+  </a>
+</div>
+
+<!-- Products Grid -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  {% if products %}
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+      {% for product in products %}
+      <a href="{% url 'shop_pwa:product_detail' product.id %}" style="text-decoration: none;">
+        <div class="product-card">
+          {% if product.get_primary_image_url %}
+          <img src="{{ product.get_primary_image_url|external_image }}" alt="{{ product.name }}" class="product-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="product-img" style="background: #ddd6fe; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-box" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+          </div>
+          {% else %}
+          <div class="product-img" style="background: #ddd6fe; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-box" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+          </div>
+          {% endif %}
+
+          <div style="padding: 1rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; line-height: 1.3;">{{ product.name|truncatechars:40 }}</h3>
+
+            {% if product.brand %}
+            <p style="color: #9ca3af; font-size: 0.75rem; margin-bottom: 0.5rem;">{{ product.brand }}</p>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 700; color: #8b5cf6; font-size: 1.125rem;">
+                GHS {{ product.base_price|floatformat:2 }}
+              </div>
+
+              {% if product.is_featured %}
+              <span style="background: #fbbf24; color: white; padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.625rem; font-weight: 600;">
+                <i class="fas fa-star"></i> Featured
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="width: 80px; height: 80px; background: #ddd6fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="fas fa-search" style="font-size: 2rem; color: #8b5cf6;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No products found</h3>
+      <p style="color: #6b7280;">Try adjusting your filters or search criteria</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'shop_pwa:product_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-th"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'shop_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

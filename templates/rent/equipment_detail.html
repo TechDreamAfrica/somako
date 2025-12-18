@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}{{ equipment.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Equipment Hero Section -->
+<section>
+  <div>
+    <div></div>
+  </div>
+
+  <div>
+    <div>
+      <div>
+        <a href="{% url 'rent:equipment_list' %}">
+          <i></i>Back to Equipment
+        </a>
+        <h1>{{ equipment.name }}</h1>
+        <p>{{ equipment.brand }}</p>
+      </div>
+      <div>
+        <span>{{ equipment.category.name }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div>
+    <div>
+      <!-- Left Column - Images & Details -->
+      <div>
+        <!-- Equipment Image -->
+        <div>
+          {% if equipment.equipmentimage_set.first %}
+          <img src="{{ equipment.equipmentimage_set.first.get_image_url }}" alt="{{ equipment.name }}">
+          {% else %}
+          <div>
+            <i></i>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Equipment Description -->
+        <div>
+          <h2>
+            <i></i>About This Equipment
+          </h2>
+          <p>{{ equipment.description }}</p>
+
+          <!-- Equipment Features Grid -->
+          <div>
+            <div>
+              <div>
+                <i></i>
+              </div>
+              <div>
+                <div>Brand</div>
+                <div>{{ equipment.brand }}</div>
+              </div>
+            </div>
+
+            <div>
+              <div>
+                <i></i>
+              </div>
+              <div>
+                <div>Condition</div>
+                <div>{{ equipment.condition }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specifications (if any) -->
+        {% if equipment.specifications %}
+        <div>
+          <h2>
+            <i></i>Specifications
+          </h2>
+          <div>{{ equipment.specifications }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right Column - Booking Card (Sticky) -->
+      <div>
+        <div>
+          <div>
+            <!-- Price -->
+            <div>
+              <div>GHS {{ equipment.price_per_period }}</div>
+              <div>per {{ equipment.rental_period }}</div>
+            </div>
+
+            <!-- Availability Status -->
+            <div>
+              {% if equipment.is_available %}
+              <div>
+                <i></i>
+                <span>Available Now</span>
+              </div>
+              {% else %}
+              <div>
+                <i></i>
+                <span>Not Available</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Book Button -->
+            {% if equipment.is_available %}
+            <a href="{% url 'rent:booking_create' %}?equipment={{ equipment.id }}">
+              <i></i>Book Now
+            </a>
+            {% else %}
+            <button disabled>
+              <i></i>Not Available
+            </button>
+            {% endif %}
+
+            <!-- Equipment Details List -->
+            <div>
+              <h3>Equipment Details</h3>
+
+              <div>
+                <div>
+                  <i></i>
+                </div>
+                <div>
+                  <div>Equipment ID</div>
+                  <div>#{{ equipment.id }}</div>
+                </div>
+              </div>
+
+              <div>
+                <div>
+                  <i></i>
+                </div>
+                <div>
+                  <div>Category</div>
+                  <div>{{ equipment.category.name }}</div>
+                </div>
+              </div>
+
+              <div>
+                <div>
+                  <i></i>
+                </div>
+                <div>
+                  <div>Condition</div>
+                  <div>{{ equipment.condition }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Actions -->
+            {% if user.is_authenticated and user != equipment.owner %}
+            <a href="{% url 'rent:chat_thread' %}?equipment={{ equipment.id }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; margin-bottom: 1rem;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.background='white'; this.style.borderColor='#d1fae5'">
+              <i class="fas fa-comments"></i>Chat with Owner
+            </a>
+            {% endif %}
+            <div>
+              <button>
+                <i></i>Ask Question
+              </button>
+              <button>
+                <i></i>Save Equipment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Earnings - Driver - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: #eab308;
+    padding: 2.5rem 1rem;
+    margin-bottom: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2.25rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-stat {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .hero-stat-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .earnings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 0 1rem 1.5rem 1rem;
+  }
+
+  .earnings-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .earnings-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: #eab308, rgba(5, 150, 105, 0.1));
+    border-radius: 0 0 0 100%;
+  }
+
+  .earnings-card.featured {
+    background: #eab308;
+    border: 3px solid #10b981;
+    transform: scale(1.02);
+  }
+
+  .earnings-card.featured::before {
+    background: #eab308, rgba(5, 150, 105, 0.2));
+  }
+
+  .earnings-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .earnings-amount {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .earnings-card.featured .earnings-amount {
+    color: #065f46;
+  }
+
+  .earnings-change {
+    font-size: 0.75rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+  }
+
+  .change-positive {
+    color: #10b981;
+  }
+
+  .change-negative {
+    color: #ef4444;
+  }
+
+  .period-selector {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    padding: 0.25rem;
+    margin: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+  }
+
+  .period-option {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .period-option.active {
+    background: #eab308;
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .earnings-card.featured .earnings-label {
+    color: #92400e;
+  }
+
+  .earnings-amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #eab308;
+    margin-bottom: 0.5rem;
+  }
+
+  .earnings-card.featured .earnings-amount {
+    font-size: 2.5rem;
+    color: #ffffff;
+  }
+
+  .earnings-subtitle {
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+
+  .earnings-card.featured .earnings-subtitle {
+    color: #78350f;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .stat-row:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    color: #6b7280;
+  }
+
+  .stat-value {
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .icon-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+  }
+
+  .btn-action {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fas fa-money-bill-wave"></i>
+    Earnings
+  </h1>
+  <p class="page-subtitle">
+    Track your income, analyze performance, and grow your earnings
+  </p>
+  
+  <!-- Hero Statistics -->
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-number">GHS {{ total_earnings|default:"0"|floatformat:0 }}</div>
+      <div class="hero-stat-label">Total Earned</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">{{ total_rides|default:"0" }}</div>
+      <div class="hero-stat-label">Total Rides</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">GHS {{ avg_per_ride|default:"0"|floatformat:0 }}</div>
+      <div class="hero-stat-label">Avg Per Ride</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">{{ this_month_rides|default:"0" }}</div>
+      <div class="hero-stat-label">This Month</div>
+    </div>
+  </div>
+</div>
+
+<!-- Period Selector -->
+<div class="period-selector">
+  <a href="?period=today" class="period-option {% if period == 'today' or not period %}active{% endif %}">Today</a>
+  <a href="?period=week" class="period-option {% if period == 'week' %}active{% endif %}">This Week</a>
+  <a href="?period=month" class="period-option {% if period == 'month' %}active{% endif %}">This Month</a>
+</div>
+
+<div class="pwa-container">
+  <!-- Earnings Summary -->
+  <div class="earnings-grid">
+    <div class="earnings-card featured">
+      <div class="icon-badge" style="background: #eab308;">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="earnings-label">Total Earnings</div>
+      <div class="earnings-amount">GHS {{ total_earnings|floatformat:2 }}</div>
+      <div class="earnings-subtitle">All time earnings</div>
+    </div>
+  </div>
+
+  <div class="earnings-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="earnings-card">
+      <div class="icon-badge" style="background: #eab308;">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <div class="earnings-label">Today</div>
+      <div class="earnings-amount" style="font-size: 1.5rem;">GHS {{ today_earnings|floatformat:2 }}</div>
+      <div class="earnings-subtitle">Today's income</div>
+    </div>
+
+    <div class="earnings-card">
+      <div class="icon-badge" style="background: #eab308;">
+        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+      </div>
+      <div class="earnings-label">This Week</div>
+      <div class="earnings-amount" style="font-size: 1.5rem;">GHS {{ week_earnings|floatformat:2 }}</div>
+      <div class="earnings-subtitle">Weekly income</div>
+    </div>
+  </div>
+
+  <!-- Driver Stats -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-chart-line" style="color: #eab308;"></i> Statistics
+    </h2>
+    <div class="stat-row">
+      <span class="stat-label">Total Rides</span>
+      <span class="stat-value">{{ driver.total_rides }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Average Rating</span>
+      <span class="stat-value">
+        <i class="fas fa-star" style="color: #fbbf24;"></i> 
+        {{ driver.average_rating|default:"N/A" }}
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Status</span>
+      <span class="stat-value">
+        {% if driver.availability == 'ONLINE' %}
+          <span style="color: #10b981;">🟢 Online</span>
+        {% elif driver.availability == 'OFFLINE' %}
+          <span style="color: #ef4444;">🔴 Offline</span>
+        {% else %}
+          <span style="color: #eab308;">🟡 Busy</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Payout Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-university" style="color: #eab308;"></i> Payout Information
+    </h2>
+    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+      Earnings are paid out weekly to your registered bank account.
+    </p>
+    {% if driver.bank_name %}
+    <div class="stat-row">
+      <span class="stat-label">Bank</span>
+      <span class="stat-value">{{ driver.bank_name }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Account Number</span>
+      <span class="stat-value">{{ driver.account_number }}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Account Name</span>
+      <span class="stat-value">{{ driver.account_holder_name }}</span>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 1rem; background: #fef3c7; border-radius: 12px;">
+      <p style="color: #92400e; font-weight: 600;">⚠️ No bank account registered</p>
+      <p style="color: #78350f; font-size: 0.875rem;">Please update your profile with banking details</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div style="padding: 0 1rem;">
+    <button onclick="window.location.href='{% url 'ride_pwa:driver_profile' %}'" class="btn-action">
+      <i class="fas fa-edit"></i> Update Banking Details
+    </button>
+    <button onclick="window.location.href='{% url 'ride_pwa:driver_dashboard' %}'" class="btn-action btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+  </div>
+</div>
+
+<!-- Floating Refresh Button -->
+<button class="floating-refresh" onclick="window.location.reload()" title="Refresh earnings">
+  <i class="fas fa-sync-alt"></i>
+</button>
+
+<style>
+  .floating-refresh {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    font-size: 1.2rem;
+    transition: all 0.3s;
+  }
+
+  .floating-refresh:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  }
+</style>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:driver_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'ride_pwa:available_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'ride_pwa:active_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-car"></i>
+    <span>Active</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_earnings' %}" class="bottom-nav-item active">
+    <i class="fas fa-money-bill-wave"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

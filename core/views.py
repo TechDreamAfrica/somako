@@ -1,0 +1,112 @@
+from django.shortcuts import render
+from django.db.models import Avg
+from accounts.models import User
+
+# Import models from service apps
+from rent.models import Property, Equipment, RentalBooking
+from pharmacy.models import Medicine, Order as PharmacyOrder
+from shop.models import Product, Order as ShopOrder
+from food.models import Restaurant, MenuItem, Order as FoodOrder
+from ride.models import Ride, DriverProfile
+
+
+def home(request):
+    """Home page view with featured content and statistics from all service apps"""
+
+    # RENT APP DATA
+    featured_properties = Property.objects.filter(
+        is_available=True
+    ).order_by('-created_at')[:6]
+
+    featured_equipment = Equipment.objects.filter(
+        is_available=True
+    ).order_by('-created_at')[:4]
+
+    total_properties = Property.objects.filter(is_available=True).count()
+    total_equipment = Equipment.objects.filter(is_available=True).count()
+    total_rentals = RentalBooking.objects.filter(status__in=['confirmed', 'active']).count()
+
+    # PHARMACY APP DATA
+    featured_medicines = Medicine.objects.filter(
+        is_active=True
+    ).order_by('-created_at')[:6]
+
+    total_medicines = Medicine.objects.filter(is_active=True).count()
+    total_pharmacy_orders = PharmacyOrder.objects.filter(status='delivered').count()
+
+    # SHOP APP DATA
+    featured_products = Product.objects.filter(
+        is_active=True
+    ).order_by('-created_at')[:6]
+
+    total_products = Product.objects.filter(is_active=True).count()
+    total_shop_orders = ShopOrder.objects.count()
+
+    # FOOD APP DATA
+    featured_restaurants = Restaurant.objects.filter(
+        status='active'
+    ).annotate(
+        avg_rating=Avg('reviews__rating')
+    ).order_by('-avg_rating', '-created_at')[:6]
+
+    featured_menu_items = MenuItem.objects.filter(
+        is_available=True,
+        is_featured=True
+    ).order_by('-created_at')[:6]
+
+    total_restaurants = Restaurant.objects.filter(status='active').count()
+    total_food_orders = FoodOrder.objects.filter(status='delivered').count()
+
+    # RIDE APP DATA
+    total_drivers = DriverProfile.objects.filter(
+        status='approved',
+        availability='available'
+    ).count()
+
+    total_rides = Ride.objects.filter(status='completed').count()
+    active_rides = Ride.objects.filter(status__in=['accepted', 'arrived', 'in_progress']).count()
+
+    # AGGREGATE STATISTICS
+    total_users = User.objects.count()
+    total_orders = total_pharmacy_orders + total_shop_orders + total_food_orders + total_rides
+
+    # Count unique cities from properties, restaurants, etc.
+    property_cities = Property.objects.values_list('city', flat=True).distinct()
+    restaurant_cities = Restaurant.objects.values_list('city', flat=True).distinct()
+    unique_cities = len(set(list(property_cities) + list(restaurant_cities)))
+
+    context = {
+        # Rent data
+        'featured_properties': featured_properties,
+        'featured_equipment': featured_equipment,
+        'total_properties': total_properties,
+        'total_equipment': total_equipment,
+        'total_rentals': total_rentals,
+
+        # Pharmacy data
+        'featured_medicines': featured_medicines,
+        'total_medicines': total_medicines,
+        'total_pharmacy_orders': total_pharmacy_orders,
+
+        # Shop data
+        'featured_products': featured_products,
+        'total_products': total_products,
+        'total_shop_orders': total_shop_orders,
+
+        # Food data
+        'featured_restaurants': featured_restaurants,
+        'featured_menu_items': featured_menu_items,
+        'total_restaurants': total_restaurants,
+        'total_food_orders': total_food_orders,
+
+        # Ride data
+        'total_drivers': total_drivers,
+        'total_rides': total_rides,
+        'active_rides': active_rides,
+
+        # Aggregate statistics
+        'total_users': total_users,
+        'total_orders': total_orders,
+        'unique_cities': unique_cities,
+    }
+    return render(request, 'core/home.html', context)

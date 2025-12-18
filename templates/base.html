@@ -1,0 +1,1201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      {% block title %}
+      Soma Ko - All-in-One Marketplace | Shop, Rent, Food Delivery & Ride-Hailing in Ghana
+      {% endblock %}
+    </title>
+    <meta
+      name="description"
+      content="{% block description %}Soma Ko is Ghana's leading all-in-one marketplace platform. Shop online, rent properties & equipment, order food delivery, book rides, and connect with skilled workers. Your one-stop solution for all services in Ghana.{% endblock %}"
+    />
+    <meta
+      name="keywords"
+      content="{% block keywords %}Soma Ko, Ghana marketplace, online shopping Ghana, food delivery Ghana, property rental Ghana, ride-hailing Ghana, e-commerce Ghana, buy and sell Ghana, restaurant delivery, property listings, car rental, equipment rental, skilled workers, plumber, electrician, handyman, Accra, Kumasi, Takoradi, online marketplace Africa{% endblock %}"
+    />
+    <meta name="author" content="Soma Ko Ghana" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    <link
+      rel="canonical"
+      href="{% block canonical %}https://www.somako.org{% endblock %}"
+    />
+
+    <!-- Open Graph Meta Tags (Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Soma Ko Ghana" />
+    <meta
+      property="og:title"
+      content="{% block og_title %}Soma Ko - All-in-One Marketplace | Shop, Rent, Food Delivery & Rides in Ghana{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}Ghana's premier marketplace platform. Shop products, rent properties, order food, book rides, and find skilled workers. Everything you need in one place!{% endblock %}"
+    />
+    <meta
+      property="og:image"
+      content="{% block og_image %}https://www.somako.org/static/images/somako-og-image.jpg{% endblock %}"
+    />
+    <meta
+      property="og:image:alt"
+      content="Soma Ko Ghana - Connecting Skills with Opportunities"
+    />
+    <meta
+      property="og:url"
+      content="{% block og_url %}https://www.somako.org{% endblock %}"
+    />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SomaKoGhana" />
+    <meta name="twitter:creator" content="@SomaKoGhana" />
+    <meta
+      name="twitter:title"
+      content="{% block twitter_title %}Soma Ko Ghana - Connect Skilled Workers with Clients{% endblock %}"
+    />
+    <meta
+      name="twitter:description"
+      content="{% block twitter_description %}Find skilled workers across Ghana and Africa. From plumbing to programming, connect with the right person for any job.{% endblock %}"
+    />
+    <meta
+      name="twitter:image"
+      content="{% block twitter_image %}https://www.somako.org/static/images/somako-twitter-card.jpg{% endblock %}"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Soma Ko Ghana - Connecting Skills with Opportunities"
+    />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="GH" />
+    <meta name="geo.country" content="Ghana" />
+    <meta name="geo.placename" content="Accra, Ghana" />
+    <meta name="geo.position" content="5.6037;-0.1870" />
+    <meta name="ICBM" content="5.6037, -0.1870" />
+
+    <!-- Mobile App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Soma Ko" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Soma Ko Ghana" />
+    <meta name="msapplication-TileColor" content="#059669" />
+    <meta name="theme-color" content="#059669" />
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/static/images/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/static/images/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/static/images/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/static/site.webmanifest" />
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Soma Ko Ghana",
+        "alternateName": "Soma Ko",
+        "url": "https://www.somako.org",
+        "description": "Soma Ko Ghana connects skilled workers across Africa with clients who need their services. Find plumbers, electricians, developers, and more.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://www.somako.org/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        },
+        "sameAs": [
+          "https://facebook.com/SomaKoGhana",
+          "https://twitter.com/SomaKoGhana",
+          "https://linkedin.com/company/somako-ghana",
+          "https://instagram.com/somakoghana"
+        ]
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Soma Ko Ghana",
+        "url": "https://www.somako.org",
+        "logo": "https://www.somako.org/static/images/logo.png",
+        "description": "Connecting skilled workers with opportunities across Ghana and Africa",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "GH",
+          "addressRegion": "Greater Accra",
+          "addressLocality": "Accra"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+233-597-458-456",
+          "contactType": "customer service",
+          "email": "support@somako.org"
+        },
+        "sameAs": [
+          "https://facebook.com/SomaKoGhana",
+          "https://twitter.com/SomaKoGhana",
+          "https://linkedin.com/company/somako-ghana",
+          "https://instagram.com/somakoghana"
+        ]
+      }
+    </script>
+
+    <!-- Additional Schema.org blocks can be added per page -->
+    {% block schema_org %}{% endblock %}
+
+    <!-- Hreflang tags for international SEO -->
+    {% block hreflang %}
+    <link rel="alternate" hreflang="en" href="https://www.somako.org" />
+    <link rel="alternate" hreflang="en-gh" href="https://www.somako.org" />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://www.somako.org"
+    />
+    {% endblock %}
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#ecfdf5',
+                100: '#d1fae5',
+                200: '#a7f3d0',
+                300: '#6ee7b7',
+                400: '#34d399',
+                500: '#10b981',
+                600: '#059669',
+                700: '#047857',
+                800: '#065f46',
+                900: '#064e3b',
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Main Website Theme CSS (Green Theme) -->
+    <link rel="stylesheet" href="{% static 'css/main-theme.css' %}" />
+    
+    <!-- App-Specific Theme Overrides -->
+    <link rel="stylesheet" href="{% static 'css/app-themes.css' %}" />
+
+    <!-- Additional styles block for child templates -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N08CBF9WQT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-N08CBF9WQT');
+    </script>
+  </head>
+  <body class="bg-gray-50 {% block content_class %}{% endblock %}" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+    <!-- Navigation -->
+    <nav class="navbar-custom sticky-top" style="background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(34, 197, 94, 0.1);">
+      <div class="container-fluid px-3 px-md-4 px-lg-5">
+        <div class="row align-items-center py-2 py-lg-3 w-100 mx-0">
+          <!-- Logo -->
+          <div class="col-6 col-lg-2">
+            <a href="{% url 'core:home' %}" class="logo-container text-decoration-none" style="display: flex; align-items: center; gap: 0.75rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.querySelector('.logo-icon').style.transform='rotate(5deg) scale(1.05)'; this.querySelector('.logo-icon').style.boxShadow='0 8px 25px rgba(34, 197, 94, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.querySelector('.logo-icon').style.transform='rotate(0) scale(1)'; this.querySelector('.logo-icon').style.boxShadow='0 4px 15px rgba(34, 197, 94, 0.3)'">>
+              <div class="logo-icon" style="width: 44px; height: 44px; background: #22c55e; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <i class="fas fa-briefcase" style="color: white; font-size: 1.25rem; position: relative; z-index: 2;"></i>
+              </div>
+              <span class="d-none d-md-inline fw-bold" style="color: #22c55e; font-size: 1.5rem; letter-spacing: -0.75px; font-family: 'Inter', -apple-system, sans-serif; position: relative;">
+                Soma Ko
+                <span style="position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #22c55e; transition: width 0.3s ease;"></span>
+              </span>
+            </a>
+          </div>
+
+          <!-- Desktop Navigation - Main Links -->
+          <div class="col-lg-7 d-none d-lg-block">
+            <div class="d-flex justify-content-center gap-1">
+              <a href="{% url 'rent:property_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
+                <i class="fas fa-home" style="color: #059669; font-size: 1.125rem;"></i>
+                <span style="color: #1f2937;">Rent</span>
+              </a>
+              <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
+                <i class="fas fa-pills" style="color: #059669; font-size: 1.125rem;"></i>
+                <span style="color: #1f2937;">Pharmacy</span>
+              </a>
+              <a href="{% url 'shop:product_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
+                <i class="fas fa-shopping-bag" style="color: #059669; font-size: 1.125rem;"></i>
+                <span style="color: #1f2937;">Shop</span>
+              </a>
+              <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
+                <i class="fas fa-utensils" style="color: #059669; font-size: 1.125rem;"></i>
+                <span style="color: #1f2937;">Food</span>
+              </a>
+              <a href="{% url 'ride:book_ride' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
+                <i class="fas fa-car" style="color: #059669; font-size: 1.125rem;"></i>
+                <span style="color: #1f2937;">Ride</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Desktop User Menu -->
+          <div class="col-lg-3 d-none d-lg-block">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+              {% if user.is_authenticated %}
+              <!-- Cart Dropdown -->
+              <div class="position-relative">
+                <button
+                  id="cartDropdownButton"
+                  type="button"
+                  class="cart-dropdown-button"
+                  onclick="toggleCartDropdown(event)"
+                  style="background: #ecfdf5; border: 2px solid #059669; color: #059669; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                  onmouseover="this.style.background='#059669'; this.style.color='white'"
+                  onmouseout="this.style.background='#ecfdf5'; this.style.color='#059669'"
+                >
+                  <i class="fas fa-shopping-cart" style="font-size: 1.125rem;"></i>
+                  {% if total_cart_count > 0 %}
+                  <span class="cart-count" style="position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);">{{ total_cart_count }}</span>
+                  {% endif %}
+                </button>
+
+                <div id="cartDropdown" class="cart-dropdown-menu hidden" style="position: absolute; top: calc(100% + 0.75rem); right: 0; min-width: 320px; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); padding: 1rem; z-index: 1000; border: 1px solid #e5e7eb;">
+                  <h6 style="font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #ecfdf5;">Shopping Carts</h6>
+
+                  {% if food_cart_count > 0 %}
+                  <a href="{% url 'food:cart_view' %}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; margin-bottom: 0.5rem;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='transparent'">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <i class="fas fa-utensils" style="color: #059669; font-size: 1.125rem;"></i>
+                      <span style="font-weight: 500;">Food</span>
+                    </div>
+                    <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.625rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600;">{{ food_cart_count }}</span>
+                  </a>
+                  {% endif %}
+
+                  {% if shop_cart_count > 0 %}
+                  <a href="{% url 'shop:cart_view' %}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; margin-bottom: 0.5rem;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='transparent'">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <i class="fas fa-shopping-bag" style="color: #059669; font-size: 1.125rem;"></i>
+                      <span style="font-weight: 500;">Shop</span>
+                    </div>
+                    <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.625rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600;">{{ shop_cart_count }}</span>
+                  </a>
+                  {% endif %}
+
+                  {% if pharmacy_cart_count > 0 %}
+                  <a href="{% url 'pharmacy:cart' %}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; margin-bottom: 0.5rem;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='transparent'">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <i class="fas fa-pills" style="color: #059669; font-size: 1.125rem;"></i>
+                      <span style="font-weight: 500;">Pharmacy</span>
+                    </div>
+                    <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.625rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600;">{{ pharmacy_cart_count }}</span>
+                  </a>
+                  {% endif %}
+
+                  {% if total_cart_count == 0 %}
+                  <div style="text-align: center; padding: 2rem 1rem; color: #9ca3af;">
+                    <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #d1d5db; margin-bottom: 0.75rem;"></i>
+                    <p style="margin: 0; font-size: 0.9375rem;">Your cart is empty</p>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <div class="position-relative">
+                <button
+                  id="navbarDropdown"
+                  type="button"
+                  class="user-dropdown-button"
+                  onclick="toggleDropdown(event)"
+                >
+                  {% if user.profile_picture %}
+                  <img
+                    src="{{ user.profile_picture }}"
+                    alt="{{ user.username }}"
+                  />
+                  {% else %}
+                  <div class="user-avatar-placeholder">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  {% endif %}
+                  <span class="d-none d-xl-inline">{{ user.first_name|default:user.username }}</span>
+                  <i class="fas fa-chevron-down" style="font-size: 0.75rem;"></i>
+                </button>
+
+                <div id="userDropdown" class="user-dropdown-menu hidden" style="position: absolute; top: calc(100% + 0.75rem); right: 0; min-width: 240px; background: white; border-radius: 0.75rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); padding: 0.5rem; z-index: 1000; border: 1px solid #e5e7eb; animation: slideDown 0.3s ease;">
+                  <a href="{% url 'accounts:dashboard' %}" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; font-size: 0.9375rem; font-weight: 500;" onmouseover="this.style.background='#ecfdf5'; this.style.color='#059669'; this.style.transform='translateX(4px)'" onmouseout="this.style.background='transparent'; this.style.color='#4b5563'; this.style.transform='translateX(0)'">
+                    <i class="fas fa-chart-line" style="font-size: 1.125rem; color: #059669; width: 20px;"></i>
+                    <span>Dashboard</span>
+                  </a>
+
+                  <a href="{% url 'accounts:notifications' %}" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; font-size: 0.9375rem; font-weight: 500;" onmouseover="this.style.background='#ecfdf5'; this.style.color='#059669'; this.style.transform='translateX(4px)'" onmouseout="this.style.background='transparent'; this.style.color='#4b5563'; this.style.transform='translateX(0)'">
+                    <i class="fas fa-bell" style="font-size: 1.125rem; color: #059669; width: 20px;"></i>
+                    <span>Notifications</span>
+                  </a>
+
+                  <a href="{% url 'rent:my_messages' %}" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; font-size: 0.9375rem; font-weight: 500;" onmouseover="this.style.background='#ecfdf5'; this.style.color='#059669'; this.style.transform='translateX(4px)'" onmouseout="this.style.background='transparent'; this.style.color='#4b5563'; this.style.transform='translateX(0)'">
+                    <i class="fas fa-envelope" style="font-size: 1.125rem; color: #059669; width: 20px;"></i>
+                    <span>Messages</span>
+                  </a>
+
+                  <a href="{% url 'accounts:profile' %}" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #4b5563; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; font-size: 0.9375rem; font-weight: 500;" onmouseover="this.style.background='#ecfdf5'; this.style.color='#059669'; this.style.transform='translateX(4px)'" onmouseout="this.style.background='transparent'; this.style.color='#4b5563'; this.style.transform='translateX(0)'">
+                    <i class="fas fa-user-circle" style="font-size: 1.125rem; color: #059669; width: 20px;"></i>
+                    <span>Profile</span>
+                  </a>
+          
+                  <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid #e5e7eb;" />
+
+                  <form method="post" action="{% url 'accounts:logout' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #dc2626; border-radius: 0.5rem; transition: all 0.3s ease; text-decoration: none; font-size: 0.9375rem; font-weight: 600; width: 100%; background: transparent; border: none; cursor: pointer; text-align: left;" onmouseover="this.style.background='#fee2e2'; this.style.transform='translateX(4px)'" onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'">
+                      <i class="fas fa-sign-out-alt" style="font-size: 1.125rem; color: #dc2626; width: 20px;"></i>
+                      <span>Logout</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {% else %}
+              <a href="{% url 'accounts:login' %}" class="nav-link-custom" style="padding: 0.625rem 1rem;">
+                <i class="fas fa-sign-in-alt" style="color: #059669;"></i>
+                <span style="color: #1f2937; font-weight: 500;">Login</span>
+              </a>
+              <a href="{% url 'accounts:signup' %}" class="btn-custom btn-primary" style="padding: 0.625rem 1.5rem; background: #22c55e; color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); border: none; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s ease; text-decoration: none;">
+                <i class="fas fa-user-plus"></i>
+                <span>Sign Up</span>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <div class="col-6 d-lg-none text-end">
+            <button
+              type="button"
+              class="mobile-menu-button"
+              onclick="toggleMobileMenu()"
+              aria-label="Toggle navigation"
+              style="background: #ecfdf5; border: 2px solid #059669; color: #059669; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);"
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="mobile-nav-menu hidden" style="background: white; border-top: 2px solid #ecfdf5; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); animation: slideDown 0.3s ease;">
+          <div class="pb-3 px-2">
+            <a href="{% url 'rent:property_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-home me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+              <span style="color: #1f2937; font-weight: 500;">Rent</span>
+            </a>
+            <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-pills me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+              <span style="color: #1f2937; font-weight: 500;">Pharmacy</span>
+            </a>
+            <a href="{% url 'shop:product_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-shopping-bag me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+              <span style="color: #1f2937; font-weight: 500;">Shop</span>
+            </a>
+            <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-utensils me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+              <span style="color: #1f2937; font-weight: 500;">Food</span>
+            </a>
+            <a href="{% url 'ride:book_ride' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-car me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+              <span style="color: #1f2937; font-weight: 500;">Ride</span>
+            </a>
+
+            <div class="mt-3 pt-3" style="border-top: 2px solid #ecfdf5;">
+              {% if user.is_authenticated %}
+                <a href="{% url 'accounts:dashboard' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-chart-line me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                  <span style="color: #1f2937; font-weight: 500;">Dashboard</span>
+                </a>
+                <a href="{% url 'accounts:profile' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-user-circle me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                  <span style="color: #1f2937; font-weight: 500;">Profile</span>
+                </a>
+                <a href="{% url 'accounts:notifications' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-bell me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                  <span style="color: #1f2937; font-weight: 500;">Notifications</span>
+                </a>
+                <a href="{% url 'rent:my_messages' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-envelope me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                  <span style="color: #1f2937; font-weight: 500;">Messages</span>
+                </a>
+                <form method="post" action="{% url 'accounts:logout' %}" class="mt-2">
+                  {% csrf_token %}
+                  <button type="submit" class="nav-link-custom d-flex align-items-center w-100" style="padding: 0.875rem 1rem; border-radius: 0.5rem; background: #fee2e2; border: 2px solid #ef4444; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#ef4444'; this.querySelector('i').style.color='white'; this.querySelector('span').style.color='white'" onmouseout="this.style.background='#fee2e2'; this.querySelector('i').style.color='#ef4444'; this.querySelector('span').style.color='#ef4444'">
+                    <i class="fas fa-sign-out-alt me-3" style="color: #ef4444; font-size: 1.125rem; width: 20px; transition: color 0.3s ease;"></i>
+                    <span style="color: #ef4444; font-weight: 600; transition: color 0.3s ease;">Logout</span>
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'accounts:login' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                  <i class="fas fa-sign-in-alt me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                  <span style="color: #1f2937; font-weight: 500;">Login</span>
+                </a>
+                <a href="{% url 'accounts:signup' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; background: #ecfdf5; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.background='#059669'; this.querySelector('i').style.color='white'; this.querySelector('span').style.color='white'" onmouseout="this.style.background='#ecfdf5'; this.querySelector('i').style.color='#059669'; this.querySelector('span').style.color='#059669'">
+                  <i class="fas fa-user-plus me-3" style="color: #059669; font-size: 1.125rem; width: 20px; transition: color 0.3s ease;"></i>
+                  <span style="color: #059669; font-weight: 600; transition: color 0.3s ease;">Sign Up</span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container-fluid px-3 px-md-4 px-lg-5" style="margin-top: 1.5rem; position: relative; z-index: 999;">
+      <div class="row">
+        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+          {% for message in messages %}
+          <div class="alert-custom alert-{{ message.tags|default:'info' }} fade-in" role="alert" style="border-radius: 0.75rem; padding: 1.125rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); animation: slideInRight 0.4s ease;">
+            <div class="alert-icon" style="font-size: 1.375rem; margin-right: 0.875rem;">
+              {% if message.tags == 'error' %}
+              <i class="fas fa-exclamation-circle"></i>
+              {% elif message.tags == 'success' %}
+              <i class="fas fa-check-circle"></i>
+              {% elif message.tags == 'warning' %}
+              <i class="fas fa-exclamation-triangle"></i>
+              {% else %}
+              <i class="fas fa-info-circle"></i>
+              {% endif %}
+            </div>
+            <div class="flex-grow-1" style="font-weight: 500; line-height: 1.6;">{{ message }}</div>
+            <button
+              type="button"
+              class="alert-close"
+              onclick="this.parentElement.style.animation='slideInRight 0.3s reverse'; setTimeout(() => this.parentElement.remove(), 300);"
+              aria-label="Close"
+              style="background: transparent; border: none; padding: 0.25rem; cursor: pointer; transition: transform 0.2s ease;"
+              onmouseover="this.style.transform='scale(1.1)'"
+              onmouseout="this.style.transform='scale(1)'"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main style="min-height: calc(100vh - 500px); padding-top: 1.5rem; padding-bottom: 3rem;">{% block content %}{% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="footer-custom" style="background: #166534; color: #f3f4f6; padding: 4rem 0 1.5rem; margin-top: 5rem; position: relative; overflow: hidden;">
+      <!-- Decorative green accent -->
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #22c55e; opacity: 0.8;"></div>
+
+      <div class="container-custom" style="position: relative; z-index: 1;">
+        <div class="row g-4 g-lg-5">
+          <!-- Company Info -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="logo-container mb-4" style="display: inline-flex; align-items: center; gap: 0.875rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.querySelector('.logo-icon').style.transform='rotate(-5deg) scale(1.08)'; this.querySelector('.logo-icon').style.boxShadow='0 8px 30px rgba(34, 197, 94, 0.6)'; this.querySelector('.footer-logo-text').style.textShadow='0 4px 12px rgba(34, 197, 94, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.querySelector('.logo-icon').style.transform='rotate(0) scale(1)'; this.querySelector('.logo-icon').style.boxShadow='0 4px 15px rgba(34, 197, 94, 0.4)'; this.querySelector('.footer-logo-text').style.textShadow='none'">
+              <div class="logo-icon" style="width: 50px; height: 50px; background: #22c55e; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); border-radius: 0.875rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.1);">
+                <i class="fas fa-briefcase" style="color: white; font-size: 1.5rem; position: relative; z-index: 2; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));"></i>
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <span class="text-white footer-logo-text" style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.75px; font-family: 'Inter', -apple-system, sans-serif; line-height: 1.2; transition: text-shadow 0.3s ease; color: #22c55e;">
+                  Soma Ko
+                </span>
+                <span style="font-size: 0.75rem; color: #86efac; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px;">Ghana</span>
+              </div>
+            </div>
+            <p class="mb-4" style="color: #d1d5db; line-height: 1.8; font-size: 0.9375rem;">
+              Connecting skilled workers across Ghana and Africa with clients
+              who need their services. From plumbing to programming, find the
+              right person for any job.
+            </p>
+            <div class="social-links" style="display: flex; gap: 0.875rem; margin-top: 1.5rem;">
+              <a href="https://facebook.com/SomaKoGhana" aria-label="Facebook" target="_blank" rel="noopener" style="width: 42px; height: 42px; background: rgba(5, 150, 105, 0.15); border: 2px solid rgba(5, 150, 105, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.background='#059669'; this.style.borderColor='#059669'; this.style.color='white'; this.style.transform='translateY(-4px) scale(1.05)'" onmouseout="this.style.background='rgba(5, 150, 105, 0.15)'; this.style.borderColor='rgba(5, 150, 105, 0.3)'; this.style.color='#10b981'; this.style.transform='translateY(0) scale(1)'">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://twitter.com/SomaKoGhana" aria-label="Twitter" target="_blank" rel="noopener" style="width: 42px; height: 42px; background: rgba(5, 150, 105, 0.15); border: 2px solid rgba(5, 150, 105, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.background='#059669'; this.style.borderColor='#059669'; this.style.color='white'; this.style.transform='translateY(-4px) scale(1.05)'" onmouseout="this.style.background='rgba(5, 150, 105, 0.15)'; this.style.borderColor='rgba(5, 150, 105, 0.3)'; this.style.color='#10b981'; this.style.transform='translateY(0) scale(1)'">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="https://linkedin.com/company/somako-ghana" aria-label="LinkedIn" target="_blank" rel="noopener" style="width: 42px; height: 42px; background: rgba(5, 150, 105, 0.15); border: 2px solid rgba(5, 150, 105, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.background='#059669'; this.style.borderColor='#059669'; this.style.color='white'; this.style.transform='translateY(-4px) scale(1.05)'" onmouseout="this.style.background='rgba(5, 150, 105, 0.15)'; this.style.borderColor='rgba(5, 150, 105, 0.3)'; this.style.color='#10b981'; this.style.transform='translateY(0) scale(1)'">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="https://instagram.com/somakoghana" aria-label="Instagram" target="_blank" rel="noopener" style="width: 42px; height: 42px; background: rgba(5, 150, 105, 0.15); border: 2px solid rgba(5, 150, 105, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.background='#059669'; this.style.borderColor='#059669'; this.style.color='white'; this.style.transform='translateY(-4px) scale(1.05)'" onmouseout="this.style.background='rgba(5, 150, 105, 0.15)'; this.style.borderColor='rgba(5, 150, 105, 0.3)'; this.style.color='#10b981'; this.style.transform='translateY(0) scale(1)'">
+                <i class="fab fa-instagram"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="col-6 col-md-6 col-lg-2">
+            <h6 style="color: white; font-size: 1.125rem; font-weight: 700; margin-bottom: 1.25rem; position: relative; padding-bottom: 0.75rem;">
+              Quick Links
+              <span style="position: absolute; left: 0; bottom: 0; width: 45px; height: 3px; background: #22c55e; border-radius: 2px;"></span>
+            </h6>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'core:home' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Home
+                </a>
+              </li>
+              {% if user.is_authenticated %}
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'accounts:dashboard' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items-center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Dashboard
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'accounts:profile' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items-center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  My Profile
+                </a>
+              </li>
+              {% else %}
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'accounts:login' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items-center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Login
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'accounts:signup' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items-center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Sign Up
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Support -->
+          <div class="col-6 col-md-6 col-lg-2">
+            <h6 style="color: white; font-size: 1.125rem; font-weight: 700; margin-bottom: 1.25rem; position: relative; padding-bottom: 0.75rem;">
+              Support
+              <span style="position: absolute; left: 0; bottom: 0; width: 45px; height: 3px; background: #22c55e; border-radius: 2px;"></span>
+            </h6>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'accounts:subscription_plans' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Pricing
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="#" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Help Center
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="#" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Contact Us
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Services -->
+          <div class="col-6 col-md-6 col-lg-2">
+            <h6 style="color: white; font-size: 1.125rem; font-weight: 700; margin-bottom: 1.25rem; position: relative; padding-bottom: 0.75rem;">
+              Services
+              <span style="position: absolute; left: 0; bottom: 0; width: 45px; height: 3px; background: #22c55e; border-radius: 2px;"></span>
+            </h6>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'rent:property_list' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Rent Properties
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'pharmacy:medicine_list' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Pharmacy
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'shop:product_list' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Shopping
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'food:restaurant_list' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Food Delivery
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'ride:book_ride' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  Ride Booking
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contact & Support -->
+          <div class="col-6 col-md-6 col-lg-2">
+            <h6 style="color: white; font-size: 1.125rem; font-weight: 700; margin-bottom: 1.25rem; position: relative; padding-bottom: 0.75rem;">
+              Contact Us
+              <span style="position: absolute; left: 0; bottom: 0; width: 45px; height: 3px; background: #22c55e; border-radius: 2px;"></span>
+            </h6>
+            <ul class="list-unstyled" style="padding: 0; margin: 0;">
+              <li class="mb-3 d-flex align-items-start gap-2" style="margin-bottom: 1rem;">
+                <i class="fas fa-map-marker-alt mt-1" style="color: #10b981; font-size: 0.9375rem; width: 16px;"></i>
+                <span style="color: #d1d5db; font-size: 0.9375rem; line-height: 1.6;">Accra, Ghana</span>
+              </li>
+              <li class="mb-3 d-flex align-items-start gap-2" style="margin-bottom: 1rem;">
+                <i class="fas fa-phone mt-1" style="color: #10b981; font-size: 0.9375rem; width: 16px;"></i>
+                <a href="tel:+233597458456" class="text-decoration-none" style="color: #d1d5db; font-size: 0.9375rem; line-height: 1.6; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#d1d5db'">+233 597 458 456</a>
+              </li>
+              <li class="mb-3 d-flex align-items-start gap-2" style="margin-bottom: 1rem;">
+                <i class="fas fa-envelope mt-1" style="color: #10b981; font-size: 0.9375rem; width: 16px;"></i>
+                <a href="mailto:support@somako.org" class="text-decoration-none" style="color: #d1d5db; font-size: 0.9375rem; line-height: 1.6; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#d1d5db'">support@somako.org</a>
+              </li>
+              <li class="mb-3 d-flex align-items-start gap-2" style="margin-bottom: 1rem;">
+                <i class="fas fa-clock mt-1" style="color: #10b981; font-size: 0.9375rem; width: 16px;"></i>
+                <span style="color: #d1d5db; font-size: 0.9375rem; line-height: 1.6;">24/7 Support</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Footer -->
+        <div class="footer-bottom" style="margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+          <p class="mb-0 text-center text-md-start" style="color: #9ca3af; font-size: 0.9375rem;">
+            &copy; {{ "now"|date:"Y" }} <span style="color: #10b981; font-weight: 600;">Soma Ko Ghana</span>. All rights reserved.
+          </p>
+          <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
+            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a>
+            <span class="d-none d-md-inline" style="color: #4b5563;">•</span>
+            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Terms of Service</a>
+            <span class="d-none d-md-inline" style="color: #4b5563;">•</span>
+            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Cookies</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="btn-icon" style="position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: #059669; color: white; border: none; box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4); cursor: pointer; z-index: 1000; display: none; transition: all 0.3s ease; font-size: 1.25rem;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" onmouseover="this.style.transform='translateY(-4px) scale(1.1)'; this.style.boxShadow='0 6px 25px rgba(5, 150, 105, 0.5)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 20px rgba(5, 150, 105, 0.4)'">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+      // Toggle mobile menu
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) {
+          mobileMenu.classList.toggle('hidden');
+        }
+      }
+
+      // Toggle dropdown function for user menu
+      function toggleDropdown(event) {
+        if (event) {
+          event.stopPropagation(); // Prevent event from bubbling to document
+        }
+        const dropdown = document.getElementById('userDropdown');
+        const cartDropdown = document.getElementById('cartDropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('hidden');
+          // Close cart dropdown if open
+          if (cartDropdown && !cartDropdown.classList.contains('hidden')) {
+            cartDropdown.classList.add('hidden');
+          }
+        }
+      }
+
+      // Toggle cart dropdown
+      function toggleCartDropdown(event) {
+        if (event) {
+          event.stopPropagation();
+        }
+        const cartDropdown = document.getElementById('cartDropdown');
+        const userDropdown = document.getElementById('userDropdown');
+        if (cartDropdown) {
+          cartDropdown.classList.toggle('hidden');
+          // Close user dropdown if open
+          if (userDropdown && !userDropdown.classList.contains('hidden')) {
+            userDropdown.classList.add('hidden');
+          }
+        }
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', function(event) {
+        // Close user dropdown
+        const dropdown = document.getElementById('userDropdown');
+        const button = document.getElementById('navbarDropdown');
+        if (dropdown && button) {
+          if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+            if (!dropdown.classList.contains('hidden')) {
+              dropdown.classList.add('hidden');
+            }
+          }
+        }
+
+        // Close cart dropdown
+        const cartDropdown = document.getElementById('cartDropdown');
+        const cartButton = document.getElementById('cartDropdownButton');
+        if (cartDropdown && cartButton) {
+          if (!cartButton.contains(event.target) && !cartDropdown.contains(event.target)) {
+            if (!cartDropdown.classList.contains('hidden')) {
+              cartDropdown.classList.add('hidden');
+            }
+          }
+        }
+      });
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileButton = document.querySelector('.mobile-menu-button');
+        if (mobileMenu && mobileButton) {
+          if (!mobileButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+            if (!mobileMenu.classList.contains('hidden')) {
+              mobileMenu.classList.add('hidden');
+            }
+          }
+        }
+      });
+
+      // Add scroll behavior to navbar and scroll-to-top button
+      let lastScroll = 0;
+      const navbar = document.querySelector('.navbar-custom');
+      const scrollToTopBtn = document.getElementById('scrollToTop');
+
+      window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset;
+
+        // Add scrolled class for styling
+        if (currentScroll > 50) {
+          navbar.classList.add('scrolled');
+          if (navbar) {
+            navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+          }
+        } else {
+          navbar.classList.remove('scrolled');
+          if (navbar) {
+            navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
+          }
+        }
+
+        // Show/hide scroll to top button
+        if (scrollToTopBtn) {
+          if (currentScroll > 300) {
+            scrollToTopBtn.style.display = 'flex';
+            scrollToTopBtn.style.alignItems = 'center';
+            scrollToTopBtn.style.justifyContent = 'center';
+          } else {
+            scrollToTopBtn.style.display = 'none';
+          }
+        }
+
+        lastScroll = currentScroll;
+      });
+
+      // Add smooth scroll behavior to anchor links
+      document.addEventListener("DOMContentLoaded", function () {
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (href !== "#") {
+              e.preventDefault();
+              const target = document.querySelector(href);
+              if (target) {
+                target.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }
+          });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert-custom');
+        alerts.forEach(alert => {
+          setTimeout(() => {
+            alert.style.animation = 'slideInRight 0.3s reverse';
+            setTimeout(() => alert.remove(), 300);
+          }, 5000);
+        });
+
+        // Add loading animation to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+              submitBtn.disabled = true;
+              const originalText = submitBtn.innerHTML;
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+
+              // Re-enable after 3 seconds in case submission fails
+              setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+              }, 3000);
+            }
+          });
+        });
+
+        // Add animation to elements when they come into view
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('fade-in');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        // Observe cards and other elements
+        document.querySelectorAll('.card-custom, .alert-custom').forEach(el => {
+          observer.observe(el);
+        });
+      });
+
+      // Add ripple effect to buttons (optional enhancement)
+      document.addEventListener('click', function(e) {
+        const button = e.target.closest('.btn-custom, .btn-primary, .btn-outline');
+        if (button) {
+          const ripple = document.createElement('span');
+          const rect = button.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          ripple.classList.add('ripple');
+
+          button.style.position = 'relative';
+          button.style.overflow = 'hidden';
+          button.appendChild(ripple);
+
+          setTimeout(() => ripple.remove(), 600);
+        }
+      });
+    </script>
+
+    <style>
+      /* Ripple effect animation */
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 600ms ease-out;
+        pointer-events: none;
+      }
+
+      @keyframes ripple-animation {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* Hidden utility */
+      .hidden {
+        display: none !important;
+      }
+
+      /* Smooth transitions for all interactive elements */
+      a, button, input, select, textarea {
+        transition: all 0.3s ease;
+      }
+
+      /* Enhanced navbar styling */
+      .navbar-custom {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Logo hover effect */
+      .logo-container:hover {
+        transform: translateY(-2px);
+      }
+
+      .logo-container:active {
+        transform: translateY(0);
+      }
+
+      /* Nav link enhanced hover */
+      .nav-link-custom:hover {
+        background: rgba(34, 197, 94, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .nav-link-custom:active {
+        transform: translateY(0);
+      }
+
+      /* Mobile menu animation */
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Alert animations */
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Fade in animation */
+      .fade-in {
+        animation: fadeIn 0.6s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Button hover glow effect */
+      .btn-custom:hover {
+        box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+      }
+
+      /* Card hover effects */
+      .card-custom {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .card-custom:hover {
+        transform: translateY(-8px);
+      }
+
+      /* Scroll animation for page load */
+      body {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      /* Focus styles for accessibility */
+      *:focus-visible {
+        outline: 3px solid rgba(5, 150, 105, 0.5);
+        outline-offset: 3px;
+      }
+
+      /* Selection color */
+      ::selection {
+        background-color: rgba(5, 150, 105, 0.3);
+        color: #111827;
+      }
+
+      ::-moz-selection {
+        background-color: rgba(5, 150, 105, 0.3);
+        color: #111827;
+      }
+
+      /* Smooth scrollbar */
+      ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f3f4f6;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #22c55e;
+        border-radius: 6px;
+        border: 2px solid #f3f4f6;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #16a34a;
+      }
+
+      /* Loading shimmer effect */
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+      }
+
+      /* Logo hover effects */
+      .logo-container:hover .logo-icon {
+        transform: rotate(5deg) scale(1.05);
+      }
+
+      .logo-container:hover span span {
+        width: 100% !important;
+      }
+
+      /* Logo pulse effect */
+      @keyframes logo-pulse {
+        0%, 100% {
+          box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+        50% {
+          box-shadow: 0 6px 20px rgba(5, 150, 105, 0.5);
+        }
+      }
+
+      /* Logo icon glow */
+      @keyframes logo-glow {
+        0%, 100% {
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        50% {
+          filter: drop-shadow(0 4px 8px rgba(5, 150, 105, 0.6));
+        }
+      }
+
+      /* Pulse animation for notifications */
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* Enhanced form focus */
+      .form-control-custom:focus {
+        border-color: #059669;
+        box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
+        transform: translateY(-2px);
+      }
+
+      /* Footer link animations */
+      footer a {
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      footer a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #22c55e;
+        transition: width 0.3s ease;
+      }
+
+      footer a:hover::after {
+        width: 100%;
+      }
+
+      /* Responsive utilities */
+      @media (max-width: 991px) {
+        .logo-container span {
+          font-size: 1.25rem !important;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .footer-custom {
+          padding: 3rem 0 1rem !important;
+        }
+      }
+    </style>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

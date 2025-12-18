@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}Checkout - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #22c55e; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="text-center">
+      <h1 style="font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 900; color: white; margin-bottom: 0.5rem; letter-spacing: -1.5px;">Secure Checkout</h1>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95);">Complete your order securely</p>
+    </div>
+  </div>
+</section>
+
+<!-- Checkout Content -->
+<section style="padding: 4rem 0; background: #22c55e; margin-top: -2rem;">
+  <div class="container">
+    <form method="post" id="checkout-form">
+      {% csrf_token %}
+      <div class="row g-4">
+        <!-- Left Column - Forms -->
+        <div class="col-lg-7">
+          <!-- Shipping Information -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #d1fae5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-truck" style="color: #059669; font-size: 1.125rem;"></i>
+              </div>
+              Shipping Information
+            </h4>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Full Name *</label>
+                <input type="text" name="full_name" required value="{{ request.user.get_full_name }}" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Email *</label>
+                <input type="email" name="email" required value="{{ request.user.email }}" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Phone *</label>
+                <input type="tel" name="phone" required value="{{ request.user.phone_number }}" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-12">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Street Address *</label>
+                <input type="text" name="shipping_address" required style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">City *</label>
+                <input type="text" name="shipping_city" required style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Region *</label>
+                <input type="text" name="shipping_state" required placeholder="e.g., Greater Accra" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Postal Code</label>
+                <input type="text" name="shipping_postal_code" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Country *</label>
+                <input type="text" name="shipping_country" required value="Ghana" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#e5e7eb'">
+              </div>
+            </div>
+          </div>
+
+          <!-- Billing Information -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+              <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin: 0; display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-file-invoice" style="color: #22c55e; font-size: 1.125rem;"></i>
+                </div>
+                Billing Address
+              </h4>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #6b7280; font-size: 0.9375rem; font-weight: 600;">
+                <input type="checkbox" id="same-as-shipping" checked style="width: 18px; height: 18px; cursor: pointer;">
+                Same as shipping
+              </label>
+            </div>
+
+            <div id="billing-fields" style="display: none;">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Street Address *</label>
+                  <input type="text" name="billing_address" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+
+                <div class="col-md-6">
+                  <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">City *</label>
+                  <input type="text" name="billing_city" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+
+                <div class="col-md-6">
+                  <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Region *</label>
+                  <input type="text" name="billing_state" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+
+                <div class="col-md-6">
+                  <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Postal Code</label>
+                  <input type="text" name="billing_postal_code" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+
+                <div class="col-md-6">
+                  <label style="display: block; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.9375rem;">Country *</label>
+                  <input type="text" name="billing_country" value="Ghana" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Method -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #ede9fe; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-shipping-fast" style="color: #8b5cf6; font-size: 1.125rem;"></i>
+              </div>
+              Delivery Method *
+            </h4>
+
+            <div style="display: grid; gap: 1rem;">
+              <label style="display: flex; align-items: center; padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.querySelector('input').checked = true; updateDeliveryMethod('door_delivery');" onmouseover="this.style.borderColor='#8b5cf6'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e5e7eb'">
+                <input type="radio" name="delivery_method" value="door_delivery" checked required style="width: 20px; height: 20px; cursor: pointer; margin-right: 1rem;" onchange="updateDeliveryMethod('door_delivery')">
+                <div style="flex: 1;">
+                  <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">Door Delivery</div>
+                  <div style="font-size: 0.875rem; color: #6b7280;">We'll deliver to your doorstep (Delivery fee applies)</div>
+                </div>
+                <div style="font-weight: 800; color: #8b5cf6;">+GHS <span id="door-delivery-fee">25.00</span></div>
+              </label>
+
+              <label style="display: flex; align-items: center; padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.querySelector('input').checked = true; updateDeliveryMethod('pickup');" onmouseover="this.style.borderColor='#059669'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e5e7eb'">
+                <input type="radio" name="delivery_method" value="pickup" style="width: 20px; height: 20px; cursor: pointer; margin-right: 1rem;" onchange="updateDeliveryMethod('pickup')">
+                <div style="flex: 1;">
+                  <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">Pick Up Point</div>
+                  <div style="font-size: 0.875rem; color: #6b7280;">Collect from our pickup point (No delivery fee)</div>
+                </div>
+                <div style="font-weight: 800; color: #059669;">FREE</div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #d1fae5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-credit-card" style="color: #059669; font-size: 1.125rem;"></i>
+              </div>
+              Payment Method *
+            </h4>
+
+            <div style="display: grid; gap: 1rem;">
+              <label style="display: flex; align-items: center; padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.querySelector('input').checked = true;" onmouseover="this.style.borderColor='#059669'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e5e7eb'">
+                <input type="radio" name="payment_method" value="online_payment" checked required style="width: 20px; height: 20px; cursor: pointer; margin-right: 1rem;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">Online Payment (Paystack)</div>
+                  <div style="font-size: 0.875rem; color: #6b7280;">Pay securely with card or mobile money</div>
+                </div>
+                <i class="fas fa-shield-alt" style="color: #059669; font-size: 1.25rem;"></i>
+              </label>
+
+              <label style="display: flex; align-items: center; padding: 1.25rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.querySelector('input').checked = true;" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='#e5e7eb'">
+                <input type="radio" name="payment_method" value="cash_on_delivery" style="width: 20px; height: 20px; cursor: pointer; margin-right: 1rem;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">Cash on Delivery</div>
+                  <div style="font-size: 0.875rem; color: #6b7280;">Pay when you receive your order</div>
+                </div>
+                <i class="fas fa-money-bill-wave" style="color: #f59e0b; font-size: 1.25rem;"></i>
+              </label>
+            </div>
+          </div>
+
+          <!-- Additional Notes -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-sticky-note" style="color: #f59e0b; font-size: 1.125rem;"></i>
+              </div>
+              Order Notes (Optional)
+            </h4>
+            <textarea name="notes" rows="4" placeholder="Any special instructions for your order..." style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; resize: vertical;" onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+          </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="col-lg-5">
+          <div style="position: sticky; top: 2rem;">
+            <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+              <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem;">Order Summary</h4>
+
+              <!-- Cart Items -->
+              <div style="max-height: 300px; overflow-y: auto; margin-bottom: 1.5rem; padding-right: 0.5rem;">
+                {% for item in cart_items %}
+                <div style="display: flex; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; margin-bottom: 1rem;">
+                  {% with first_image=item.variant.product.images.first %}
+                  {% if first_image %}
+                  <img src="{{ first_image.image.url }}" alt="{{ item.variant.product.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
+                  {% else %}
+                  <div style="width: 60px; height: 60px; background: #dcfce7; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-box" style="color: #22c55e; opacity: 0.5;"></i>
+                  </div>
+                  {% endif %}
+                  {% endwith %}
+                  <div style="flex: 1;">
+                    <h6 style="font-size: 0.9375rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">{{ item.variant.product.name }}</h6>
+                    <p style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.25rem;">{{ item.variant.name }}</p>
+                    <p style="font-size: 0.8125rem; color: #059669; font-weight: 600; margin: 0;">Qty: {{ item.quantity }} × GHS {{ item.unit_price }}</p>
+                  </div>
+                  <div style="text-align: right;">
+                    <p style="font-size: 1rem; font-weight: 800; color: #1f2937; margin: 0;">GHS {{ item.total_price }}</p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <hr style="margin: 1.5rem 0; border-color: #e5e7eb;">
+
+              <!-- Price Breakdown -->
+              <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                  <span style="color: #6b7280; font-weight: 600;">Subtotal</span>
+                  <span style="color: #1f2937; font-weight: 700;" id="subtotal-amount">GHS {{ subtotal }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                  <span style="color: #6b7280; font-weight: 600;">Delivery Fee</span>
+                  <span style="color: #1f2937; font-weight: 700;" id="shipping-amount">GHS 25.00</span>
+                </div>
+              </div>
+
+              <hr style="margin: 1.5rem 0; border-color: #e5e7eb;">
+
+              <!-- Total -->
+              <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                <span style="font-size: 1.25rem; font-weight: 800; color: #1f2937;">Total</span>
+                <span style="font-size: 1.75rem; font-weight: 900; color: #059669;" id="total-amount">GHS {{ total }}</span>
+              </div>
+
+              <!-- Payment Button -->
+              <button type="submit" id="submit-button" style="width: 100%; padding: 1.25rem; background: #059669; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(5, 150, 105, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-lock"></i> <span id="submit-text">Proceed to Payment</span>
+              </button>
+
+              <!-- Payment Info -->
+              <div id="payment-info" style="margin-top: 1.5rem; padding: 1rem; background: #f0fdf4; border-radius: 0.75rem; border: 2px solid #bbf7d0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <i class="fas fa-shield-alt" style="color: #059669;"></i>
+                  <p style="color: #166534; font-size: 0.875rem; font-weight: 600; margin: 0;">Secure Payment with Paystack</p>
+                </div>
+                <p style="color: #15803d; font-size: 0.75rem; margin: 0;">Your payment information is encrypted and secure</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+// Constants
+const SUBTOTAL = parseFloat('{{ subtotal }}'.replace(/,/g, ''));
+const DOOR_DELIVERY_FEE = 25.00;
+const PICKUP_FEE = 0.00;
+
+// Toggle billing address fields
+document.getElementById('same-as-shipping').addEventListener('change', function() {
+  const billingFields = document.getElementById('billing-fields');
+  if (this.checked) {
+    billingFields.style.display = 'none';
+    // Copy shipping to billing
+    document.querySelector('[name="billing_address"]').required = false;
+    document.querySelector('[name="billing_city"]').required = false;
+    document.querySelector('[name="billing_state"]').required = false;
+  } else {
+    billingFields.style.display = 'block';
+    document.querySelector('[name="billing_address"]').required = true;
+    document.querySelector('[name="billing_city"]').required = true;
+    document.querySelector('[name="billing_state"]').required = true;
+  }
+});
+
+// Update delivery method and recalculate total
+function updateDeliveryMethod(method) {
+  let shippingCost = method === 'door_delivery' ? DOOR_DELIVERY_FEE : PICKUP_FEE;
+  let total = SUBTOTAL + shippingCost;
+
+  // Update display
+  document.getElementById('shipping-amount').textContent = 'GHS ' + shippingCost.toFixed(2);
+  document.getElementById('total-amount').textContent = 'GHS ' + total.toFixed(2);
+
+  // Show delivery fee notification for door delivery
+  if (method === 'door_delivery') {
+    // Update all radio label borders
+    document.querySelectorAll('[name="delivery_method"]').forEach(radio => {
+      radio.parentElement.style.borderColor = radio.checked ? '#8b5cf6' : '#e5e7eb';
+    });
+  } else {
+    // Update all radio label borders
+    document.querySelectorAll('[name="delivery_method"]').forEach(radio => {
+      radio.parentElement.style.borderColor = radio.checked ? '#059669' : '#e5e7eb';
+    });
+  }
+}
+
+// Update payment method UI
+document.querySelectorAll('[name="payment_method"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    const submitButton = document.getElementById('submit-button');
+    const submitText = document.getElementById('submit-text');
+    const paymentInfo = document.getElementById('payment-info');
+
+    if (this.value === 'cash_on_delivery') {
+      submitText.textContent = 'Place Order';
+      submitButton.querySelector('i').className = 'fas fa-check-circle';
+      paymentInfo.style.background = '#fef3c7';
+      paymentInfo.style.borderColor = '#fcd34d';
+      paymentInfo.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-money-bill-wave" style="color: #f59e0b;"></i>
+          <p style="color: #92400e; font-size: 0.875rem; font-weight: 600; margin: 0;">Cash on Delivery</p>
+        </div>
+        <p style="color: #b45309; font-size: 0.75rem; margin: 0;">Please have exact cash ready when you receive your order</p>
+      `;
+    } else {
+      submitText.textContent = 'Proceed to Payment';
+      submitButton.querySelector('i').className = 'fas fa-lock';
+      paymentInfo.style.background = '#f0fdf4';
+      paymentInfo.style.borderColor = '#bbf7d0';
+      paymentInfo.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-shield-alt" style="color: #059669;"></i>
+          <p style="color: #166534; font-size: 0.875rem; font-weight: 600; margin: 0;">Secure Payment with Paystack</p>
+        </div>
+        <p style="color: #15803d; font-size: 0.75rem; margin: 0;">Your payment information is encrypted and secure</p>
+      `;
+    }
+
+    // Update radio label borders
+    document.querySelectorAll('[name="payment_method"]').forEach(r => {
+      if (r.checked) {
+        r.parentElement.style.borderColor = r.value === 'cash_on_delivery' ? '#f59e0b' : '#059669';
+      } else {
+        r.parentElement.style.borderColor = '#e5e7eb';
+      }
+    });
+  });
+});
+
+// Copy shipping to billing if checkbox is checked
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+  if (document.getElementById('same-as-shipping').checked) {
+    document.querySelector('[name="billing_address"]').value = document.querySelector('[name="shipping_address"]').value;
+    document.querySelector('[name="billing_city"]').value = document.querySelector('[name="shipping_city"]').value;
+    document.querySelector('[name="billing_state"]').value = document.querySelector('[name="shipping_state"]').value;
+    document.querySelector('[name="billing_postal_code"]').value = document.querySelector('[name="shipping_postal_code"]').value;
+    document.querySelector('[name="billing_country"]').value = document.querySelector('[name="shipping_country"]').value;
+  }
+});
+</script>
+{% endblock %}

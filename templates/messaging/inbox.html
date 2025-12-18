@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Messages - Soma Ko{% endblock %}
+
+{% block content %}
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.conversation-card {
+  animation: fadeIn 0.4s ease-out;
+  transition: all 0.3s ease;
+}
+
+.conversation-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+}
+</style>
+
+<!-- Hero Section -->
+<section style="background: #6366f1; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Messages</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">Your conversations across all apps</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="?app=" style="padding: 0.75rem 1.25rem; background: {% if not app_filter %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; backdrop-filter: blur(10px); color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='{% if not app_filter %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}'">
+          All
+        </a>
+        <a href="?app=food" style="padding: 0.75rem 1.25rem; background: {% if app_filter == 'food' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; backdrop-filter: blur(10px); color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='{% if app_filter == 'food' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}'">
+          <i class="fas fa-utensils"></i> Food
+        </a>
+        <a href="?app=shop" style="padding: 0.75rem 1.25rem; background: {% if app_filter == 'shop' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; backdrop-filter: blur(10px); color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='{% if app_filter == 'shop' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}'">
+          <i class="fas fa-shopping-bag"></i> Shop
+        </a>
+        <a href="?app=ride" style="padding: 0.75rem 1.25rem; background: {% if app_filter == 'ride' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; backdrop-filter: blur(10px); color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='{% if app_filter == 'ride' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}'">
+          <i class="fas fa-car"></i> Ride
+        </a>
+        <a href="?app=rent" style="padding: 0.75rem 1.25rem; background: {% if app_filter == 'rent' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}; backdrop-filter: blur(10px); color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='{% if app_filter == 'rent' %}rgba(255, 255, 255, 0.3){% else %}rgba(255, 255, 255, 0.1){% endif %}'">
+          <i class="fas fa-home"></i> Rent
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Conversations Section -->
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    {% if conversations %}
+    <div style="max-width: 900px; margin: 0 auto;">
+      {% for conv in conversations %}
+      <div class="conversation-card" style="background: white; border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; cursor: pointer; animation-delay: {{ forloop.counter0 }}00ms;" onclick="window.location='{% url 'messaging:thread' %}?content_type_id={{ conv.content_type_id }}&object_id={{ conv.object_id }}&user_id={{ conv.other_user.id }}'">
+        <div style="display: flex; gap: 1.25rem; align-items: start;">
+          <!-- User Avatar -->
+          <div style="width: 60px; height: 60px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-weight: 900; font-size: 1.5rem;">
+            {{ conv.other_user.username|slice:":1"|upper }}
+          </div>
+
+          <!-- Message Preview -->
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <div>
+                <h4 style="font-weight: 800; color: #1f2937; font-size: 1.125rem; margin: 0 0 0.25rem 0;">
+                  {{ conv.other_user.get_full_name|default:conv.other_user.username }}
+                </h4>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span style="background:
+                    {% if conv.app_type == 'food' %}#fef3c7{% elif conv.app_type == 'shop' %}#dbeafe{% elif conv.app_type == 'ride' %}#e0e7ff{% elif conv.app_type == 'rent' %}#fce7f3{% else %}#f3f4f6{% endif %};
+                    color:
+                    {% if conv.app_type == 'food' %}#92400e{% elif conv.app_type == 'shop' %}#1e40af{% elif conv.app_type == 'ride' %}#3730a3{% elif conv.app_type == 'rent' %}#9f1239{% else %}#374151{% endif %};
+                    padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">
+                    <i class="fas fa-{% if conv.app_type == 'food' %}utensils{% elif conv.app_type == 'shop' %}shopping-bag{% elif conv.app_type == 'ride' %}car{% elif conv.app_type == 'rent' %}home{% else %}circle{% endif %}"></i> {{ conv.app_type|title }}
+                  </span>
+                  <span style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ conv.last_message.get_related_object_name }}</span>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="color: #6b7280; font-size: 0.8125rem; white-space: nowrap;">{{ conv.last_message.created_at|timesince }} ago</div>
+                {% if conv.unread_count > 0 %}
+                <div style="background: #ef4444; color: white; padding: 0.25rem 0.625rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-top: 0.5rem; display: inline-block;">
+                  {{ conv.unread_count }} new
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <p style="color: {% if conv.unread_count > 0 %}#1f2937{% else %}#6b7280{% endif %}; margin: 0; font-size: 0.9375rem; font-weight: {% if conv.unread_count > 0 %}600{% else %}400{% endif %}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              {% if conv.last_message.sender == request.user %}<strong>You:</strong> {% endif %}{{ conv.last_message.message|truncatewords:15 }}
+            </p>
+          </div>
+
+          <!-- Arrow -->
+          <div style="display: flex; align-items: center; color: #9ca3af;">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+      <div style="width: 120px; height: 120px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-inbox" style="font-size: 4rem; color: #3b82f6; opacity: 0.5;"></i>
+      </div>
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Messages Yet</h3>
+      <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem;">Start a conversation with restaurant owners, sellers, or drivers!</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'food:restaurant_list' %}" style="padding: 1rem 1.5rem; background: #f59e0b; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(245, 158, 11, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(245, 158, 11, 0.3)'">
+          <i class="fas fa-utensils"></i> Browse Restaurants
+        </a>
+        <a href="{% url 'shop:product_list' %}" style="padding: 1rem 1.5rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(59, 130, 246, 0.3)'">
+          <i class="fas fa-shopping-bag"></i> Browse Products
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

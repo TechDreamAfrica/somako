@@ -1,0 +1,216 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Upload Prescription - Pharmacy PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block extra_css %}
+<style>
+  .upload-area {
+    border: 2px dashed #8b5cf6;
+    border-radius: 16px;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background: #f0fdf4;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .upload-area:hover {
+    border-color: #ffffff;
+    background: #dcfce7;
+  }
+
+  .upload-area.dragover {
+    border-color: #ffffff;
+    background: #dcfce7;
+    transform: scale(1.02);
+  }
+
+  .prescription-preview {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .prescription-preview img {
+    width: 100%;
+    border-radius: 8px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem; padding-top: calc(2rem + env(safe-area-inset-top));">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" style="color: white; text-decoration: none; display: inline-flex; align-items: center; margin-bottom: 1rem;">
+    <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back
+  </a>
+  <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">Upload Prescription</h1>
+  <p style="opacity: 0.9;">Upload your prescription to get medicines</p>
+</div>
+
+<div style="padding: 1.5rem; margin-bottom: 6rem;">
+  <form method="POST" enctype="multipart/form-data" id="prescriptionForm">
+    {% csrf_token %}
+    
+    <!-- Upload Area -->
+    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+      <div style="width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="fas fa-file-prescription" style="font-size: 2rem; color: #8b5cf6;"></i>
+      </div>
+      <h3 style="color: #1f2937; font-weight: 600; margin-bottom: 0.5rem;">Upload Prescription</h3>
+      <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Click to browse or drag and drop</p>
+      <p style="color: #9ca3af; font-size: 0.75rem;">Supported formats: JPG, PNG, PDF (Max 5MB)</p>
+      <input type="file" id="fileInput" name="prescription_file" accept="image/*,.pdf" style="display: none;" onchange="handleFileSelect(event)">
+    </div>
+
+    <!-- Preview Area -->
+    <div id="previewArea" style="display: none;">
+      <div class="prescription-preview">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;" id="fileName"></div>
+            <div style="color: #6b7280; font-size: 0.875rem;" id="fileSize"></div>
+          </div>
+          <button type="button" onclick="clearFile()" style="background: #fef2f2; color: #ef4444; border: none; padding: 0.5rem; border-radius: 8px; cursor: pointer;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <img id="previewImage" src="" alt="Preview" style="display: none;">
+        <div id="pdfPreview" style="display: none; text-align: center; padding: 2rem; background: #f3f4f6; border-radius: 8px;">
+          <i class="fas fa-file-pdf" style="font-size: 3rem; color: #ef4444; margin-bottom: 0.5rem;"></i>
+          <div style="color: #1f2937;">PDF Document</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Field -->
+    <div style="margin-top: 1.5rem;">
+      <label style="display: block; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">
+        Notes (Optional)
+      </label>
+      <textarea name="notes" rows="4" placeholder="Add any additional information or requirements..." style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 1rem; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.5rem;">
+      <i class="fas fa-upload" style="margin-right: 0.5rem;"></i>
+      Upload Prescription
+    </button>
+  </form>
+
+  <!-- Info Cards -->
+  <div style="margin-top: 2rem; background: #eff6ff; border-radius: 12px; padding: 1rem;">
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+      <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.25rem; flex-shrink: 0;"></i>
+      <div>
+        <h4 style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">Important Information</h4>
+        <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.5;">
+          • Prescription must be valid and issued by a licensed doctor<br>
+          • Image should be clear and readable<br>
+          • We'll verify and process your request within 24 hours<br>
+          • You'll be notified once medicines are ready
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Drag and drop functionality
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  uploadArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+  uploadArea.addEventListener(eventName, () => {
+    uploadArea.classList.add('dragover');
+  }, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  uploadArea.addEventListener(eventName, () => {
+    uploadArea.classList.remove('dragover');
+  }, false);
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  fileInput.files = files;
+  handleFileSelect({ target: { files: files } });
+});
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Show preview area
+  document.getElementById('previewArea').style.display = 'block';
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = formatFileSize(file.size);
+
+  // Show image preview or PDF indicator
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('previewImage').src = e.target.result;
+      document.getElementById('previewImage').style.display = 'block';
+      document.getElementById('pdfPreview').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  } else if (file.type === 'application/pdf') {
+    document.getElementById('previewImage').style.display = 'none';
+    document.getElementById('pdfPreview').style.display = 'block';
+  }
+}
+
+function clearFile() {
+  document.getElementById('fileInput').value = '';
+  document.getElementById('previewArea').style.display = 'none';
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:medicine_list' %}" class="bottom-nav-item">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

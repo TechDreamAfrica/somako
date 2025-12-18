@@ -1,0 +1,320 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Django specific
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+local_settings.py
+db.sqlite3-journal
+media/
+staticfiles/
+static_root/
+static/admin/
+static/rest_framework/
+
+# Django migrations (uncomment if you want to ignore migrations)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# If you are using PostgreSQL
+*.sql
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node_modules (if using any frontend tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Sass
+.sass-cache/
+
+# Webpack
+/dist/
+/build/
+
+# Parcel
+.parcel-cache/
+
+# Next.js
+.next/
+
+# Nuxt.js
+.nuxt/
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Custom project specific
+# Add any project-specific files/folders here
+debug_datetime.py
+test_professional_system.py
+fix_migration.py
+safe_migrate.py
+migration_backup/
+
+# Media files (uploaded content)
+media/uploads/
+media/profile_pictures/
+media/portfolio/
+media/resumes/
+media/certifications/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Secret keys and sensitive data
+secret_key.txt
+*.key
+*.pem
+*.p12
+
+# Google Cloud credentials
+*credentials.json
+google-credentials.json
+service-account*.json
+*-service-account.json
+
+# Local development databases
+# *.sqlite
+# *.sqlite3
+# *.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Redis dump files
+dump.rdb
+
+# Celery beat schedule file
+celerybeat-schedule.*
+
+# Collected static files
+/static/
+/staticfiles/
+
+# Webpack stats
+webpack-stats.json
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Test databases
+test_*.sqlite3
+
+# Local settings override
+local_settings.py
+production_settings.py
+development_settings.py
+
+# Deployment files
+*.zip
+*.tar.gz
+*.tar
+
+# Cache directories
+.cache/
+.pytest_cache/
+
+# Profiling data
+*.prof
+
+# MyPy cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/

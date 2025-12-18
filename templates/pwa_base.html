@@ -1,0 +1,636 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="{% block status_bar_style %}default{% endblock %}">
+  <meta name="theme-color" content="{% block theme_color %}#059669{% endblock %}">
+
+  <title>{% block title %}Soma Ko{% endblock %}</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="{% block manifest_url %}{% endblock %}">
+
+  <!-- App Icons -->
+  {% block icon_192 %}<link rel="icon" type="image/png" sizes="192x192" href="">
+  <link rel="apple-touch-icon" sizes="192x192" href="">{% endblock %}
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- PWA Theme CSS -->
+  <link rel="stylesheet" href="{% static 'css/pwa-theme.css' %}">
+
+  <style>
+    /* PWA-Specific Styles */
+    /* PWA Safe Areas for notched devices */
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    /* Install Prompt */
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      display: none;
+      max-width: 90%;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .install-prompt.show {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Offline Indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ef4444;
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      z-index: 10000;
+      display: none;
+    }
+
+    .offline-indicator.show {
+      display: block;
+    }
+
+    /* Bottom Navigation for Mobile */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding: 0.5rem 0;
+      padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: space-around;
+      z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      color: #6b7280;
+      transition: all 0.3s ease;
+      border-radius: 0.5rem;
+    }
+
+    .bottom-nav-item.active {
+      color: {% block nav_active_color %}#059669{% endblock %};
+      background: {% block nav_active_bg %}rgba(5, 150, 105, 0.1){% endblock %};
+    }
+
+    .bottom-nav-item i {
+      font-size: 1.25rem;
+    }
+
+    .bottom-nav-item span {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding-top: 0;
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    /* Floating Action Button */
+    .fab-container {
+      position: fixed;
+      bottom: calc(80px + env(safe-area-inset-bottom));
+      right: 1rem;
+      z-index: 999;
+    }
+
+    .fab-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, {% block fab_color_1 %}#3b82f6{% endblock %}, {% block fab_color_2 %}#1d4ed8{% endblock %});
+      color: white;
+      border: none;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fab-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+      border-radius: 50%;
+      transition: opacity 0.3s ease;
+    }
+
+    .fab-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+    }
+
+    .fab-button:active {
+      transform: scale(0.95);
+    }
+
+    .fab-button.open {
+      transform: rotate(135deg);
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .fab-button.open:hover {
+      box-shadow: 0 12px 35px rgba(239, 68, 68, 0.5);
+    }
+
+    .fab-menu {
+      position: absolute;
+      bottom: 75px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      padding: 1.25rem;
+      min-width: 220px;
+      max-width: 280px;
+      opacity: 0;
+      transform: translateY(30px) translateX(10px) scale(0.85);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .fab-menu.show {
+      opacity: 1;
+      transform: translateY(0) translateX(0) scale(1);
+      pointer-events: all;
+    }
+
+    .fab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fab-menu-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .fab-menu-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .fab-menu-item:hover {
+      background: rgba(59, 130, 246, 0.08);
+      transform: translateX(4px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .fab-menu-item:hover::before {
+      opacity: 1;
+    }
+
+    .fab-menu-item i {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .fab-menu-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+      margin: 1rem 0;
+    }
+
+    {% block extra_css %}{% endblock %}
+  </style>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N08CBF9WQT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-N08CBF9WQT');
+  </script>
+</head>
+<body>
+  <!-- Offline Indicator -->
+  <div class="offline-indicator" id="offlineIndicator">
+    <i class="fas fa-wifi-slash me-2"></i>You are offline. Some features may be limited.
+  </div>
+
+  <!-- Install Prompt -->
+  <div class="install-prompt" id="installPrompt">
+    <i class="fas fa-download" style="font-size: 2rem; color: {% block install_icon_color %}#059669{% endblock %};"></i>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">Install {% block app_name %}Soma Ko{% endblock %}</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">Get quick access from your home screen</div>
+    </div>
+    <button id="installBtn" style="background: {% block install_btn_bg %}#059669{% endblock %}; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+      Install
+    </button>
+    <button id="dismissBtn" style="background: transparent; border: none; color: #9ca3af; cursor: pointer; padding: 0.5rem;">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Temporary Login/Logout Banner -->
+  {% block auth_banner %}
+  {% if not user.is_authenticated %}
+  <div style="background: {% block login_banner_color_1 %}#3b82f6{% endblock %}; padding: 1rem; text-align: center; padding-top: calc(1rem + env(safe-area-inset-top)); position: relative; z-index: 10;">
+    <a href="{% url 'accounts:pwa_login' %}?app={% block pwa_app_name %}{% endblock %}&next={{ request.path }}" style="color: white; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;">
+      <i class="fas fa-sign-in-alt"></i> Login
+    </a>
+  </div>
+  {% else %}
+  <!-- Verification Banner for Unverified Users -->
+  {% if not user.is_verified %}
+  <div style="background: #f59e0b; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; position: relative; z-index: 11;">
+    <div style="flex:1; color: white;">
+      <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+      <span style="font-weight: 600; font-size: 0.9rem;">Verify your account to unlock all features</span>
+    </div>
+    <a href="{% url 'accounts:pwa_verify' %}?next={{ request.path }}" style="background: white; color: #d97706; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.875rem; white-space: nowrap;">
+      Verify Now
+    </a>
+  </div>
+  {% endif %}
+
+  <div style="background: #059669; padding: 0.875rem 1rem; padding-top: calc(0.875rem + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; position: relative; z-index: 10; pointer-events: auto;">
+    <span style="color: white; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9375rem;">
+      <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
+      {% if user.is_verified %}<i class="fas fa-check-circle" style="color:#a7f3d0;font-size:0.875rem;" title="Verified"></i>{% endif %}
+    </span>
+    <a href="{% url 'accounts:pwa_logout' %}" style="color: white; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.3s; font-size: 0.875rem; position: relative; z-index: 20; cursor: pointer; pointer-events: auto;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
+  {% endif %}
+  {% endblock %}
+
+  <!-- Messages Display -->
+  {% if messages %}
+  <div style="padding: 0 1rem; margin-bottom: 1rem;">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}" style="
+      padding: 1rem; 
+      margin-bottom: 0.5rem; 
+      border-radius: 8px; 
+      border-left: 4px solid 
+        {% if message.tags == 'success' %}#10b981
+        {% elif message.tags == 'error' %}#ef4444
+        {% elif message.tags == 'warning' %}#f59e0b
+        {% else %}#3b82f6{% endif %};
+      background: 
+        {% if message.tags == 'success' %}#d1fae5
+        {% elif message.tags == 'error' %}#fee2e2
+        {% elif message.tags == 'warning' %}#fef3c7
+        {% else %}#dbeafe{% endif %};
+      color: 
+        {% if message.tags == 'success' %}#065f46
+        {% elif message.tags == 'error' %}#991b1b
+        {% elif message.tags == 'warning' %}#92400e
+        {% else %}#1e40af{% endif %};
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+    ">
+      <i class="fas 
+        {% if message.tags == 'success' %}fa-check-circle
+        {% elif message.tags == 'error' %}fa-times-circle
+        {% elif message.tags == 'warning' %}fa-exclamation-triangle
+        {% else %}fa-info-circle{% endif %}"
+        style="margin-top: 0.125rem; flex-shrink: 0;"></i>
+      <span style="flex: 1;">{{ message }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main Content -->
+  <div class="main-content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- App Switcher FAB - Only for General Users -->
+  {% if user.is_authenticated and not user.is_staff and not user.is_superuser %}
+  <div class="fab-container">
+    <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
+      <i class="fas fa-th-large"></i>
+    </button>
+    
+    <div class="fab-menu" id="fabMenu">
+      <div style="font-weight: 700; color: #1f2937; margin-bottom: 1rem; font-size: 0.875rem; text-align: center;">
+        <i class="fas fa-rocket me-2"></i>Switch Apps
+      </div>
+      
+      <a href="/pwa/food/" class="fab-menu-item">
+        <i class="fas fa-utensils" style="color: #ef4444;"></i>
+        <span>Food Delivery</span>
+      </a>
+      
+      {% comment %} <a href="/pwa/shop/" class="fab-menu-item">
+        <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i>
+        <span>Shop</span>
+      </a>
+      
+      <a href="/pwa/pharmacy/" class="fab-menu-item">
+        <i class="fas fa-pills" style="color: #10b981;"></i>
+        <span>Pharmacy</span>
+      </a>
+      
+      <a href="/pwa/rent/" class="fab-menu-item">
+        <i class="fas fa-home" style="color: #f59e0b;"></i>
+        <span>Rent & Stay</span>
+      </a>
+      
+      <a href="/pwa/ride/" class="fab-menu-item">
+        <i class="fas fa-car" style="color: #8b5cf6;"></i>
+        <span>Ride Share</span>
+      </a> {% endcomment %}
+      
+      <a href="/pwa/express/" class="fab-menu-item">
+        <i class="fas fa-shipping-fast" style="color: #06b6d4;"></i>
+        <span>Express Delivery</span>
+      </a>
+      
+      <div class="fab-menu-divider"></div>
+      
+      {% comment %} <a href="/" class="fab-menu-item">
+        <i class="fas fa-globe" style="color: #6b7280;"></i>
+        <span>Main Website</span>
+      </a> {% endcomment %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Bottom Navigation -->
+  {% block bottom_nav %}{% endblock %}
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- PWA Registration & Install -->
+  <script>
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{% block service_worker_url %}{% endblock %}')
+          .then((registration) => {
+            console.log('Service Worker registered:', registration);
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // Install Prompt
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    const installBtn = document.getElementById('installBtn');
+    const dismissBtn = document.getElementById('dismissBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      // Check if user dismissed before
+      if (!localStorage.getItem('pwa-install-dismissed')) {
+        setTimeout(() => {
+          installPrompt.classList.add('show');
+        }, 3000);
+      }
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        deferredPrompt = null;
+        installPrompt.classList.remove('show');
+      }
+    });
+
+    dismissBtn.addEventListener('click', () => {
+      installPrompt.classList.remove('show');
+      localStorage.setItem('pwa-install-dismissed', 'true');
+    });
+
+    // Online/Offline Detection
+    const offlineIndicator = document.getElementById('offlineIndicator');
+
+    window.addEventListener('online', () => {
+      offlineIndicator.classList.remove('show');
+    });
+
+    window.addEventListener('offline', () => {
+      offlineIndicator.classList.add('show');
+    });
+
+    // Check initial state
+    if (!navigator.onLine) {
+      offlineIndicator.classList.add('show');
+    }
+
+    // Push Notification Permission (optional)
+    if ('Notification' in window && navigator.serviceWorker) {
+      if (Notification.permission === 'default') {
+        // Can prompt for notification permission later when user performs an action
+      }
+    }
+
+    // Floating Action Button Menu Toggle
+    function toggleFabMenu() {
+      const fabMenu = document.getElementById('fabMenu');
+      const fabButton = document.getElementById('fabButton');
+
+      if (fabMenu.classList.contains('show')) {
+        closeFabMenu();
+      } else {
+        openFabMenu();
+      }
+    }
+
+    function openFabMenu() {
+      const fabMenu = document.getElementById('fabMenu');
+      const fabButton = document.getElementById('fabButton');
+      const fabItems = document.querySelectorAll('.fab-menu-item');
+
+      fabMenu.classList.add('show');
+      fabButton.classList.add('open');
+
+      // Add staggered animation to menu items
+      fabItems.forEach((item, index) => {
+        setTimeout(() => {
+          item.style.transform = 'translateX(0)';
+          item.style.opacity = '1';
+        }, index * 50);
+      });
+
+      // Add haptic feedback if available
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10);
+      }
+    }
+
+    function closeFabMenu() {
+      const fabMenu = document.getElementById('fabMenu');
+      const fabButton = document.getElementById('fabButton');
+      const fabItems = document.querySelectorAll('.fab-menu-item');
+
+      // Reset item animations
+      fabItems.forEach((item) => {
+        item.style.transform = 'translateX(20px)';
+        item.style.opacity = '0.5';
+      });
+
+      setTimeout(() => {
+        fabMenu.classList.remove('show');
+        fabButton.classList.remove('open');
+      }, 100);
+    }
+
+    // Initialize menu items with hidden state
+    document.addEventListener('DOMContentLoaded', () => {
+      const fabItems = document.querySelectorAll('.fab-menu-item');
+      fabItems.forEach((item) => {
+        item.style.transform = 'translateX(20px)';
+        item.style.opacity = '0.5';
+        item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+      });
+    });
+
+    // Close FAB menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const fabContainer = document.querySelector('.fab-container');
+      const fabMenu = document.getElementById('fabMenu');
+
+      if (!fabContainer.contains(e.target) && fabMenu.classList.contains('show')) {
+        closeFabMenu();
+      }
+    });
+
+    // Close FAB menu on escape key
+    document.addEventListener('keydown', (e) => {
+      const fabMenu = document.getElementById('fabMenu');
+      if (e.key === 'Escape' && fabMenu.classList.contains('show')) {
+        closeFabMenu();
+      }
+    });
+
+    // Add app navigation tracking
+    document.querySelectorAll('.fab-menu-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        // Add loading state
+        const icon = item.querySelector('i');
+        const originalClass = icon.className;
+        icon.className = 'fas fa-spinner fa-spin';
+        
+        // Restore after a short delay (visual feedback)
+        setTimeout(() => {
+          icon.className = originalClass;
+        }, 500);
+
+        // Optional: Add analytics tracking
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'app_switch', {
+            'event_category': 'navigation',
+            'event_label': item.href
+          });
+        }
+      });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

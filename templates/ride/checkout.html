@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content_class %}app-ride{% endblock %}
+{% block title %}Checkout - Pharmacy{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Checkout</h1>
+
+  <div>
+    <div>
+      <div>
+        <div>
+          <h5>Delivery Address</h5>
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">
+              <i></i>Place Order
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <div>
+          <h5>Order Summary</h5>
+          {% for item in cart_items %}
+          <div>
+            <span>{{ item.medicine.name }} x{{ item.quantity }}</span>
+            <span>${{ item.subtotal }}</span>
+          </div>
+          {% endfor %}
+          <hr>
+          <div>
+            <span>Total</span>
+            <span>${{ total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

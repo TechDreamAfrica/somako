@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}Wishlist{% endblock %}
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>My Wishlist</h1>
+  <div>
+    {% for item in wishlist_items %}
+    <div>
+      <div>
+        <div>
+          <h5>{{ item.medicine.name }}</h5>
+          <p>${{ item.medicine.price }}</p>
+          <a href="{% url 'pharmacy:medicine_detail' item.medicine.slug %}">View</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div><h4>Wishlist Empty</h4></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

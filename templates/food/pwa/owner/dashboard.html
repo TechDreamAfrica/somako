@@ -1,0 +1,476 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Restaurant Dashboard - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .restaurant-banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .restaurant-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .restaurant-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .restaurant-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: white;
+    margin-bottom: 1rem;
+  }
+
+  .restaurant-name {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .restaurant-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .status-active {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .order-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-preparing {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  .status-ready {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-delivered {
+    background: #f3e8ff;
+    color: #6b21a8;
+  }
+
+  .quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    width: 100%;
+    text-align: left;
+    color: #1f2937;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .quick-action-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Restaurant Banner and Profile -->
+<div class="restaurant-header">
+  <div class="banner-container">
+    {% if restaurant.image %}
+      <img src="{{ restaurant.get_image_url }}" alt="{{ restaurant.name }} Banner" class="restaurant-banner" onerror="this.parentElement.innerHTML='<div class=\'restaurant-banner\' style=\'background: #f97316; display: flex; align-items: center; justify-content: center;\'><i class=\'fas fa-store\' style=\'font-size: 4rem; color: rgba(255, 255, 255, 0.3);\'></i></div>'">
+    {% else %}
+      <div class="restaurant-banner" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-store" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="restaurant-profile">
+    {% if restaurant.logo %}
+      <img src="{{ restaurant.get_logo_url }}" alt="{{ restaurant.name }} Logo" class="restaurant-logo" onerror="this.src=''; this.style.background='#f97316'; this.innerHTML='<i class=\'fas fa-utensils\' style=\'font-size:3rem;color:white;\'></i>'">
+    {% else %}
+      <div class="restaurant-logo" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-utensils" style="font-size: 3rem; color: white;"></i>
+      </div>
+    {% endif %}
+
+    <h1 class="restaurant-name">{{ restaurant.name }}</h1>
+
+    <div class="status-{{ restaurant.status }}{% if restaurant.status == 'active' %} status-active{% else %} status-inactive{% endif %} restaurant-status">
+      <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+      <span>{% if restaurant.status == 'active' %}Active{% else %}Inactive{% endif %}</span>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <!-- Today's Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-clock" style="color: #92400e;"></i>
+      </div>
+      <div class="stat-value">{{ pending_orders }}</div>
+      <div class="stat-label">Pending Orders</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-receipt" style="color: #1e40af;"></i>
+      </div>
+      <div class="stat-value">{{ today_orders }}</div>
+      <div class="stat-label">Today's Orders</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-money-bill-wave" style="color: #065f46;"></i>
+      </div>
+      <div class="stat-value">GHS {{ today_revenue|floatformat:2 }}</div>
+      <div class="stat-label">Today's Revenue</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-utensils" style="color: #dc2626;"></i>
+      </div>
+      <div class="stat-value">{{ active_menu_items }}</div>
+      <div class="stat-label">Active Items</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-chart-line" style="color: #3730a3;"></i>
+      </div>
+      <div class="stat-value">{{ total_orders }}</div>
+      <div class="stat-label">Total Orders</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-wallet" style="color: #9f1239;"></i>
+      </div>
+      <div class="stat-value">GHS {{ week_revenue|floatformat:0 }}</div>
+      <div class="stat-label">Week Revenue</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-calendar-alt" style="color: #5b21b6;"></i>
+      </div>
+      <div class="stat-value">GHS {{ month_revenue|floatformat:0 }}</div>
+      <div class="stat-label">Month Revenue</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #f97316;">
+        <i class="fas fa-coins" style="color: #065f46;"></i>
+      </div>
+      <div class="stat-value">GHS {{ total_revenue|floatformat:0 }}</div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <h2 class="section-title">Quick Actions</h2>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="quick-action-btn">
+    <div style="width: 48px; height: 48px; background: #f97316; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-list" style="color: #92400e; font-size: 1.25rem;"></i>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; margin-bottom: 0.25rem;">Manage Orders</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">View and update order status</div>
+    </div>
+    <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+  </a>
+
+  <a href="{% url 'food_pwa:manage_menu' %}" class="quick-action-btn">
+    <div style="width: 48px; height: 48px; background: #f97316; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-utensils" style="color: #dc2626; font-size: 1.25rem;"></i>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; margin-bottom: 0.25rem;">Manage Menu</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">Add, edit, or remove menu items</div>
+    </div>
+    <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+  </a>
+
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="quick-action-btn">
+    <div style="width: 48px; height: 48px; background: #f97316; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-cog" style="color: #4338ca; font-size: 1.25rem;"></i>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; margin-bottom: 0.25rem;">Restaurant Settings</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">Update profile, hours, and details</div>
+    </div>
+    <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+  </a>
+
+  <a href="{% url 'accounts:subscription_plans' %}" class="quick-action-btn">
+    <div style="width: 48px; height: 48px; background: #f97316; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-crown" style="color: #065f46; font-size: 1.25rem;"></i>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; margin-bottom: 0.25rem;">Subscription Plans</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">Upgrade to premium features</div>
+    </div>
+    <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+  </a>
+
+  <!-- Recent Orders -->
+  <div style="margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 class="section-title" style="margin-bottom: 0;">Recent Orders</h2>
+      <a href="{% url 'food_pwa:manage_orders' %}" style="color: #f97316; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        View All <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    {% if recent_orders %}
+      {% for order in recent_orders %}
+      <div class="order-card">
+        <a href="{% url 'food_pwa:order_detail_owner' order.id %}" style="text-decoration: none; display: block; margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+            <div>
+              <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                Order #{{ order.id }}
+              </div>
+              <div style="font-size: 0.875rem; color: #6b7280;">
+                {{ order.customer.get_full_name|default:order.customer.username }}
+              </div>
+            </div>
+            <span class="order-status status-{{ order.status }}">
+              {{ order.get_status_display }}
+            </span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="color: #6b7280; font-size: 0.875rem;">
+              <i class="far fa-clock"></i> {{ order.created_at|timesince }} ago
+            </div>
+            <div style="font-weight: 700; color: #f97316; font-size: 1.125rem;">
+              GHS {{ order.total_amount|floatformat:2 }}
+            </div>
+          </div>
+        </a>
+
+        <!-- Quick Status Actions -->
+        {% if order.status == 'pending' %}
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="flex: 1;" onsubmit="return confirm('Confirm this order?');">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="confirmed">
+            <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+              <i class="fas fa-check"></i> Confirm
+            </button>
+          </form>
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="flex: 1;" onsubmit="return confirm('Cancel this order?');">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="cancelled">
+            <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </form>
+        </div>
+        {% elif order.status == 'confirmed' %}
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as preparing?');">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="preparing">
+            <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+              <i class="fas fa-fire"></i> Start Preparing
+            </button>
+          </form>
+        </div>
+        {% elif order.status == 'preparing' %}
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as ready for pickup?');">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="ready">
+            <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+              <i class="fas fa-check-circle"></i> Mark as Ready
+            </button>
+          </form>
+        </div>
+        {% elif order.status == 'ready' %}
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+          <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as picked up?');">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="picked_up">
+            <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+              <i class="fas fa-hand-holding-box"></i> Picked Up
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align: center; padding: 3rem 1.5rem; background: white; border-radius: 20px;">
+        <div style="width: 80px; height: 80px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+          <i class="fas fa-inbox" style="font-size: 2rem; color: #dc2626;"></i>
+        </div>
+        <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">No Orders Yet</h3>
+        <p style="color: #6b7280; margin: 0; font-size: 0.875rem;">New orders will appear here</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

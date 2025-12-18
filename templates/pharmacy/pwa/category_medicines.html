@@ -1,0 +1,90 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+{% block extra_css %}
+<style>
+  .category-header {
+    background: #8b5cf6;
+    color: white;
+    padding: 2rem 1rem;
+  }
+
+  .category-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+  }
+
+  .category-card:active {
+    transform: scale(0.98);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem;">
+  <h1 style="font-size: 1.75rem; font-weight: 700;">{{ category.name }}</h1>
+  {% if category.description %}
+  <p style="opacity: 0.9; margin-top: 0.5rem;">{{ category.description }}</p>
+  {% endif %}
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  {% if medicines %}
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+      {% for medicine in medicines %}
+      <a href="{% url 'pharmacy_pwa:medicine_detail' medicine.id %}" style="text-decoration: none;">
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+          {% if medicine.get_primary_image %}
+          <img src="{{ medicine.get_primary_image.url }}" style="width: 100%; height: 140px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 140px; background: #8b5cf6; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-pills" style="font-size: 2rem; color: #8b5cf6;"></i>
+          </div>
+          {% endif %}
+          <div style="padding: 0.75rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">{{ medicine.name|truncatechars:40 }}</h3>
+            <div style="font-weight: 700; color: #8b5cf6;">GHS {{ medicine.base_price|floatformat:2 }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No medicines in this category</h3>
+      <a href="{% url 'pharmacy_pwa:medicine_list' %}" style="display: inline-block; margin-top: 1rem; color: #8b5cf6; font-weight: 600;">Browse all medicines</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:medicine_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

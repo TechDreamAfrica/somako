@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}My Messages - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Messages Hero Section -->
+<section style="background: #14b8a6; padding: 3rem 0; position: relative; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="text-align: center;">
+      <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; margin-bottom: 0.75rem; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+        <i class="fas fa-comments"></i> My Messages
+      </h1>
+      <p style="color: rgba(255, 255, 255, 0.95); font-size: 1.125rem;">View and manage all your conversations</p>
+    </div>
+  </div>
+</section>
+
+<!-- Messages List Section -->
+<section style="padding: 3rem 0; background: #f9fafb; min-height: 60vh;">
+  <div class="container">
+    {% if conversations %}
+    <div class="row g-4">
+      {% for conversation in conversations %}
+      <div class="col-md-6 col-lg-4">
+        <a href="{% url 'rent:chat_thread' %}?{{ conversation.type }}={{ conversation.item.id }}" style="text-decoration: none;">
+          <div style="background: white; border-radius: 1.25rem; padding: 1.75rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 30px rgba(5, 150, 105, 0.15)'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#f3f4f6'">
+
+            <!-- Conversation Header -->
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 2px solid #f3f4f6;">
+              <div style="width: 60px; height: 60px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                {% if conversation.type == 'property' %}
+                <i class="fas fa-home" style="font-size: 1.5rem; color: #059669;"></i>
+                {% else %}
+                <i class="fas fa-tools" style="font-size: 1.5rem; color: #059669;"></i>
+                {% endif %}
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  {% if conversation.type == 'property' %}
+                    {{ conversation.item.title }}
+                  {% else %}
+                    {{ conversation.item.name }}
+                  {% endif %}
+                </h3>
+                <span style="display: inline-block; background: #14b8a6; color: #047857; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; border: 1px solid #a7f3d0;">
+                  {{ conversation.type|title }}
+                </span>
+              </div>
+              {% if conversation.unread_count > 0 %}
+              <div style="background: #14b8a6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); flex-shrink: 0;">
+                {{ conversation.unread_count }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Last Message Preview -->
+            <div style="margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <i class="fas fa-user-circle" style="color: #059669; font-size: 0.875rem;"></i>
+                <span style="font-weight: 600; color: #4b5563; font-size: 0.875rem;">
+                  {% if conversation.last_message.sender == user %}
+                    You
+                  {% else %}
+                    {{ conversation.last_message.sender.username }}
+                  {% endif %}
+                </span>
+                <span style="color: #9ca3af; font-size: 0.75rem;">
+                  <i class="fas fa-clock"></i>
+                  {{ conversation.last_message.created_at|timesince }} ago
+                </span>
+              </div>
+              <p style="color: #6b7280; font-size: 0.9375rem; line-height: 1.6; margin: 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                {{ conversation.last_message.message|truncatewords:15 }}
+              </p>
+            </div>
+
+            <!-- View Chat Button -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #059669; font-weight: 600; font-size: 0.9375rem;">
+              View Conversation
+              <i class="fas fa-arrow-right"></i>
+            </div>
+
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; max-width: 600px; margin: 0 auto;">
+      <div style="width: 120px; height: 120px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-inbox" style="font-size: 4rem; color: #059669; opacity: 0.5;"></i>
+      </div>
+      <h3 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Messages Yet</h3>
+      <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.7;">
+        Start a conversation by messaging property or equipment owners
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'rent:property_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 2rem; background: #14b8a6; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+          <i class="fas fa-home"></i>Browse Properties
+        </a>
+        <a href="{% url 'rent:equipment_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 2rem; background: white; color: #059669; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; border: 2px solid #d1fae5; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.background='white'; this.style.borderColor='#d1fae5'">
+          <i class="fas fa-tools"></i>Browse Equipment
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+</style>
+{% endblock %}

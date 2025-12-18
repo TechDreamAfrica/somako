@@ -1,0 +1,403 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Profile - {{ service_name|default:"Soma Ko" }}{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+{% block pwa_app_name %}profile{% endblock %}
+
+{% block auth_banner %}
+  <!-- Hide auth banner on profile page (user already logged in) -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f9fafb;
+  }
+
+  /* Profile Header */
+  .profile-header {
+    background: #6366f1;
+    padding: 2rem 1rem;
+    color: white;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .profile-avatar-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: {{ app_color|default:"#059669" }};
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .profile-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+  }
+
+  .profile-email {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    word-wrap: break-word;
+  }
+
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .stat-item {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.75rem 0.5rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  /* Menu Sections */
+  .menu-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .menu-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    text-decoration: none;
+    color: #1f2937;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .menu-item:last-child {
+    border-bottom: none;
+  }
+
+  .menu-item:hover {
+    background: #f9fafb;
+    transform: translateX(4px);
+  }
+
+  .menu-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .menu-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .menu-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+  }
+
+  .menu-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .menu-arrow {
+    color: #d1d5db;
+    font-size: 1.25rem;
+  }
+
+  /* Logout Button */
+  .logout-section {
+    margin: 1rem;
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #fee2e2;
+    color: #dc2626;
+    font-weight: 600;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .logout-btn:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  /* Bottom spacing for nav */
+  .content-spacer {
+    height: 80px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+  <div class="profile-avatar-container">
+    <div class="profile-avatar">
+      {% if user.profile_picture %}
+        <img src="{{ user.profile_picture }}" alt="{{ user.get_full_name }}">
+      {% else %}
+        <i class="fas fa-user"></i>
+      {% endif %}
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+      <div class="profile-email">{{ user.email }}</div>
+    </div>
+  </div>
+
+  <div class="profile-stats">
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.orders|default:0 }}</span>
+      <span class="stat-label">Orders</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.saved|default:0 }}</span>
+      <span class="stat-label">Saved</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ stats.reviews|default:0 }}</span>
+      <span class="stat-label">Reviews</span>
+    </div>
+  </div>
+</div>
+
+<!-- Account Section -->
+<div class="menu-section">
+  <div class="menu-section-title">Account</div>
+  
+  <a href="{% url 'accounts:pwa_profile_edit' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-user-edit"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Edit Profile</div>
+      <div class="menu-subtitle">Update your personal information</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="{% url 'accounts:pwa_profile_password' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-lock"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Change Password</div>
+      <div class="menu-subtitle">Update your security credentials</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+</div>
+
+<!-- Activity Section -->
+<div class="menu-section">
+  <div class="menu-section-title">Activity</div>
+  
+  <a href="{% url 'accounts:pwa_profile_orders' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-receipt"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Order History</div>
+      <div class="menu-subtitle">View your past orders</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="{% url 'accounts:pwa_profile_saved' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-heart"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Saved Items</div>
+      <div class="menu-subtitle">Your favorite items</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="{% url 'accounts:notifications' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-bell"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Notifications</div>
+      <div class="menu-subtitle">Manage your notifications</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+</div>
+
+<!-- Settings Section -->
+<div class="menu-section">
+  <div class="menu-section-title">Settings</div>
+  
+  <a href="{% url 'accounts:pwa_profile_settings' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-cog"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">App Settings</div>
+      <div class="menu-subtitle">Preferences and options</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="{% url 'accounts:notification_preferences' %}" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-bell-slash"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Notification Preferences</div>
+      <div class="menu-subtitle">Control what you receive</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+</div>
+
+<!-- Support Section -->
+<div class="menu-section">
+  <div class="menu-section-title">Support</div>
+  
+  <a href="#" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-question-circle"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Help & FAQ</div>
+      <div class="menu-subtitle">Get answers to your questions</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="#" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-headset"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Contact Support</div>
+      <div class="menu-subtitle">We're here to help</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+
+  <a href="#" class="menu-item">
+    <div class="menu-icon">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="menu-content">
+      <div class="menu-title">Terms & Privacy</div>
+      <div class="menu-subtitle">Legal information</div>
+    </div>
+    <i class="fas fa-chevron-right menu-arrow"></i>
+  </a>
+</div>
+
+<!-- Logout Button -->
+<div class="logout-section">
+  <form method="post" action="{% url 'accounts:pwa_logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </form>
+</div>
+
+<div class="content-spacer"></div>
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{{ pwa_home_url|default:'/' }}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item active">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+</div>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,424 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Edit Item {{ item.item_number }} - Soma Ko{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#8b5cf6{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #8b5cf6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #8b5cf6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .btn-primary {
+    background: #8b5cf6;
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    margin-top: 0.75rem;
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+  <div class="banner-container">
+    <!-- Background pattern -->
+  </div>
+  
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-edit" style="color: white; font-size: 3rem;"></i>
+    </div>
+    
+    <h1 style="margin: 0 0 0.5rem 0; color: #1f2937; font-size: 1.75rem; font-weight: 700;">
+      Edit Item
+    </h1>
+    <p style="margin: 0; color: #6b7280; font-size: 1rem;">
+      {{ item.item_number }} in Order {{ order.order_number }}
+    </p>
+  </div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  
+  <!-- Recipient Information -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-user" style="color: #8b5cf6;"></i>
+      Recipient Information
+    </h2>
+    
+    <div class="form-group">
+      <label for="recipient_name" class="form-label">Recipient Name *</label>
+      <input type="text" id="recipient_name" name="recipient_name" class="form-control" 
+             value="{{ item.recipient_name }}" placeholder="Full name of recipient" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="recipient_phone" class="form-label">Phone Number *</label>
+      <input type="tel" id="recipient_phone" name="recipient_phone" class="form-control" 
+             value="{{ item.recipient_phone }}" placeholder="0XXX XXX XXX" required>
+    </div>
+  </div>
+
+  <!-- Package Details -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-box" style="color: #8b5cf6;"></i>
+      Package Details
+    </h2>
+    
+    <div class="form-group">
+      <label for="package_type" class="form-label">Package Type *</label>
+      <select id="package_type" name="package_type" class="form-control" required>
+        {% for value, label in package_types %}
+        <option value="{{ value }}" {% if item.package_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="description" class="form-label">Description *</label>
+      <textarea id="description" name="description" class="form-control" rows="3" 
+                placeholder="Describe the item to be delivered" required>{{ item.description }}</textarea>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="weight" class="form-label">Weight (kg) *</label>
+        <input type="number" id="weight" name="weight" class="form-control" 
+               value="{{ item.weight }}" step="0.1" min="0.1" placeholder="0.0" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="value" class="form-label">Declared Value (GH₵)</label>
+        <input type="number" id="value" name="value" class="form-control" 
+               value="{{ item.value }}" step="0.01" min="0" placeholder="0.00">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="urgency" class="form-label">Urgency Level *</label>
+      <select id="urgency" name="urgency" class="form-control" required>
+        {% for value, label in urgency_levels %}
+        <option value="{{ value }}" {% if item.urgency == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <!-- Delivery Cost Display -->
+    <div class="form-group">
+      <label class="form-label">Estimated Delivery Cost</label>
+      <div style="background: #f3f4f6; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #6b7280; font-size: 14px;">Current Cost:</span>
+          <span style="color: #1f2937; font-weight: 700; font-size: 18px;" id="displayCost">
+            GH₵{{ current_estimated_cost|floatformat:2 }}
+          </span>
+        </div>
+        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+          Cost calculated based on weight, urgency, and delivery regions
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pickup Address -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-map-marker-alt" style="color: #8b5cf6;"></i>
+      Pickup Address
+    </h2>
+    
+    <div class="form-group">
+      <label for="pickup_address" class="form-label">Pickup Address *</label>
+      <textarea id="pickup_address" name="pickup_address" class="form-control" rows="3" 
+                placeholder="Full pickup address" required>{{ item.pickup_address }}</textarea>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+      <div>
+        <label for="pickup_landmark" class="form-label">Pickup Landmark</label>
+        <input type="text" id="pickup_landmark" name="pickup_landmark" class="form-control" 
+               value="{{ item.pickup_landmark }}" placeholder="Notable landmark nearby">
+      </div>
+      <div>
+        <label for="pickup_region" class="form-label">Pickup Region</label>
+        <select id="pickup_region" name="pickup_region" class="form-control">
+          <option value="">Select Region</option>
+          {% for region in regions %}
+          <option value="{{ region.id }}" {% if item.pickup_region_id == region.id %}selected{% endif %}>{{ region.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="pickup_instructions" class="form-label">Pickup Instructions</label>
+      <textarea id="pickup_instructions" name="pickup_instructions" class="form-control" rows="2" 
+                placeholder="Special instructions for pickup">{{ item.pickup_instructions }}</textarea>
+    </div>
+  </div>
+
+  <!-- Delivery Address -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-flag-checkered" style="color: #8b5cf6;"></i>
+      Delivery Address
+    </h2>
+    
+    <div class="form-group">
+      <label for="delivery_address" class="form-label">Delivery Address *</label>
+      <textarea id="delivery_address" name="delivery_address" class="form-control" rows="3" 
+                placeholder="Full delivery address" required>{{ item.delivery_address }}</textarea>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+      <div>
+        <label for="delivery_landmark" class="form-label">Delivery Landmark</label>
+        <input type="text" id="delivery_landmark" name="delivery_landmark" class="form-control" 
+               value="{{ item.delivery_landmark }}" placeholder="Notable landmark nearby">
+      </div>
+      <div>
+        <label for="delivery_region" class="form-label">Delivery Region</label>
+        <select id="delivery_region" name="delivery_region" class="form-control">
+          <option value="">Select Region</option>
+          {% for region in regions %}
+          <option value="{{ region.id }}" {% if item.delivery_region_id == region.id %}selected{% endif %}>{{ region.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="delivery_instructions" class="form-label">Delivery Instructions</label>
+      <textarea id="delivery_instructions" name="delivery_instructions" class="form-control" rows="2" 
+                placeholder="Special instructions for delivery">{{ item.delivery_instructions }}</textarea>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-dollar-sign" style="color: #8b5cf6;"></i>
+      Pricing
+    </h2>
+    
+    <div class="form-group">
+      <label for="estimated_cost" class="form-label">Estimated Cost (GH₵) *</label>
+      <input type="number" id="estimated_cost" name="estimated_cost" class="form-control" 
+             value="{{ item.estimated_cost|floatformat:2 }}" min="1" step="0.01" required>
+      <p style="margin: 0.25rem 0 0 0; color: #6b7280; font-size: 0.875rem;">
+        Estimated delivery cost for this item
+      </p>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div style="padding: 0 1rem 2rem 1rem;">
+    <button type="submit" class="btn-primary">
+      <i class="fas fa-save" style="margin-right: 0.5rem;"></i>
+      Update Item
+    </button>
+    
+    <a href="{% url 'express_pwa:order_detail' order.order_number %}" class="btn-secondary">
+      <i class="fas fa-times" style="margin-right: 0.5rem;"></i>
+      Cancel
+    </a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-calculate estimated cost based on weight, urgency, and regions
+    const weightInput = document.querySelector('input[name="weight"]');
+    const urgencySelect = document.querySelector('select[name="urgency"]');
+    const pickupRegionSelect = document.querySelector('select[name="pickup_region"]');
+    const deliveryRegionSelect = document.querySelector('select[name="delivery_region"]');
+    const costDisplay = document.getElementById('displayCost');
+    const costInput = document.querySelector('input[name="estimated_cost"]');
+    
+    function calculateCost() {
+        const weight = parseFloat(weightInput.value) || 1;
+        const urgency = urgencySelect.value;
+        const pickupRegion = pickupRegionSelect ? pickupRegionSelect.value : '';
+        const deliveryRegion = deliveryRegionSelect ? deliveryRegionSelect.value : '';
+        
+        // Base cost calculation
+        let baseCost = 20; // Same region default
+        if (pickupRegion && deliveryRegion && pickupRegion !== deliveryRegion) {
+            baseCost = 40; // Different regions
+        }
+        
+        let weightCost = weight * 2; // GH₵2 per kg
+        let urgencyMultiplier = 1;
+        
+        if (urgency === 'express') urgencyMultiplier = 1.5;
+        if (urgency === 'urgent') urgencyMultiplier = 2;
+        
+        const totalCost = (baseCost + weightCost) * urgencyMultiplier;
+        costDisplay.textContent = `GH₵${totalCost.toFixed(2)}`;
+        if (costInput) {
+            costInput.value = totalCost.toFixed(2);
+        }
+    }
+    
+    // Add event listeners
+    if (weightInput) weightInput.addEventListener('input', calculateCost);
+    if (urgencySelect) urgencySelect.addEventListener('change', calculateCost);
+    if (pickupRegionSelect) pickupRegionSelect.addEventListener('change', calculateCost);
+    if (deliveryRegionSelect) deliveryRegionSelect.addEventListener('change', calculateCost);
+    
+    // Initial calculation
+    calculateCost();
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:order_tracking' %}" class="bottom-nav-item">
+    <i class="fas fa-map-marker-alt"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'express_pwa:order_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

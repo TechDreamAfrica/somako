@@ -1,0 +1,225 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Delivery #{{ delivery.tracking_number }} - Rider{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .page-header {
+    background: white;
+    padding: 0;
+    margin: 1rem 0 1.5rem 0;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+
+  .status-badge {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #f59e0b;
+  }
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+
+  .btn-outline {
+    background: white;
+    color: #1d4ed8;
+    border: 2px solid #1d4ed8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fas fa-box"></i>
+    {{ delivery.tracking_number }}
+  </h1>
+  <p class="page-subtitle">Delivery Details</p>
+  <div class="status-badge">{{ delivery.get_status_display }}</div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Route -->
+  <div class="info-card">
+    <h2 class="card-title"><i class="fas fa-route" style="color: #1d4ed8;"></i> Route</h2>
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+      <div style="flex: 1;">
+        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem;">PICKUP</div>
+        <div style="font-weight: 600; color: #1f2937;">{{ delivery.pickup_address }}</div>
+        {% if delivery.pickup_landmark %}<div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">{{ delivery.pickup_landmark }}</div>{% endif %}
+      </div>
+    </div>
+    <div style="border-top: 2px solid #f3f4f6; padding-top: 1rem;">
+      <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem;">DELIVERY</div>
+      <div style="font-weight: 600; color: #1f2937;">{{ delivery.delivery_address }}</div>
+      {% if delivery.delivery_landmark %}<div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">{{ delivery.delivery_landmark }}</div>{% endif %}
+    </div>
+  </div>
+
+  <!-- Package Info -->
+  <div class="info-card">
+    <h2 class="card-title"><i class="fas fa-box" style="color: #1d4ed8;"></i> Package Details</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div><div style="font-size: 0.875rem; color: #6b7280;">Type</div><div style="font-weight: 600;">{{ delivery.get_package_type_display }}</div></div>
+      <div><div style="font-size: 0.875rem; color: #6b7280;">Weight</div><div style="font-weight: 600;">{{ delivery.weight }} kg</div></div>
+      <div><div style="font-size: 0.875rem; color: #6b7280;">Urgency</div><div style="font-weight: 600;">{{ delivery.get_urgency_display }}</div></div>
+      <div><div style="font-size: 0.875rem; color: #6b7280;">Value</div><div style="font-weight: 600;">GHS {{ delivery.value }}</div></div>
+    </div>
+    {% if delivery.description %}<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;"><div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Description</div><div>{{ delivery.description }}</div></div>{% endif %}
+  </div>
+
+  <!-- Contact -->
+  <div class="info-card">
+    <h2 class="card-title"><i class="fas fa-user" style="color: #1d4ed8;"></i> Customer Contact</h2>
+    <div style="margin-bottom: 1rem;"><div style="font-size: 0.875rem; color: #6b7280;">Sender</div><div style="font-weight: 600;">{{ delivery.sender.get_full_name|default:delivery.sender.username }}</div></div>
+    <div style="margin-bottom: 1rem;"><div style="font-size: 0.875rem; color: #6b7280;">Recipient</div><div style="font-weight: 600;">{{ delivery.recipient_name }}</div></div>
+    <a href="tel:{{ delivery.recipient_phone }}" style="display: block; padding: 0.875rem; background: #10b981; color: white; text-align: center; border-radius: 12px; text-decoration: none; font-weight: 600;"><i class="fas fa-phone"></i> Call Recipient</a>
+  </div>
+
+  <!-- Earnings -->
+  <div class="info-card">
+    <h2 class="card-title"><i class="fas fa-coins" style="color: #10b981;"></i> Earnings</h2>
+    <div style="text-align: center; padding: 1rem;"><div style="font-size: 2rem; font-weight: 800; color: #10b981;">GHS {{ delivery.estimated_cost|floatformat:2 }}</div></div>
+  </div>
+
+  <!-- Actions -->
+  <div style="padding: 0 1rem;">
+    {% if can_pickup %}
+    <form method="post" action="{% url 'express_pwa:update_delivery_status_rider' delivery.id %}">{% csrf_token %}<input type="hidden" name="status" value="picked_up"><button type="submit" class="action-btn btn-success"><i class="fas fa-check"></i> Mark as Picked Up</button></form>
+    {% elif can_mark_in_transit %}
+    <form method="post" action="{% url 'express_pwa:update_delivery_status_rider' delivery.id %}">{% csrf_token %}<input type="hidden" name="status" value="in_transit"><button type="submit" class="action-btn btn-success"><i class="fas fa-truck"></i> Mark as In Transit</button></form>
+    {% elif can_complete %}
+    <a href="{% url 'express_pwa:rider_capture_signature' delivery.id %}" class="action-btn btn-primary"><i class="fas fa-signature"></i> Get Signature & Complete</a>
+    {% endif %}
+    <button onclick="window.location.href='{% url 'express_pwa:rider_my_deliveries' %}'" class="action-btn btn-outline"><i class="fas fa-list"></i> Back to My Deliveries</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item"><i class="fas fa-search"></i><span>Available</span></a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item active"><i class="fas fa-box"></i><span>Deliveries</span></a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item"><i class="fas fa-wallet"></i><span>Earnings</span></a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+</div>
+{% endblock %}

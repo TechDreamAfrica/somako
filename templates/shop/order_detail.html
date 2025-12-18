@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}Order #{{ order.order_number }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #22c55e; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="text-center">
+      <div style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 3px solid rgba(255, 255, 255, 0.3);">
+        <i class="fas fa-check-circle" style="font-size: 3rem; color: white;"></i>
+      </div>
+      <h1 style="font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: white; margin-bottom: 0.5rem; letter-spacing: -1px;">Order Confirmed!</h1>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95); margin-bottom: 0.5rem;">Order #{{ order.order_number }}</p>
+      <p style="font-size: 0.9375rem; color: rgba(255, 255, 255, 0.85);">{{ order.created_at|date:"F j, Y \a\t g:i A" }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Order Details -->
+<section style="padding: 4rem 0; background: #22c55e; margin-top: -2rem;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column - Order Items & Details -->
+      <div class="col-lg-8">
+        <!-- Order Status -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">Order Status</h4>
+
+          {% if order.status == 'pending' %}
+          <div style="background: #fef3c7; border: 2px solid #fcd34d; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #fbbf24; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-clock" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #92400e; margin-bottom: 0.25rem;">Pending Payment</h5>
+              <p style="color: #78350f; font-size: 0.9375rem; margin: 0;">Your order is awaiting payment confirmation</p>
+            </div>
+          </div>
+          {% elif order.status == 'confirmed' %}
+          <div style="background: #d1fae5; border: 2px solid #6ee7b7; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-check" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #065f46; margin-bottom: 0.25rem;">Order Confirmed</h5>
+              <p style="color: #047857; font-size: 0.9375rem; margin: 0;">Your order has been confirmed and is being processed</p>
+            </div>
+          </div>
+          {% elif order.status == 'processing' %}
+          <div style="background: #dcfce7; border: 2px solid #86efac; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-cog fa-spin" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #166534; margin-bottom: 0.25rem;">Processing</h5>
+              <p style="color: #1e3a8a; font-size: 0.9375rem; margin: 0;">We're preparing your order for shipment</p>
+            </div>
+          </div>
+          {% elif order.status == 'shipped' %}
+          <div style="background: #e0e7ff; border: 2px solid #a5b4fc; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-shipping-fast" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #3730a3; margin-bottom: 0.25rem;">Shipped</h5>
+              <p style="color: #4338ca; font-size: 0.9375rem; margin: 0;">Your order is on its way to you</p>
+            </div>
+          </div>
+          {% elif order.status == 'delivered' %}
+          <div style="background: #d1fae5; border: 2px solid #6ee7b7; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-box-open" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #065f46; margin-bottom: 0.25rem;">Delivered</h5>
+              <p style="color: #047857; font-size: 0.9375rem; margin: 0;">Your order has been delivered</p>
+            </div>
+          </div>
+          {% elif order.status == 'cancelled' %}
+          <div style="background: #fee2e2; border: 2px solid #fca5a5; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-times-circle" style="font-size: 1.5rem; color: white;"></i>
+            </div>
+            <div>
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #991b1b; margin-bottom: 0.25rem;">Cancelled</h5>
+              <p style="color: #7f1d1d; font-size: 0.9375rem; margin: 0;">This order has been cancelled</p>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Order Items -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+          <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem;">Order Items</h4>
+
+          {% for item in order.items.all %}
+          <div style="display: flex; gap: 1.5rem; padding: 1.5rem; background: #f9fafb; border-radius: 1rem; margin-bottom: 1rem; border: 2px solid #e5e7eb;">
+            {% with first_image=item.variant.product.images.first %}
+            {% if first_image %}
+            <img src="{{ first_image.image.url }}" alt="{{ item.product_name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.75rem; border: 2px solid #dcfce7;">
+            {% else %}
+            <div style="width: 80px; height: 80px; background: #dcfce7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-box" style="font-size: 2rem; color: #22c55e; opacity: 0.5;"></i>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div style="flex: 1;">
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">{{ item.product_name }}</h5>
+              <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 0.5rem;">{{ item.variant_name }}</p>
+              <p style="color: #059669; font-size: 0.875rem; font-weight: 600; margin: 0;">SKU: {{ item.sku }}</p>
+            </div>
+
+            <div style="text-align: right;">
+              <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.25rem;">Qty: {{ item.quantity }}</p>
+              <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">GHS {{ item.unit_price }} each</p>
+              <p style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin: 0;">GHS {{ item.total_price }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Shipping & Billing -->
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-shipping-fast" style="color: #059669;"></i> Shipping Address
+              </h5>
+              <p style="color: #374151; font-size: 0.9375rem; line-height: 1.6; margin: 0;">
+                {{ order.shipping_address }}<br>
+                {{ order.shipping_city }}, {{ order.shipping_state }}<br>
+                {% if order.shipping_postal_code %}{{ order.shipping_postal_code }}<br>{% endif %}
+                {{ order.shipping_country }}
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-user" style="color: #22c55e;"></i> Contact Information
+              </h5>
+              <p style="color: #374151; font-size: 0.9375rem; line-height: 1.6; margin: 0;">
+                <strong>Email:</strong> {{ order.customer_email }}<br>
+                <strong>Phone:</strong> {{ order.customer_phone }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem;">Order Summary</h4>
+
+            <div style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Subtotal</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ order.subtotal }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Tax</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ order.tax_amount }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Shipping</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ order.shipping_cost }}</span>
+              </div>
+            </div>
+
+            <hr style="margin: 1.5rem 0; border-color: #e5e7eb;">
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+              <span style="font-size: 1.25rem; font-weight: 800; color: #1f2937;">Total</span>
+              <span style="font-size: 1.75rem; font-weight: 900; color: #059669;">GHS {{ order.total_amount }}</span>
+            </div>
+
+            {% if order.notes %}
+            <div style="background: #fef3c7; border: 2px solid #fcd34d; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem;">
+              <h6 style="font-size: 0.875rem; font-weight: 700; color: #92400e; margin-bottom: 0.5rem;">Order Notes:</h6>
+              <p style="color: #78350f; font-size: 0.8125rem; margin: 0;">{{ order.notes }}</p>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <a href="{% url 'shop:order_list' %}" style="width: 100%; padding: 1rem; background: #22c55e; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-list"></i> View All Orders
+              </a>
+              <a href="{% url 'shop:product_list' %}" style="width: 100%; padding: 1rem; background: white; color: #059669; text-decoration: none; border: 2px solid #059669; border-radius: 0.75rem; font-weight: 600; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='white'">
+                <i class="fas fa-shopping-bag"></i> Continue Shopping
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

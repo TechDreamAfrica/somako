@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}Browse Properties - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #14b8a6; padding: 5rem 0 4rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="text-center" style="max-width: 700px; margin: 0 auto;">
+      <span style="display: inline-flex; align-items: center; gap: 0.625rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.625rem 1.5rem; border-radius: 50px; font-size: 0.9375rem; font-weight: 600; color: white; margin-bottom: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+        <i class="fas fa-home"></i>Property Rentals
+      </span>
+      <h1 style="font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 900; color: white; margin-bottom: 1.25rem; letter-spacing: -1.5px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">Find Your Perfect Property</h1>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95); line-height: 1.7;">Browse through our collection of properties and equipment for rent</p>
+    </div>
+  </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section style="background: white; padding: 3rem 0; margin-top: -3rem; position: relative; z-index: 10;">
+  <div class="container">
+    <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+      <form method="get">
+        <div class="row g-3">
+          <div class="col-md-6 col-lg-3">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.9375rem;">
+              <i class="fas fa-search" style="color: #059669;"></i>Search
+            </label>
+            <input type="text" name="search" placeholder="Search properties..." value="{{ request.GET.search }}" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.9375rem;">
+              <i class="fas fa-map-marker-alt" style="color: #059669;"></i>Location
+            </label>
+            <input type="text" name="location" placeholder="City or State" value="{{ request.GET.location }}" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.9375rem;">
+              <i class="fas fa-tag" style="color: #059669;"></i>Category
+            </label>
+            <select name="category" style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+              <option value="">All Categories</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <label style="display: block; opacity: 0; margin-bottom: 0.75rem; font-size: 0.9375rem;">Action</label>
+            <button type="submit" style="width: 100%; padding: 0.875rem 1.125rem; background: #14b8a6; color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.625rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <i class="fas fa-search"></i>Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Properties Grid Section -->
+<section style="padding: 4rem 0; background: #14b8a6;">
+  <div class="container">
+    <div class="row g-4">
+      {% for property in properties %}
+      <div class="col-md-6 col-lg-4">
+        <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #f3f4f6; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 20px 40px rgba(5, 150, 105, 0.2)'; this.style.borderColor='#d1fae5'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#f3f4f6'">
+          {% if property.get_main_image_url %}
+          <div style="position: relative; height: 240px; overflow: hidden; background: #f3f4f6;">
+            <img src="{{ property.get_main_image_url }}" alt="{{ property.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onerror="console.error('Image failed to load:', this.src); this.style.display='none'; this.parentElement.style.background='#ecfdf5'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; var icon=document.createElement('i'); icon.className='fas fa-home'; icon.style.cssText='font-size: 4rem; color: #059669; opacity: 0.3; position: absolute;'; this.parentElement.appendChild(icon); var msg=document.createElement('div'); msg.style.cssText='position: absolute; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 8px; font-size: 10px; border-radius: 4px; word-break: break-all;'; msg.textContent='Error loading: ' + this.src; this.parentElement.appendChild(msg);" onload="console.log('Image loaded successfully:', this.src)">
+            <div style="position: absolute; inset: 0; background: #14b8a6 100%);"></div>
+            <div style="position: absolute; top: 1rem; left: 1rem;">
+              {% if property.listing_type == 'for_sale' %}
+              <span style="background: #14b8a6; color: #115e59; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #14b8a6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">FOR SALE</span>
+              {% else %}
+              <span style="background: #14b8a6; color: #047857; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #059669; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">FOR RENT</span>
+              {% endif %}
+            </div>
+            <div style="position: absolute; top: 1rem; right: 1rem;">
+              <button style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.95); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);" onmouseover="this.style.background='#fef2f2'; this.querySelector('i').style.color='#ffffff'" onmouseout="this.style.background='rgba(255, 255, 255, 0.95)'; this.querySelector('i').style.color='#9ca3af'">
+                <i class="fas fa-heart" style="color: #9ca3af; font-size: 1rem; transition: color 0.3s ease;"></i>
+              </button>
+            </div>
+          </div>
+          {% else %}
+          <div style="position: relative; height: 240px; background: #14b8a6; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-home" style="font-size: 4rem; color: #059669; opacity: 0.3;"></i>
+            <div style="position: absolute; top: 1rem; left: 1rem;">
+              {% if property.listing_type == 'for_sale' %}
+              <span style="background: #14b8a6; color: #115e59; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #14b8a6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">FOR SALE</span>
+              {% else %}
+              <span style="background: #14b8a6; color: #047857; padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #059669; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">FOR RENT</span>
+              {% endif %}
+            </div>
+            <div style="position: absolute; top: 1rem; right: 1rem;">
+              <button style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.95); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);" onmouseover="this.style.background='#fef2f2'; this.querySelector('i').style.color='#ffffff'" onmouseout="this.style.background='rgba(255, 255, 255, 0.95)'; this.querySelector('i').style.color='#9ca3af'">
+                <i class="fas fa-heart" style="color: #9ca3af; font-size: 1rem; transition: color 0.3s ease;"></i>
+              </button>
+            </div>
+          </div>
+          {% endif %}
+
+          <div style="padding: 1.75rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap;">
+              <span style="background: #14b8a6; color: #047857; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600; border: 1px solid #a7f3d0;">{{ property.category.name }}</span>
+              {% if property.is_available %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; background: #d1fae5; color: #047857; padding: 0.375rem 0.75rem; border-radius: 50px; font-weight: 700; font-size: 0.8125rem;">
+                <span style="width: 6px; height: 6px; background: #ffffff; border-radius: 50%; display: inline-block;"></span>Available
+              </span>
+              {% else %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; background: #fee2e2; color: #991b1b; padding: 0.375rem 0.75rem; border-radius: 50px; font-weight: 700; font-size: 0.8125rem;">
+                <span style="width: 6px; height: 6px; background: #ffffff; border-radius: 50%; display: inline-block;"></span>Unavailable
+              </span>
+              {% endif %}
+            </div>
+
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 0.75rem; line-height: 1.3;">{{ property.title }}</h3>
+
+            <p style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-map-marker-alt" style="color: #059669;"></i>{{ property.city }}, {{ property.state }}
+            </p>
+
+            <p style="color: #9ca3af; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.25rem;">{{ property.description|truncatewords:20 }}</p>
+
+            <!-- Property Features -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 2px solid #f3f4f6;">
+              {% if property.bedrooms %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+                <i class="fas fa-bed" style="color: #059669; font-size: 0.875rem;"></i>{{ property.bedrooms }}
+              </span>
+              {% endif %}
+              {% if property.bathrooms %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+                <i class="fas fa-bath" style="color: #059669; font-size: 0.875rem;"></i>{{ property.bathrooms }}
+              </span>
+              {% endif %}
+              {% if property.area %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+                <i class="fas fa-expand-arrows-alt" style="color: #059669; font-size: 0.875rem;"></i>{{ property.area }} sq ft
+              </span>
+              {% endif %}
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                {% if property.listing_type == 'for_sale' %}
+                <span style="font-size: 1.75rem; font-weight: 800; color: #14b8a6; font-family: 'Inter', sans-serif;">GHS {{ property.price_per_period }}</span>
+                <span style="color: #9ca3af; font-size: 0.875rem; font-weight: 600; display: block;">Total Price</span>
+                {% else %}
+                <span style="font-size: 1.75rem; font-weight: 800; color: #059669; font-family: 'Inter', sans-serif;">GHS {{ property.price_per_period }}</span>
+                <span style="color: #9ca3af; font-size: 0.875rem; font-weight: 600; display: block;">/{{ property.rental_period }}</span>
+                {% endif %}
+              </div>
+              {% if property.listing_type == 'for_sale' %}
+              <a href="{% url 'rent:property_detail' property.pk %}" style="background: #14b8a6; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.transform='translateX(3px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                Buy <i class="fas fa-shopping-cart" style="font-size: 0.75rem;"></i>
+              </a>
+              {% else %}
+              <a href="{% url 'rent:property_detail' property.pk %}" style="background: #14b8a6; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.transform='translateX(3px)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                Rent <i class="fas fa-key" style="font-size: 0.75rem;"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+          <div style="width: 100px; height: 100px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+            <i class="fas fa-home" style="font-size: 3rem; color: #059669; opacity: 0.5;"></i>
+          </div>
+          <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Properties Found</h4>
+          <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">Try adjusting your search filters or browse all properties</p>
+          <a href="{% url 'rent:property_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 2rem; background: #14b8a6; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="fas fa-redo-alt"></i>Clear Filters
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if properties.has_other_pages %}
+    <div style="margin-top: 4rem;">
+      <nav>
+        <ul style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap; list-style: none; padding: 0; margin: 0;">
+          {% if properties.has_previous %}
+          <li>
+            <a href="?page={{ properties.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.background='white'; this.style.borderColor='#d1fae5'">
+              <i class="fas fa-chevron-left"></i>Previous
+            </a>
+          </li>
+          {% endif %}
+
+          {% for num in properties.paginator.page_range %}
+          {% if num == properties.number %}
+          <li>
+            <span style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: #14b8a6; color: white; border-radius: 0.75rem; font-weight: 700; font-size: 0.9375rem; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">{{ num }}</span>
+          </li>
+          {% else %}
+          <li>
+            <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#d1fae5'; this.style.color='#059669'" onmouseout="this.style.background='white'; this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+
+          {% if properties.has_next %}
+          <li>
+            <a href="?page={{ properties.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#a7f3d0'" onmouseout="this.style.background='white'; this.style.borderColor='#d1fae5'">
+              Next<i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

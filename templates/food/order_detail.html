@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}Order Details - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.status-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+</style>
+
+<!-- Hero Section -->
+<section style="background: #f97316; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Order Details</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 1.125rem;">
+          <i class="fas fa-receipt"></i> Order #{{ order.order_number }}
+        </p>
+      </div>
+      <div>
+        {% if order.status == 'pending' %}
+        <span class="status-pulse" style="background: rgba(245, 158, 11, 0.2); color: #f97316; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(245, 158, 11, 0.4); font-size: 1rem;">
+          <i class="fas fa-clock"></i> {{ order.get_status_display }}
+        </span>
+        {% elif order.status == 'confirmed' or order.status == 'preparing' %}
+        <span class="status-pulse" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(59, 130, 246, 0.4); font-size: 1rem;">
+          <i class="fas fa-utensils"></i> {{ order.get_status_display }}
+        </span>
+        {% elif order.status == 'out_for_delivery' %}
+        <span class="status-pulse" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(139, 92, 246, 0.4); font-size: 1rem;">
+          <i class="fas fa-truck"></i> {{ order.get_status_display }}
+        </span>
+        {% elif order.status == 'delivered' or order.status == 'completed' %}
+        <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(16, 185, 129, 0.4); font-size: 1rem;">
+          <i class="fas fa-check-circle"></i> {{ order.get_status_display }}
+        </span>
+        {% elif order.status == 'cancelled' %}
+        <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(239, 68, 68, 0.4); font-size: 1rem;">
+          <i class="fas fa-times-circle"></i> {{ order.get_status_display }}
+        </span>
+        {% else %}
+        <span style="background: rgba(107, 114, 128, 0.2); color: #6b7280; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 700; border: 2px solid rgba(107, 114, 128, 0.4); font-size: 1rem;">
+          {{ order.get_status_display }}
+        </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Order Details Section -->
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row">
+      <!-- Left Column - Order Items -->
+      <div class="col-lg-8">
+        <!-- Restaurant Info Card -->
+        <div class="fade-in" style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 2px solid #f3f4f6;">
+          <div style="display: flex; gap: 1.5rem; align-items: start;">
+            {% if order.restaurant.get_logo_url %}
+            <img src="{{ order.restaurant.get_logo_url }}" alt="{{ order.restaurant.name }}" style="width: 80px; height: 80px; border-radius: 1rem; object-fit: cover; border: 2px solid #e5e7eb;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="width: 80px; height: 80px; background: #f97316; border-radius: 1rem; display: none; align-items: center; justify-content: center;">
+              <i class="fas fa-store" style="font-size: 2rem; color: white;"></i>
+            </div>
+            {% else %}
+            <div style="width: 80px; height: 80px; background: #f97316; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-store" style="font-size: 2rem; color: white;"></i>
+            </div>
+            {% endif %}
+            <div style="flex: 1;">
+              <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">{{ order.restaurant.name }}</h3>
+              <p style="color: #6b7280; margin-bottom: 0.5rem;">
+                <i class="fas fa-map-marker-alt" style="color: #f97316;"></i> {{ order.restaurant.address }}
+              </p>
+              <p style="color: #6b7280; margin: 0;">
+                <i class="fas fa-phone" style="color: #10b981;"></i> {{ order.restaurant.phone }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items Card -->
+        <div class="fade-in" style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 2px solid #f3f4f6;">
+          <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-shopping-bag" style="color: #3b82f6;"></i> Order Items
+          </h3>
+
+          <div style="border-top: 2px solid #f3f4f6;">
+            {% for item in order.orderitem_set.all %}
+            <div style="padding: 1.5rem 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 1.5rem; align-items: start;">
+              {% if item.menu_item.image %}
+              <img src="{{ item.menu_item.get_image_url }}" alt="{{ item.menu_item.name }}" style="width: 80px; height: 80px; border-radius: 0.75rem; object-fit: cover; border: 2px solid #f3f4f6;">
+              {% else %}
+              <div style="width: 80px; height: 80px; background: #dbeafe; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; border: 2px solid #93c5fd;">
+                <i class="fas fa-utensils" style="font-size: 1.5rem; color: #3b82f6;"></i>
+              </div>
+              {% endif %}
+
+              <div style="flex: 1;">
+                <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.125rem;">{{ item.menu_item.name }}</h4>
+                {% if item.menu_item.description %}
+                <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">{{ item.menu_item.description|truncatewords:15 }}</p>
+                {% endif %}
+
+                <!-- Addons -->
+                {% if item.addons.exists %}
+                <div style="margin-top: 0.5rem;">
+                  <p style="color: #6b7280; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.25rem;">Add-ons:</p>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for addon in item.addons.all %}
+                    <span style="background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600;">
+                      {{ addon.name }} (+GHS {{ addon.price }})
+                    </span>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+
+                <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+                  <span style="background: #f3f4f6; color: #374151; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-weight: 700;">
+                    Qty: {{ item.quantity }}
+                  </span>
+                  <span style="color: #6b7280; font-size: 0.875rem;">@ GHS {{ item.price }}</span>
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="color: #3b82f6; font-weight: 900; font-size: 1.25rem;">GHS {{ item.subtotal }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Delivery Address Card -->
+        <div class="fade-in" style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 2px solid #f3f4f6;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">
+            <i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> Delivery Address
+          </h3>
+          <p style="color: #374151; font-size: 1rem; margin: 0; line-height: 1.6;">{{ order.delivery_address }}</p>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="col-lg-4">
+        <!-- Order Summary Card -->
+        <div class="fade-in" style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 2px solid #f3f4f6; position: sticky; top: 2rem;">
+          <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-file-invoice-dollar" style="color: #10b981;"></i> Order Summary
+          </h3>
+
+          <!-- Order Info -->
+          <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #f3f4f6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+              <span style="color: #6b7280; font-size: 0.9375rem;">Order Date</span>
+              <span style="color: #1f2937; font-weight: 600; font-size: 0.9375rem;">{{ order.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+              <span style="color: #6b7280; font-size: 0.9375rem;">Order Time</span>
+              <span style="color: #1f2937; font-weight: 600; font-size: 0.9375rem;">{{ order.created_at|time:"h:i A" }}</span>
+            </div>
+            {% if order.estimated_delivery_time %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280; font-size: 0.9375rem;">Est. Delivery</span>
+              <span style="color: #f97316; font-weight: 700; font-size: 0.9375rem;">{{ order.estimated_delivery_time }} mins</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Price Breakdown -->
+          <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #f3f4f6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+              <span style="color: #6b7280;">Subtotal</span>
+              <span style="color: #1f2937; font-weight: 600;">GHS {{ order.subtotal|default:order.total_amount }}</span>
+            </div>
+            {% if order.delivery_fee %}
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+              <span style="color: #6b7280;">Delivery Fee</span>
+              <span style="color: #1f2937; font-weight: 600;">GHS {{ order.delivery_fee }}</span>
+            </div>
+            {% endif %}
+            {% if order.tax %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Tax</span>
+              <span style="color: #1f2937; font-weight: 600;">GHS {{ order.tax }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Total -->
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 2px solid #93c5fd;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #1e40af; font-weight: 700; font-size: 1.125rem;">Total Amount</span>
+              <span style="color: #1e3a8a; font-weight: 900; font-size: 1.75rem;">GHS {{ order.total_amount }}</span>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+              <div style="width: 40px; height: 40px; background: #10b981; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-credit-card" style="color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600;">Payment Method</div>
+                <div style="color: #1f2937; font-weight: 700;">{{ order.payment_method|default:"Cash on Delivery" }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% if order.status != 'delivered' and order.status != 'completed' and order.status != 'cancelled' %}
+            <a href="{% url 'food:track_order' order.order_number %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; background: #10b981; color: white; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(16, 185, 129, 0.3)'">
+              <i class="fas fa-map-marker-alt"></i> Track Order
+            </a>
+            {% endif %}
+
+            <a href="{% url 'food:order_list' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#3b82f6'">
+              <i class="fas fa-list"></i> View All Orders
+            </a>
+
+            <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; background: #f3f4f6; color: #6b7280; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#e5e7eb'; this.style.color='#374151'" onmouseout="this.style.background='#f3f4f6'; this.style.color='#6b7280'">
+              <i class="fas fa-store"></i> Order More Food
+            </a>
+          </div>
+        </div>
+
+        <!-- Need Help Card -->
+        <div class="fade-in" style="background: #fef3c7; border-radius: 1.5rem; padding: 1.5rem; border: 2px solid #fcd34d;">
+          <h4 style="color: #92400e; font-weight: 800; margin-bottom: 1rem; font-size: 1.125rem;">
+            <i class="fas fa-question-circle"></i> Need Help?
+          </h4>
+          <p style="color: #78350f; margin-bottom: 1rem; font-size: 0.9375rem;">Contact us if you have any questions about your order</p>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <a href="tel:+233000000000" style="display: flex; align-items: center; gap: 0.5rem; color: #92400e; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#78350f'" onmouseout="this.style.color='#92400e'">
+              <i class="fas fa-phone"></i> Call Support
+            </a>
+            <a href="mailto:support@somako.com" style="display: flex; align-items: center; gap: 0.5rem; color: #92400e; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#78350f'" onmouseout="this.style.color='#92400e'">
+              <i class="fas fa-envelope"></i> Email Us
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

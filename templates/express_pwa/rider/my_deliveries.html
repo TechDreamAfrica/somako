@@ -1,0 +1,366 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}My Deliveries - Rider{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .page-header {
+    background: white;
+    padding: 0;
+    margin: 1rem 0 1.5rem 0;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #8b5cf6;
+  }
+
+  .delivery-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    position: relative;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+
+  .delivery-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .tracking-number {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .status-badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #dbeafe; color: #1e40af; }
+  .status-assigned { background: #e0e7ff; color: #3730a3; }
+  .status-picked_up { background: #fed7aa; color: #ea580c; }
+  .status-in_transit { background: #fde68a; color: #d97706; }
+  .status-delivered { background: #d1fae5; color: #065f46; }
+  .status-cancelled { background: #fee2e2; color: #dc2626; }
+
+  .delivery-info {
+    margin-bottom: 1rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .info-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .info-value {
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .delivery-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    flex: 1;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: white;
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0;
+    z-index: 50;
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .bottom-nav-item.active {
+    color: #1d4ed8;
+  }
+
+  .bottom-nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  body {
+    padding-bottom: 80px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="banner-container">
+    <div style="text-align: center;">
+      <h1 class="page-title">
+        <i class="fas fa-truck"></i>
+        My Deliveries
+      </h1>
+      <p class="page-subtitle">Manage your assigned deliveries</p>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+  <form method="get" style="display: flex; gap: 0.5rem; align-items: center;">
+    <select name="status" class="form-control" style="flex: 1; padding: 0.5rem; border: 2px solid #e5e7eb; border-radius: 8px;">
+      <option value="">All Statuses</option>
+      {% for status_code, status_name in status_choices %}
+        <option value="{{ status_code }}" {% if status_filter == status_code %}selected{% endif %}>
+          {{ status_name }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary" style="flex: none; padding: 0.5rem 1rem;">
+      <i class="fas fa-filter"></i>
+    </button>
+  </form>
+</div>
+
+<!-- Delivery Items -->
+{% if delivery_items %}
+  <div style="margin: 0 1rem 1rem 1rem; padding: 1rem; background: #faf5ff; border-radius: 12px; border-left: 4px solid #7c3aed;">
+    <h3 style="font-weight: 700; color: #1f2937; margin: 0; font-size: 1rem;">
+      <i class="fas fa-boxes" style="color: #7c3aed;"></i> My Delivery Items ({{ delivery_items.count }})
+    </h3>
+  </div>
+  {% for item in delivery_items %}
+    <div class="delivery-card" style="border-left: 4px solid #7c3aed;">
+      <div class="delivery-header">
+        <div class="tracking-number" style="color: #7c3aed;">
+          {{ item.order.order_number }} - {{ item.item_number }}
+        </div>
+        <div class="status-badge status-{{ item.status }}" style="background: #faf5ff; color: #7c3aed; border: 1px solid #7c3aed;">
+          {{ item.get_status_display }}
+        </div>
+      </div>
+
+      <div class="delivery-info">
+        <div class="info-row">
+          <span class="info-label">Order:</span>
+          <span class="info-value">{{ item.order.order_number }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Sender:</span>
+          <span class="info-value">{{ item.order.sender.get_full_name|default:item.order.sender.username }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Recipient:</span>
+          <span class="info-value">{{ item.recipient_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Package:</span>
+          <span class="info-value">{{ item.get_package_type_display }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Pickup:</span>
+          <span class="info-value">{{ item.pickup_region.name|default:"Unknown Region" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Delivery:</span>
+          <span class="info-value">{{ item.delivery_region.name|default:"Unknown Region" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Cost:</span>
+          <span class="info-value">GH₵{{ item.final_cost|default:item.estimated_cost|floatformat:2 }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Created:</span>
+          <span class="info-value">{{ item.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+      </div>
+
+      <div class="delivery-actions">
+        <a href="{% url 'express_pwa:order_detail_rider' item.order.id %}" class="btn btn-primary" style="background: #7c3aed;">
+          <i class="fas fa-eye"></i>
+          View Order
+        </a>
+        
+        {% if item.status == 'assigned' %}
+          <a href="{% url 'express_pwa:update_order_item_status' item.order.id item.id %}" class="btn btn-success">
+            <i class="fas fa-play"></i>
+            Update Status
+          </a>
+        {% elif item.status == 'picked_up' %}
+          <a href="{% url 'express_pwa:update_order_item_status' item.order.id item.id %}" class="btn btn-success">
+            <i class="fas fa-truck"></i>
+            In Transit
+          </a>
+        {% elif item.status == 'in_transit' %}
+          <a href="{% url 'express_pwa:update_order_item_status' item.order.id item.id %}" class="btn btn-success">
+            <i class="fas fa-check"></i>
+            Complete
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Empty State -->
+{% if not delivery_items %}
+  <div class="delivery-card" style="text-align: center; color: #6b7280;">
+    <i class="fas fa-boxes" style="font-size: 3rem; margin-bottom: 1rem; color: #d1d5db;"></i>
+    <h3 style="margin-bottom: 0.5rem;">No Delivery Items Found</h3>
+    <p style="margin: 0;">
+      {% if status_filter %}
+        No delivery items found with status "{{ status_filter|title }}".
+      {% else %}
+        You haven't been assigned any delivery items yet.
+      {% endif %}
+    </p>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-tachometer-alt"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item active">
+    <i class="fas fa-truck"></i>
+    <span>My Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-money-bill-wave"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

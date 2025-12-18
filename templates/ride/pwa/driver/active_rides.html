@@ -1,0 +1,455 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Active Rides - Driver - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: #eab308;
+    padding: 2rem 1rem;
+    margin-bottom: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="70" r="1.5" fill="white" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1rem;
+    margin-top: -1rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .stat-card {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .ride-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #eab308;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ride-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: #eab308, rgba(217, 119, 6, 0.1));
+    border-radius: 0 0 0 100%;
+  }
+
+  .ride-card:active {
+    transform: scale(0.98);
+  }
+
+  .ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-in-progress {
+    background: #eab308;
+    color: #92400e;
+    border: 2px solid #eab308;
+  }
+
+  .status-accepted {
+    background: #eab308;
+    color: #1e40af;
+    border: 2px solid #3b82f6;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .floating-refresh {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    font-size: 1.2rem;
+    transition: all 0.3s;
+  }
+
+  .floating-refresh:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+  }
+
+  .ride-id {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .status-accepted {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-driver_arrived {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-in_progress {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  .passenger-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .passenger-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #92400e;
+  }
+
+  .location-info {
+    margin-bottom: 1rem;
+  }
+
+  .location-row {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .location-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .location-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pickup-icon {
+    background: #eab308;
+  }
+
+  .dropoff-icon {
+    background: #eab308;
+  }
+
+  .location-text {
+    flex: 1;
+  }
+
+  .location-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .location-address {
+    color: #1f2937;
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+
+  .btn-view {
+    width: 100%;
+    padding: 0.875rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+
+  .btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #eab308;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fare-badge {
+    background: #eab308;
+    color: #92400e;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fas fa-car" style="margin-right: 0.5rem;"></i>
+    Active Rides
+  </h1>
+  <p class="page-subtitle">
+    Manage your ongoing rides and deliver excellent service
+  </p>
+</div>
+
+<!-- Statistics Row -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number">{{ rides|length }}</div>
+    <div class="stat-label">Active Now</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ today_total|default:"0" }}</div>
+    <div class="stat-label">Today Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">GHS {{ today_earnings|default:"0"|floatformat:0 }}</div>
+    <div class="stat-label">Today Earned</div>
+  </div>
+</div>
+
+<div class="pwa-container">
+  {% if rides %}
+    {% for ride in rides %}
+    <div class="ride-card">
+      <div class="ride-header">
+        <span class="ride-id">Ride #{{ ride.ride_id|slice:":8" }}</span>
+        <span class="status-badge status-{{ ride.status|lower }}">
+          {{ ride.get_status_display }}
+        </span>
+      </div>
+
+      <div class="passenger-info">
+        <div class="passenger-avatar">
+          {{ ride.passenger.first_name|first }}{{ ride.passenger.last_name|first }}
+        </div>
+        <div style="flex: 1;">
+          <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+            {{ ride.passenger.get_full_name }}
+          </div>
+          <div style="color: #6b7280; font-size: 0.875rem;">
+            <i class="fas fa-users"></i> {{ ride.passenger_count }} passenger{{ ride.passenger_count|pluralize }}
+          </div>
+        </div>
+      </div>
+
+      <div class="location-info">
+        <div class="location-row">
+          <div class="location-icon pickup-icon">
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+              <circle cx="12" cy="12" r="8"/>
+            </svg>
+          </div>
+          <div class="location-text">
+            <div class="location-label">PICKUP</div>
+            <div class="location-address">{{ ride.pickup_address|truncatewords:6 }}</div>
+          </div>
+        </div>
+
+        <div class="location-row">
+          <div class="location-icon dropoff-icon">
+            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="location-text">
+            <div class="location-label">DROPOFF</div>
+            <div class="location-address">{{ ride.dropoff_address|truncatewords:6 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fare-badge">
+        Fare: GHS {{ ride.total_fare|floatformat:2 }}
+      </div>
+
+      <a href="{% url 'ride_pwa:driver_ride_detail' ride.id %}" class="btn-view">
+        View Details & Update Status
+      </a>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">
+        No Active Rides
+      </h2>
+      <p style="color: #6b7280; margin-bottom: 1.5rem;">
+        You don't have any active rides at the moment.
+      </p>
+      <button onclick="window.location.href='{% url 'ride_pwa:available_rides' %}'" 
+              style="padding: 0.75rem 1.5rem; background: #eab308; 
+                     color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">
+        View Available Rides
+      </button>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:driver_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'ride_pwa:available_rides' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'ride_pwa:active_rides' %}" class="bottom-nav-item active">
+    <i class="fas fa-car"></i>
+    <span>Active</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-money-bill-wave"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'ride_pwa:driver_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

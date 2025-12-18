@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% block content_class %}app-ride{% endblock %}
+{% block title %}Ride #{{ ride.ride_id }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<section style="position: relative; background: #2563eb; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; color: white;">
+      <div>
+        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 0.5rem 1rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.625rem; margin-bottom: 1rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+          <i class="fas fa-receipt"></i>
+          <span style="font-weight: 700; font-size: 0.875rem;">Ride Details</span>
+        </div>
+        <h1 style="font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 900; margin-bottom: 0.75rem; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">
+          Ride #{{ ride.ride_id|slice:":8" }}
+        </h1>
+        <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95); font-weight: 600;">{{ ride.get_status_display }}</p>
+      </div>
+      <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 1.5rem 2.5rem; border-radius: 1.25rem; text-align: center; border: 2px solid rgba(255, 255, 255, 0.3);">
+        <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 0.25rem;">GHS {{ ride.total_fare|default:"0.00" }}</div>
+        <div style="font-size: 0.875rem; font-weight: 700; color: rgba(255, 255, 255, 0.9);">Total Fare</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #2563eb;">
+  <div class="container">
+    <div class="row g-4">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- Status Card -->
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-info-circle" style="color: #2563eb;"></i>
+          </div>
+          Ride Status
+        </h2>
+
+        <div class="row g-3" style="margin-bottom: 2rem;">
+          <div class="col-md-6">
+            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd;">
+              <div style="color: #1e40af; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Current Status</div>
+              <div style="color: #1f2937; font-size: 1.25rem; font-weight: 900;">
+                {{ ride.get_status_display }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d;">
+              <div style="color: #92400e; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Payment Status</div>
+              <div style="color: #1f2937; font-size: 1.25rem; font-weight: 900;">
+                {{ ride.get_payment_status_display }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div style="position: relative; padding-left: 2rem;">
+          <div style="position: absolute; left: 1.1875rem; top: 2rem; bottom: 2rem; width: 2px; background: #2563eb;"></div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% if ride.requested_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-paper-plane" style="color: #2563eb;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Ride Requested</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.requested_at|date:"M d, Y g:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if ride.accepted_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-check" style="color: #10b981;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Driver Accepted</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.accepted_at|date:"M d, Y g:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if ride.arrived_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-map-marker-alt" style="color: #2563eb;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Driver Arrived</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.arrived_at|date:"M d, Y g:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if ride.started_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-play" style="color: #2563eb;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Ride Started</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.started_at|date:"M d, Y g:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if ride.completed_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-flag-checkered" style="color: #10b981;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Ride Completed</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.completed_at|date:"M d, Y g:i A" }}</div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if ride.cancelled_at %}
+            <div style="position: relative;">
+              <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                <i class="fas fa-times" style="color: #ef4444;"></i>
+              </div>
+              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+                <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Ride Cancelled</div>
+                <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.cancelled_at|date:"M d, Y g:i A" }}</div>
+                {% if ride.cancellation_reason %}
+                <div style="color: #ef4444; font-size: 0.8125rem; font-weight: 600; margin-top: 0.5rem;">Reason: {{ ride.cancellation_reason }}</div>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Route Card -->
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-route" style="color: #2563eb;"></i>
+          </div>
+          Route Details
+        </h2>
+
+        <!-- Pickup -->
+        <div style="background: #2563eb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #6ee7b7; margin-bottom: 1.5rem;">
+          <div style="display: flex; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-map-marker-alt" style="color: white; font-size: 1.5rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="color: #065f46; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Pickup Location</div>
+              <div style="color: #1f2937; font-weight: 800; font-size: 1.0625rem; margin-bottom: 0.375rem;">{{ ride.pickup_address }}</div>
+              <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+                Lat: {{ ride.pickup_latitude }}, Lng: {{ ride.pickup_longitude }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropoff -->
+        <div style="background: #2563eb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fca5a5; margin-bottom: 1.5rem;">
+          <div style="display: flex; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-map-marker-alt" style="color: white; font-size: 1.5rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="color: #991b1b; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Destination</div>
+              <div style="color: #1f2937; font-weight: 800; font-size: 1.0625rem; margin-bottom: 0.375rem;">{{ ride.dropoff_address }}</div>
+              <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+                Lat: {{ ride.dropoff_latitude }}, Lng: {{ ride.dropoff_longitude }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Distance & Duration -->
+        <div class="row g-3">
+          <div class="col-6">
+            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd; text-align: center;">
+              <div style="color: #1e40af; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Distance</div>
+              <div style="color: #1f2937; font-size: 1.75rem; font-weight: 900;">
+                {{ ride.actual_distance_km|default:ride.estimated_distance_km }} km
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d; text-align: center;">
+              <div style="color: #92400e; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Duration</div>
+              <div style="color: #1f2937; font-size: 1.75rem; font-weight: 900;">
+                {{ ride.actual_duration_minutes|default:ride.estimated_duration_minutes }} min
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Fare Breakdown -->
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+          <i class="fas fa-receipt" style="color: #2563eb;"></i>
+          Fare Breakdown
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">Base Fare</span>
+            <span style="color: #1f2937; font-weight: 800; font-size: 0.875rem;">GHS {{ ride.base_fare }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">Distance Fare</span>
+            <span style="color: #1f2937; font-weight: 800; font-size: 0.875rem;">GHS {{ ride.distance_fare }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">Time Fare</span>
+            <span style="color: #1f2937; font-weight: 800; font-size: 0.875rem;">GHS {{ ride.time_fare }}</span>
+          </div>
+          {% if ride.surge_multiplier > 1 %}
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #dc2626; font-size: 0.875rem; font-weight: 600;">Surge ({{ ride.surge_multiplier }}x)</span>
+            <span style="color: #dc2626; font-weight: 800; font-size: 0.875rem;">Applied</span>
+          </div>
+          {% endif %}
+          <div style="height: 2px; background: #2563eb; margin: 0.5rem 0;"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #1f2937; font-size: 1rem; font-weight: 800;">Total</span>
+            <span style="color: #2563eb; font-weight: 900; font-size: 1.75rem;">GHS {{ ride.total_fare|default:"0.00" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+          <i class="fas fa-credit-card" style="color: #2563eb;"></i>
+          Payment
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <div style="color: #6b7280; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Method</div>
+            <div style="color: #1f2937; font-weight: 800; font-size: 1rem;">{{ ride.get_payment_method_display }}</div>
+          </div>
+          <div>
+            <div style="color: #6b7280; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Status</div>
+            <div style="color: #1f2937; font-weight: 800; font-size: 1rem;">
+              {{ ride.get_payment_status_display }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Driver Info -->
+      {% if ride.driver %}
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+          <i class="fas fa-user-circle" style="color: #2563eb;"></i>
+          Driver Details
+        </h3>
+
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+          {% if ride.driver.user.profile_picture %}
+          <img src="{{ ride.driver.user.profile_picture.url }}" alt="{{ ride.driver.user.get_full_name }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #ede9fe;">
+          {% else %}
+          <div style="width: 60px; height: 60px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: #2563eb; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            {{ ride.driver.user.first_name|first }}
+          </div>
+          {% endif %}
+          <div>
+            <div style="font-weight: 800; color: #1f2937; font-size: 1.0625rem; margin-bottom: 0.25rem;">{{ ride.driver.user.get_full_name }}</div>
+            <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 600;">License: {{ ride.driver.license_number }}</div>
+          </div>
+        </div>
+
+        {% if ride.vehicle %}
+        <div style="background: #2563eb; padding: 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+          <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.5rem;">Vehicle</div>
+          <div style="font-weight: 800; color: #1f2937; font-size: 1rem; margin-bottom: 0.25rem;">{{ ride.vehicle }}</div>
+          <div style="color: #2563eb; font-size: 0.875rem; font-weight: 700;">{{ ride.vehicle_category.name }}</div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Additional Info -->
+      {% if ride.special_requests %}
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.625rem;">
+          <i class="fas fa-comment-alt" style="color: #2563eb;"></i>
+          Special Requests
+        </h3>
+        <p style="color: #4b5563; font-size: 0.9375rem; line-height: 1.6; margin: 0;">{{ ride.special_requests }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Payment Action -->
+      {% if ride.payment_status == 'PENDING' %}
+      <div style="background: #2563eb; border-radius: 1.5rem; padding: 2rem; border: 2px solid #fcd34d; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 1.5rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #92400e; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.625rem;">
+            <i class="fas fa-exclamation-circle"></i>
+            Complete Payment
+          </h3>
+          <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Please make payment to complete this ride.</p>
+        </div>
+
+        {% if ride.payment_method == 'CASH' %}
+        <!-- Cash Payment Button -->
+        <form method="post" action="{% url 'ride:confirm_cash_payment' ride.ride_id %}">
+          {% csrf_token %}
+          <button type="submit" style="width: 100%; padding: 1rem; background: #2563eb; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Confirm Cash Payment (GHS {{ ride.total_fare }})</span>
+          </button>
+        </form>
+        {% else %}
+        <!-- Mobile Money Payment Button -->
+        <form method="post" action="{% url 'ride:initiate_payment' ride.ride_id %}" id="paystackPaymentForm">
+          {% csrf_token %}
+          <button type="submit" style="width: 100%; padding: 1rem; background: #2563eb; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(139, 92, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="fas fa-mobile-alt"></i>
+            <span>Pay with Mobile Money (GHS {{ ride.total_fare }})</span>
+          </button>
+        </form>
+        <div style="text-align: center; color: #6b7280; font-size: 0.8125rem; font-weight: 600;">
+          <i class="fas fa-shield-alt"></i>
+          Secure payment via Paystack
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      <div>
+        <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: white; color: #2563eb; border: 2px solid #2563eb; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='white'">
+          <i class="fas fa-plus-circle"></i>
+          Book Another Ride
+        </a>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+{% endblock %}

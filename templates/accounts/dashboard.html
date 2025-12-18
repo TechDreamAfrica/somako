@@ -1,0 +1,1004 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - {{ service_name|default:"Soma Ko" }}{% endblock %}
+
+{% block content %}
+<div style="background: #6366f1; min-height: calc(100vh - 200px); padding: 2rem 0;">
+  <div class="container-fluid px-3 px-md-4 px-lg-5">
+
+    <!-- Dashboard Header -->
+    <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div style="display: flex; align-items: center; gap: 1.5rem;">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture }}" alt="{{ user.username }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #059669; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+            {% else %}
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #059669; display: flex; align-items: center; justify-content: center; border: 4px solid #ecfdf5; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
+              <i class="fas fa-user" style="font-size: 2rem; color: white;"></i>
+            </div>
+            {% endif %}
+            <div>
+              <h1 style="font-size: 1.875rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">
+                Welcome back, {{ user.first_name|default:user.username }}! 👋
+              </h1>
+              <p style="color: #6b7280; margin: 0; font-size: 1rem;">
+                {% if service_role %}
+                  <span style="background: #ecfdf5; padding: 0.375rem 1rem; border-radius: 0.5rem; color: #065f46; font-weight: 600; border: 1px solid #10b981;">
+                    <i class="fas fa-briefcase me-2"></i>{{ service_name|default:"General User" }}
+                  </span>
+                {% else %}
+                  Ready to get started? Let's make today productive!
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <div style="background: #ecfdf5; padding: 1rem 1.5rem; border-radius: 1rem; display: inline-block; border: 2px solid #10b981;">
+            <div style="color: #065f46; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Rating</div>
+            <div style="font-size: 1.75rem; font-weight: 900; color: #059669;">
+              {{ user.rating|floatformat:1 }}<span style="font-size: 1rem; color: #6b7280;">/5.0</span>
+            </div>
+            <div style="color: #059669; font-size: 0.8125rem; margin-top: 0.25rem;">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if show_subscription_cta %}
+    <div style="background: #eef2ff; border: 1px solid #818cf8; border-radius: 1rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;">
+      <div style="display:flex; align-items:center; gap: 1rem; flex-wrap: wrap;">
+        <div style="width:44px;height:44px;border-radius:10px;background:#6366f1;display:flex;align-items:center;justify-content:center;color:#fff;">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div style="flex:1; min-width: 240px;">
+          <div style="font-weight:800;color:#1f2937;">Unlock provider features</div>
+          <div style="color:#4b5563;font-size:.95rem;">Subscribe to activate premium tools for your {{ service_role|default:'provider' }} account.</div>
+        </div>
+        <div>
+          <a href="{% url 'accounts:subscription_plans' %}?service={{ service_role|default:'general' }}" class="btn btn-primary" style="background:#6366f1;border-color:#6366f1;font-weight:700;">View Plans</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-4 mb-4">
+      {% if service_role == 'landlord' %}
+        <!-- Landlord Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fff7ed; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fb923c; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(251, 146, 60, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f97316; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">
+                <i class="fas fa-building" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #9a3412; font-size: 0.875rem; font-weight: 600;">My Properties</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #ea580c;">{{ my_properties.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-calendar-check" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Active Rentals</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Monthly Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-eye" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Property Views</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+     
+        <!-- Seller Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-box" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">My Products</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">{{ my_products.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-shopping-cart" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Total Sales</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #e9d5ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);">
+                <i class="fas fa-star" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #581c87; font-size: 0.875rem; font-weight: 600;">Reviews</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #9333ea;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+     
+        <!-- Buyer Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-shopping-bag" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">My Orders</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">{{ my_orders.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-heart" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Wishlist</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Total Spent</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fee2e2; padding: 1.5rem; border-radius: 1rem; border: 2px solid #ef4444; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-truck" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #7f1d1d; font-size: 0.875rem; font-weight: 600;">In Transit</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% elif service_role == 'pharmacy_owner' %}
+        <!-- Pharmacy Owner Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-pills" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Total Medicines</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">{{ my_medicines.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-clipboard-check" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Orders</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fee2e2; padding: 1.5rem; border-radius: 1rem; border: 2px solid #ef4444; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #7f1d1d; font-size: 0.875rem; font-weight: 600;">Low Stock</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+     
+        <!-- Patient Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-prescription-bottle-alt" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">My Orders</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">{{ my_orders.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-file-prescription" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Prescriptions</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-calendar-plus" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Appointments</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #e9d5ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);">
+                <i class="fas fa-history" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #581c87; font-size: 0.875rem; font-weight: 600;">Medical History</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #9333ea;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% elif service_role == 'restaurant_owner' %}
+        <!-- Restaurant Owner Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fee2e2; padding: 1.5rem; border-radius: 1rem; border: 2px solid #ef4444; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-store" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #7f1d1d; font-size: 0.875rem; font-weight: 600;">My Restaurants</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">{{ my_restaurants.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-utensils" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Menu Items</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">{{ menu_items_count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-receipt" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Delivered Orders</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">{{ delivered_orders|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Delivered Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">GH₵ {{ delivered_revenue|floatformat:2 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #e0e7ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #6366f1; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(99, 102, 241, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #6366f1; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+                <i class="fas fa-chart-line" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #312e81; font-size: 0.875rem; font-weight: 600;">Monthly Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #4f46e5;">GH₵ {{ monthly_revenue|floatformat:2 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #d1fae5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-calendar-day" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Today's Revenue</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">GH₵ {{ today_revenue|floatformat:2 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Food Customer Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fee2e2; padding: 1.5rem; border-radius: 1rem; border: 2px solid #ef4444; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-hamburger" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #7f1d1d; font-size: 0.875rem; font-weight: 600;">My Orders</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">{{ my_orders.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-heart" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Favorites</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Total Spent</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-map-marker-alt" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Addresses</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% elif service_role == 'driver' %}
+        <!-- Driver Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #e9d5ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);">
+                <i class="fas fa-car" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #581c87; font-size: 0.875rem; font-weight: 600;">Total Rides</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #9333ea;">{{ my_rides.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-check-circle" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Completed</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Earnings</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-clock" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Hours Online</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      
+        <!-- Rider Stats -->
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #e9d5ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);">
+                <i class="fas fa-route" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #581c87; font-size: 0.875rem; font-weight: 600;">My Bookings</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #9333ea;">{{ my_bookings.count|default:0 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-map-marked-alt" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Saved Places</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #059669;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                <i class="fas fa-dollar-sign" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Total Spent</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                <i class="fas fa-star" style="font-size: 1.75rem; color: white;"></i>
+              </div>
+              <div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Loyalty Points</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #d97706;">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% else %}
+        <!-- General User Stats - Activities across all apps -->
+        <div class="col-sm-6 col-lg-3">
+          <a href="{% url 'rent:booking_list' %}" style="text-decoration: none;">
+            <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 1rem; border: 2px solid #10b981; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; background: #10b981; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                  <i class="fas fa-home" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <div>
+                  <div style="color: #065f46; font-size: 0.875rem; font-weight: 600;">Rentals</div>
+                  <div style="font-size: 2rem; font-weight: 900; color: #059669;">{{ rent_count|default:0 }}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <a href="{% url 'ride:ride_history' %}" style="text-decoration: none;">
+            <div style="background: #e9d5ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);">
+                  <i class="fas fa-car" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <div>
+                  <div style="color: #581c87; font-size: 0.875rem; font-weight: 600;">Rides</div>
+                  <div style="font-size: 2rem; font-weight: 900; color: #9333ea;">{{ ride_count|default:0 }}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <a href="{% url 'food:order_list' %}" style="text-decoration: none;">
+            <div style="background: #fee2e2; padding: 1.5rem; border-radius: 1rem; border: 2px solid #ef4444; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                  <i class="fas fa-utensils" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <div>
+                  <div style="color: #7f1d1d; font-size: 0.875rem; font-weight: 600;">Food Orders</div>
+                  <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">{{ food_count|default:0 }}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <a href="{% url 'shop:order_list' %}" style="text-decoration: none;">
+            <div style="background: #dbeafe; padding: 1.5rem; border-radius: 1rem; border: 2px solid #3b82f6; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                  <i class="fas fa-shopping-cart" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <div>
+                  <div style="color: #1e3a8a; font-size: 0.875rem; font-weight: 600;">Shop Orders</div>
+                  <div style="font-size: 2rem; font-weight: 900; color: #2563eb;">{{ shop_count|default:0 }}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <a href="{% url 'pharmacy:order_list' %}" style="text-decoration: none;">
+            <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #f59e0b; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                  <i class="fas fa-pills" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <div>
+                  <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Pharmacy Orders</div>
+                  <div style="font-size: 2rem; font-weight: 900; color: #d97706;">{{ pharmacy_count|default:0 }}</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick Actions & Content -->
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <!-- Quick Actions Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-bolt" style="color: #f59e0b;"></i>
+            Quick Actions
+          </h3>
+          <div class="row g-3">
+            {% if service_role == 'landlord' %}
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'rent:property_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #10b981; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">List Property</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'rent:property_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-list" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #1e3a8a; font-weight: 700;">My Listings</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'shop:product_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-shopping-cart" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #1e3a8a; font-weight: 700;">Shop Now</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'accounts:subscription_plans' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #059669; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-crown" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">Subscription</div>
+                </a>
+              </div>
+            {% elif service_role == 'pharmacy_owner' %}
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'pharmacy:medicine_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #1e3a8a; font-weight: 700;">Add Medicine</div>
+                </a>
+              </div>
+              <!-- Subscription - Only for Providers -->
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'accounts:subscription_plans' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #059669; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-crown" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">Subscription</div>
+                </a>
+              </div>
+            
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'pharmacy:medicine_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-pills" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #1e3a8a; font-weight: 700;">Buy Medicine</div>
+                </a>
+              </div>
+            {% elif service_role == 'restaurant_owner' %}
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-utensils" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #7f1d1d; font-weight: 700;">Manage Menu</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-hamburger" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #7f1d1d; font-weight: 700;">Order Food</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'accounts:subscription_plans' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #059669; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-crown" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">Subscription</div>
+                </a>
+              </div>
+            {% elif service_role == 'driver' %}
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #e9d5ff; border-radius: 1rem; text-decoration: none; border: 2px solid #a855f7; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #a855f7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-car" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #581c87; font-weight: 700;">Go Online</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #e9d5ff; border-radius: 1rem; text-decoration: none; border: 2px solid #a855f7; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #a855f7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-route" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #581c87; font-weight: 700;">Book a Ride</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'accounts:subscription_plans' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #059669; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-crown" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">Subscription</div>
+                </a>
+              </div>
+            {% else %}
+              <!-- General User - Show all available apps -->
+              <div class="col-sm-6 col-md-4">
+                <a href="/rent/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #10b981; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-home" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #065f46; font-weight: 700;">Rent</div>
+                </a>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <a href="/ride/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #e9d5ff; border-radius: 1rem; text-decoration: none; border: 2px solid #a855f7; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #a855f7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-car" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #581c87; font-weight: 700;">Ride</div>
+                </a>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <a href="/food/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-utensils" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #7f1d1d; font-weight: 700;">Food</div>
+                </a>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <a href="/shop/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-shopping-cart" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #1e3a8a; font-weight: 700;">Shop</div>
+                </a>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <a href="/pharmacy/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fef3c7; border-radius: 1rem; text-decoration: none; border: 2px solid #f59e0b; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #f59e0b; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-pills" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #78350f; font-weight: 700;">Pharmacy</div>
+                </a>
+              </div>
+            {% endif %}
+            <div class="col-sm-6 col-md-4">
+              <a href="{% url 'accounts:profile' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 1rem; text-decoration: none; border: 2px solid #6b7280; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(107, 114, 128, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <div style="width: 48px; height: 48px; background: #6b7280; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-user-edit" style="color: white; font-size: 1.25rem;"></i>
+                </div>
+                <div style="color: #1f2937; font-weight: 700;">Edit Profile</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-clock" style="color: #3b82f6;"></i>
+            Recent Activity
+          </h3>
+
+          {% if activities %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              {% for activity in activities %}
+                <a href="{{ activity.url }}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; text-decoration: none; border: 1px solid #e5e7eb; transition: all 0.3s ease;" onmouseover="this.style.background='#f3f4f6'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.background='#f9fafb'; this.style.boxShadow='none'">
+                  <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas {{ activity.icon }}" style="color: white; font-size: 1rem;"></i>
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem; margin-bottom: 0.25rem;">{{ activity.title }}</div>
+                    <div style="font-size: 0.75rem; color: #6b7280;">
+                      {{ activity.date|date:"M d, Y" }} •
+                      <span style="padding: 0.125rem 0.5rem; background: {% if activity.status == 'active' or activity.status == 'ACTIVE' %}#dcfce7{% elif activity.status == 'pending' or activity.status == 'REQUESTED' %}#fef3c7{% elif activity.status == 'completed' or activity.status == 'COMPLETED' %}#dbeafe{% else %}#fee2e2{% endif %}; border-radius: 0.25rem; color: {% if activity.status == 'active' or activity.status == 'ACTIVE' %}#166534{% elif activity.status == 'pending' or activity.status == 'REQUESTED' %}#854d0e{% elif activity.status == 'completed' or activity.status == 'COMPLETED' %}#1e3a8a{% else %}#991b1b{% endif %}; font-weight: 600;">{{ activity.status|title }}</span>
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right" style="color: #9ca3af; font-size: 0.875rem;"></i>
+                </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: #6b7280;">
+              <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+              <p style="font-size: 1rem; font-weight: 600;">No recent activity</p>
+              <p style="font-size: 0.875rem;">Start engaging with the platform to see your activity here!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Profile Completion -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-user-circle" style="color: #059669;"></i>
+            Profile Completion
+          </h3>
+
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span style="font-size: 0.875rem; font-weight: 600; color: #6b7280;">Overall Progress</span>
+              <span style="font-size: 0.875rem; font-weight: 800; color: #059669;">{% if user.user_type == 'worker' and user.worker_profile %}{{ user.worker_profile.profile_completion }}%{% else %}50%{% endif %}</span>
+            </div>
+            <div style="width: 100%; height: 10px; background: #e5e7eb; border-radius: 999px; overflow: hidden;">
+              <div style="height: 100%; background: #6366f1; width: {% if user.user_type == 'worker' and user.worker_profile %}{{ user.worker_profile.profile_completion }}%{% else %}50%{% endif %}; transition: width 0.5s ease;"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
+              <span style="font-size: 0.875rem; color: #4b5563;">Profile Picture</span>
+              {% if user.profile_picture %}
+                <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              {% else %}
+                <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.125rem;"></i>
+              {% endif %}
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
+              <span style="font-size: 0.875rem; color: #4b5563;">Contact Info</span>
+              {% if user.email and user.phone_number %}
+                <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              {% else %}
+                <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.125rem;"></i>
+              {% endif %}
+            </div>
+            {% if user.user_type == 'worker' %}
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
+              <span style="font-size: 0.875rem; color: #4b5563;">Skills Added</span>
+              {% if user.worker_profile.skills.exists %}
+                <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              {% else %}
+                <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.125rem;"></i>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+
+          <a href="{% url 'accounts:profile' %}" style="display: block; margin-top: 1.5rem; padding: 0.875rem; background: #059669; color: white; text-align: center; border-radius: 0.75rem; text-decoration: none; font-weight: 700; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <i class="fas fa-edit me-2"></i>Complete Profile
+          </a>
+        </div>
+
+        <!-- Notifications -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin: 0; display: flex; align-items: center; gap: 0.75rem;">
+              <i class="fas fa-bell" style="color: #f59e0b;"></i>
+              Notifications
+            </h3>
+            {% if unread_notifications_count > 0 %}
+            <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.625rem; border-radius: 50px; font-weight: 700; font-size: 0.75rem; border: 2px solid #fbbf24;">
+              {{ unread_notifications_count }}
+            </span>
+            {% endif %}
+          </div>
+
+          {% if recent_notifications %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto;">
+              {% for notification in recent_notifications %}
+              <div style="padding: 1rem; background: {% if notification.read_at %}#f9fafb{% else %}#ecfdf5{% endif %}; border-radius: 0.75rem; border: 1px solid {% if notification.read_at %}#e5e7eb{% else %}#10b981{% endif %}; {% if not notification.read_at %}border-left: 4px solid #059669;{% endif %} transition: all 0.2s ease;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='{% if notification.read_at %}#f9fafb{% else %}#ecfdf5{% endif %}'">
+                <div style="display: flex; gap: 0.75rem;">
+                  <div style="width: 36px; height: 36px; background: {% if 'ride' in notification.notification_type %}#e9d5ff{% elif 'food' in notification.notification_type %}#fee2e2{% elif 'shop' in notification.notification_type %}#dbeafe{% elif 'pharmacy' in notification.notification_type %}#d1fae5{% elif 'rental' in notification.notification_type %}#ecfdf5{% else %}#fef3c7{% endif %}; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas {% if 'ride' in notification.notification_type %}fa-car{% elif 'food' in notification.notification_type %}fa-utensils{% elif 'shop' in notification.notification_type %}fa-shopping-bag{% elif 'pharmacy' in notification.notification_type %}fa-pills{% elif 'rental' in notification.notification_type %}fa-home{% else %}fa-bell{% endif %}" style="color: {% if 'ride' in notification.notification_type %}#a855f7{% elif 'food' in notification.notification_type %}#ef4444{% elif 'shop' in notification.notification_type %}#3b82f6{% elif 'pharmacy' in notification.notification_type %}#10b981{% elif 'rental' in notification.notification_type %}#059669{% else %}#f59e0b{% endif %}; font-size: 1rem;"></i>
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; color: #1f2937; font-size: 0.875rem; margin-bottom: 0.375rem;">{{ notification.title }}</div>
+                    <div style="font-size: 0.8125rem; color: #6b7280; line-height: 1.4; margin-bottom: 0.375rem;">{{ notification.message|truncatewords:15 }}</div>
+                    <div style="font-size: 0.75rem; color: #9ca3af; display: flex; align-items: center; gap: 0.5rem;">
+                      <i class="fas fa-clock"></i>
+                      {{ notification.created_at|timesince }} ago
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <a href="{% url 'accounts:notifications' %}" style="display: block; margin-top: 1rem; padding: 0.75rem; background: #f9fafb; color: #374151; text-align: center; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem; border: 1px solid #e5e7eb; transition: all 0.3s ease;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f9fafb'">
+              View All Notifications <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          {% else %}
+            <div style="text-align: center; padding: 2rem 1rem; color: #6b7280;">
+              <i class="fas fa-bell-slash" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+              <p style="font-size: 0.875rem; font-weight: 600; margin: 0;">No notifications yet</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Help & Support -->
+        <div style="background: #dbeafe; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 2px solid #3b82f6;">
+          <h3 style="font-size: 1.125rem; font-weight: 800; color: #1e3a8a; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-question-circle" style="color: #3b82f6;"></i>
+            Need Help?
+          </h3>
+          <p style="color: #1e40af; font-size: 0.875rem; margin-bottom: 1.5rem;">
+            Our support team is here to assist you 24/7. Get in touch with us anytime!
+          </p>
+          <a href="{% url 'core:home' %}" style="display: block; padding: 0.875rem; background: white; color: #3b82f6; text-align: center; border-radius: 0.75rem; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: 2px solid #3b82f6;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#3b82f6'">
+            <i class="fas fa-headset me-2"></i>Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block shop_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero-header {
+    background: #8b5cf6;
+    padding: 1.5rem 1rem 1rem;
+    text-align: center;
+  }
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.025em;
+  }
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+  <h1 class="hero-title">
+    <i class="fas fa-bell"></i> Notifications
+  </h1>
+  <p class="hero-subtitle">Stay updated with your orders and offers</p>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  <div style="text-align: center; padding: 4rem 1rem;">
+    <div style="width: 100px; height: 100px; background: #ddd6fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <i class="fas fa-bell" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+    </div>
+    <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No notifications</h3>
+    <p style="color: #6b7280;">You're all caught up!</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'shop_pwa:product_list' %}" class="bottom-nav-item">
+    <i class="fas fa-th"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'shop_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

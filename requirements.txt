@@ -1,0 +1,29 @@
+# Django Framework
+Django>=4.2.0,<5.0
+
+# Database
+mysqlclient>=2.1.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Admin interface
+django-jazzmin>=2.6.0
+
+# Image processing
+Pillow>=9.0.0
+
+# Timezone support
+pytz>=2023.3
+
+# Requests for external API calls
+requests>=2.31.0
+
+# Decimal support
+decimal
+
+# Date utilities  
+python-dateutil>=2.8.0
+
+# Additional utilities
+six>=1.16.0

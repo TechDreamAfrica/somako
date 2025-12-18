@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Soma Ko{% endblock %}
+
+{% block content %}
+<section style="min-height: 100vh; display: flex; align-items: center; background: #22c55e; position: relative; overflow: hidden; padding: 3rem 0;">
+  <!-- Animated Background Pattern -->
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <!-- Floating Circles -->
+  <div style="position: absolute; top: 10%; left: 5%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent); border-radius: 50%; animation: float 8s ease-in-out infinite;"></div>
+  <div style="position: absolute; bottom: 15%; right: 10%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent); border-radius: 50%; animation: float 10s ease-in-out infinite 1s;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-6">
+        <div style="background: white; border-radius: 2rem; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2); overflow: hidden;">
+          <div class="row g-0">
+            <!-- Left Side - Branding -->
+            <div class="col-md-5" style="background: #16a34a; padding: 3rem 2rem; display: flex; flex-direction: column; justify-content: center; text-align: center; color: white;">
+              <div style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; border: 3px solid rgba(255, 255, 255, 0.3);">
+                <i class="fas fa-user-circle" style="font-size: 3.5rem;"></i>
+              </div>
+              <h3 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem;">Welcome Back!</h3>
+              <p style="color: rgba(255, 255, 255, 0.9); font-size: 0.9375rem; line-height: 1.6; margin-bottom: 2rem;">Sign in to access your account and continue your journey with Soma Ko.</p>
+              <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8125rem; font-weight: 600;">
+                  <i class="fas fa-shopping-bag"></i> Shop
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8125rem; font-weight: 600;">
+                  <i class="fas fa-car"></i> Ride
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8125rem; font-weight: 600;">
+                  <i class="fas fa-utensils"></i> Food
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side - Form -->
+            <div class="col-md-7" style="padding: 3rem 2.5rem;">
+              <div style="margin-bottom: 2.5rem;">
+                <h2 style="font-size: 2rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;">Sign In</h2>
+                <p style="color: #6b7280; font-size: 0.9375rem;">Enter your credentials to access your account</p>
+              </div>
+
+              {% if messages %}
+                {% for message in messages %}
+                <div role="alert" style="background: {% if message.tags == 'error' %}#fee2e2{% else %}#f0fdf4{% endif %}; color: {% if message.tags == 'error' %}#991b1b{% else %}#166534{% endif %}; padding: 1rem 1.25rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; border: 2px solid {% if message.tags == 'error' %}#fca5a5{% else %}#bbf7d0{% endif %};">
+                  {{ message }}
+                </div>
+                {% endfor %}
+              {% endif %}
+
+              <form method="post">
+                {% csrf_token %}
+
+                <!-- Username -->
+                <div style="margin-bottom: 1.5rem;">
+                  <label for="{{ form.username.id_for_label }}" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.875rem;">
+                    <i class="fas fa-user" style="color: #059669;"></i>Username
+                  </label>
+                  <input type="text"
+                         name="{{ form.username.html_name }}"
+                         id="{{ form.username.id_for_label }}"
+                         placeholder="Enter your username"
+                         value="{{ form.username.value|default:'' }}"
+                         required
+                         style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;"
+                         onfocus="this.style.borderColor='#059669'; this.style.background='white'"
+                         onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  {% if form.username.errors %}
+                    <div style="color: #dc2626; font-size: 0.8125rem; margin-top: 0.5rem; font-weight: 600;">
+                      {{ form.username.errors.0 }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div style="margin-bottom: 1.5rem;">
+                  <label for="{{ form.password.id_for_label }}" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.875rem;">
+                    <i class="fas fa-lock" style="color: #059669;"></i>Password
+                  </label>
+                  <input type="password"
+                         name="{{ form.password.html_name }}"
+                         id="{{ form.password.id_for_label }}"
+                         placeholder="Enter your password"
+                         required
+                         style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;"
+                         onfocus="this.style.borderColor='#059669'; this.style.background='white'"
+                         onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  {% if form.password.errors %}
+                    <div style="color: #dc2626; font-size: 0.8125rem; margin-top: 0.5rem; font-weight: 600;">
+                      {{ form.password.errors.0 }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                  <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: #4b5563;">
+                    <input type="checkbox" id="rememberMe" name="remember_me" style="width: 1.125rem; height: 1.125rem; cursor: pointer;">
+                    Remember me
+                  </label>
+                  <a href="{% url 'accounts:otp_password_reset' %}" style="color: #22c55e; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#16a34a'" onmouseout="this.style.color='#22c55e'">
+                    Forgot Password?
+                  </a>
+                </div>
+
+                <!-- Form Errors -->
+                {% if form.non_field_errors %}
+                  <div style="background: #fee2e2; color: #991b1b; padding: 1rem 1.25rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; border: 2px solid #fca5a5;">
+                    {{ form.non_field_errors.0 }}
+                  </div>
+                {% endif %}
+
+                <!-- Submit Button -->
+                <button type="submit" style="width: 100%; padding: 1rem; background: #22c55e; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(34, 197, 94, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                  <i class="fas fa-sign-in-alt"></i>Sign In
+                </button>
+              </form>
+
+              <!-- Sign Up Link -->
+              <div style="text-align: center; padding-top: 1.5rem; border-top: 2px solid #f3f4f6;">
+                <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 1rem;">
+                  Don't have an account?
+                </p>
+                <a href="{% url 'accounts:signup' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; color: #059669; font-weight: 700; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#047857'; this.style.gap='0.875rem'" onmouseout="this.style.color='#059669'; this.style.gap='0.625rem'">
+                  <i class="fas fa-user-plus"></i>Create an Account
+                </a>
+              </div>
+
+              <!-- Social Login (Disabled) -->
+              <div style="margin-top: 2rem;">
+                <div style="position: relative; text-align: center; margin-bottom: 1.5rem;">
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center;">
+                    <div style="width: 100%; border-top: 2px solid #e5e7eb;"></div>
+                  </div>
+                  <span style="position: relative; background: white; padding: 0 1rem; color: #9ca3af; font-size: 0.8125rem; font-weight: 600;">Or continue with</span>
+                </div>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <button type="button" disabled style="width: 100%; padding: 0.75rem; background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb; border-radius: 0.625rem; font-weight: 600; font-size: 0.875rem; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                      <i class="fab fa-google"></i>Google
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button type="button" disabled style="width: 100%; padding: 0.75rem; background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb; border-radius: 0.625rem; font-weight: 600; font-size: 0.875rem; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                      <i class="fab fa-facebook-f"></i>Facebook
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(3deg); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{% if form and form.errors or messages %}
+<script>
+  (function(){
+    var errs = [];
+    {% if form %}
+      {% for field in form %}
+        {% for err in field.errors %}
+          errs.push("{{ field.label|default:field.name }}: {{ err|escapejs }}");
+        {% endfor %}
+      {% endfor %}
+      {% for err in form.non_field_errors %}
+        errs.push("{{ err|escapejs }}");
+      {% endfor %}
+    {% endif %}
+    {% if messages %}
+      {% for m in messages %}
+        {% if 'error' in m.tags %}
+          errs.push("{{ m|escapejs }}");
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    if (errs.length) { alert(errs.join('\n')); }
+  })();
+</script>
+{% endif %}
+{% endblock %}

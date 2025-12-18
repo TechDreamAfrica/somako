@@ -1,0 +1,408 @@
+<!-- PWA Install Modal - Include this in your PWA templates -->
+<style>
+  /* Modal Overlay */
+  .pwa-install-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+    padding: 1rem;
+  }
+
+  .pwa-install-overlay.show {
+    display: flex;
+  }
+
+  /* Modal Content */
+  .pwa-install-modal {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUpModal 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUpModal {
+    from {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Icon Container */
+  .pwa-icon-container {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: #6366f1, var(--pwa-color-lighter));
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pwa-icon-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: #6366f1, transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  }
+
+  .pwa-icon-container i {
+    font-size: 3rem;
+    color: var(--pwa-color);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Feature List */
+  .pwa-features {
+    background: #f9fafb;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    border: 1px solid #e5e7eb;
+  }
+
+  .pwa-feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .pwa-feature:last-child {
+    margin-bottom: 0;
+  }
+
+  .pwa-feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--pwa-color);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pwa-feature-icon i {
+    color: white;
+    font-size: 1.125rem;
+  }
+
+  .pwa-feature-text {
+    flex: 1;
+  }
+
+  .pwa-feature-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .pwa-feature-desc {
+    color: #6b7280;
+    font-size: 0.8125rem;
+  }
+
+  /* Buttons */
+  .pwa-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .pwa-btn-install {
+    flex: 1;
+    background: #6366f1, var(--pwa-color-dark));
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .pwa-btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .pwa-btn-install:active {
+    transform: translateY(0);
+  }
+
+  .pwa-btn-dismiss {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .pwa-btn-dismiss:hover {
+    background: #e5e7eb;
+  }
+
+  /* Close Button */
+  .pwa-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .pwa-close-btn:hover {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 768px) {
+    .pwa-install-modal {
+      padding: 1.5rem;
+      max-width: 95%;
+    }
+
+    .pwa-buttons {
+      flex-direction: column;
+    }
+
+    .pwa-btn-dismiss {
+      order: 2;
+    }
+  }
+</style>
+
+<!-- Modal HTML -->
+<div class="pwa-install-overlay" id="pwaInstallOverlay" style="--pwa-color: {{ pwa_color|default:'#059669' }}; --pwa-color-dark: {{ pwa_color_dark|default:'#047857' }}; --pwa-color-light: {{ pwa_color_light|default:'#ecfdf5' }}; --pwa-color-lighter: {{ pwa_color_lighter|default:'#d1fae5' }};">
+  <div class="pwa-install-modal">
+    <button class="pwa-close-btn" id="pwaCloseBtn">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="pwa-icon-container">
+      <i class="fas {{ pwa_icon|default:'fa-mobile-alt' }}"></i>
+    </div>
+
+    <div style="text-align: center;">
+      <h2 style="font-size: 1.75rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;">
+        Install {{ pwa_app_name|default:'Soma Ko' }}
+      </h2>
+      <p style="color: #6b7280; font-size: 0.9375rem;">
+        Get the app experience with one tap!
+      </p>
+    </div>
+
+    <div class="pwa-features">
+      <div class="pwa-feature">
+        <div class="pwa-feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="pwa-feature-text">
+          <div class="pwa-feature-title">Lightning Fast</div>
+          <div class="pwa-feature-desc">Loads instantly, works offline</div>
+        </div>
+      </div>
+
+      <div class="pwa-feature">
+        <div class="pwa-feature-icon">
+          <i class="fas fa-home"></i>
+        </div>
+        <div class="pwa-feature-text">
+          <div class="pwa-feature-title">Home Screen Access</div>
+          <div class="pwa-feature-desc">One tap from your home screen</div>
+        </div>
+      </div>
+
+      <div class="pwa-feature">
+        <div class="pwa-feature-icon">
+          <i class="fas fa-bell"></i>
+        </div>
+        <div class="pwa-feature-text">
+          <div class="pwa-feature-title">Push Notifications</div>
+          <div class="pwa-feature-desc">Stay updated with alerts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pwa-buttons">
+      <button class="pwa-btn-install" id="pwaInstallBtn">
+        <i class="fas fa-download me-2"></i>Install App
+      </button>
+      <button class="pwa-btn-dismiss" id="pwaDismissBtn">
+        Later
+      </button>
+    </div>
+
+    <p style="text-align: center; color: #9ca3af; font-size: 0.75rem; margin-top: 1rem; margin-bottom: 0;">
+      No app store required • Free forever
+    </p>
+  </div>
+</div>
+
+<!-- PWA Install Script -->
+<script>
+(function() {
+  console.log('PWA Modal: Script loaded');
+  let deferredPrompt;
+  const overlay = document.getElementById('pwaInstallOverlay');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const dismissBtn = document.getElementById('pwaDismissBtn');
+  const closeBtn = document.getElementById('pwaCloseBtn');
+
+  console.log('PWA Modal: Elements found?', {
+    overlay: !!overlay,
+    installBtn: !!installBtn,
+    dismissBtn: !!dismissBtn,
+    closeBtn: !!closeBtn
+  });
+
+  // Listen for beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('PWA: Install prompt event fired!');
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Check if user has previously dismissed
+    const dismissed = localStorage.getItem('pwa-install-dismissed');
+    const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
+
+    console.log('PWA: Dismissed status:', { dismissed, dismissedTime });
+
+    // Show again after 7 days
+    const shouldShow = !dismissed || (Date.now() - parseInt(dismissedTime)) > (7 * 24 * 60 * 60 * 1000);
+
+    console.log('PWA: Should show modal?', shouldShow);
+
+    if (shouldShow) {
+      // Show modal after 2 seconds
+      setTimeout(() => {
+        console.log('PWA: Showing modal now');
+        overlay.classList.add('show');
+      }, 2000);
+    } else {
+      console.log('PWA: Modal dismissed previously, not showing');
+    }
+  });
+
+  // Install button click
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      console.log('PWA: No install prompt available');
+      // Show user-friendly message
+      overlay.innerHTML = `
+        <div class="pwa-install-modal" style="text-align: center; padding: 2rem;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: #fee2e2; border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-info-circle" style="font-size: 2.5rem; color: #dc2626;"></i>
+          </div>
+          <h3 style="color: #1f2937; margin-bottom: 0.75rem;">Installation Not Available</h3>
+          <p style="color: #6b7280; margin-bottom: 1.5rem;">
+            Your browser doesn't support app installation yet. Try using Chrome, Edge, or Safari for the full app experience.
+          </p>
+          <button onclick="document.getElementById('pwaInstallOverlay').classList.remove('show')" class="pwa-btn-install" style="max-width: 200px; margin: 0 auto;">
+            Got it
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    overlay.classList.remove('show');
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user's response
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`PWA: User response: ${outcome}`);
+
+    if (outcome === 'accepted') {
+      console.log('PWA: User accepted the install prompt');
+    } else {
+      console.log('PWA: User dismissed the install prompt');
+    }
+
+    deferredPrompt = null;
+  });
+
+  // Dismiss button click
+  function dismissModal() {
+    overlay.classList.remove('show');
+    localStorage.setItem('pwa-install-dismissed', 'true');
+    localStorage.setItem('pwa-install-dismissed-time', Date.now().toString());
+  }
+
+  dismissBtn.addEventListener('click', dismissModal);
+  closeBtn.addEventListener('click', dismissModal);
+
+  // Click outside modal to close
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      dismissModal();
+    }
+  });
+
+  // Listen for app installed event
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA: App was installed');
+    overlay.classList.remove('show');
+    // You can show a success message here
+  });
+
+  // Force show modal for testing (remove in production)
+  window.showPWAInstall = function() {
+    overlay.classList.add('show');
+  };
+})();
+</script>

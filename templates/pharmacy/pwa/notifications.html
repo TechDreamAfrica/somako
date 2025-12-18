@@ -1,0 +1,80 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+{% block extra_css %}
+<style>
+  .notifications-header {
+    background: #8b5cf6;
+    color: white;
+    padding: 2rem 1rem;
+  }
+
+  .notification-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s;
+  }
+
+  .notification-item.unread {
+    border-left: 4px solid #8b5cf6;
+  }
+
+  .notification-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #8b5cf6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem;">
+  <h1 style="font-size: 1.75rem; font-weight: 700;">Notifications</h1>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  <div style="text-align: center; padding: 4rem 1rem;">
+    <div style="width: 100px; height: 100px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <i class="fas fa-bell" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+    </div>
+    <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No notifications</h3>
+    <p style="color: #6b7280;">You're all caught up!</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:medicine_list' %}" class="bottom-nav-item">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

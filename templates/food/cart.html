@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}Shopping Cart - Pharmacy{% endblock %}
+
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>Shopping Cart</h1>
+
+  {% if cart_items %}
+  <div>
+    <div>
+      {% for item in cart_items %}
+      <div>
+        <div>
+          <div>
+            <div>
+              {% if item.medicine.image %}
+              <img src="{{ item.medicine.image.url }}" alt="{{ item.medicine.name }}">
+              {% else %}
+              <div>
+                <i></i>
+              </div>
+              {% endif %}
+            </div>
+            <div>
+              <h5>{{ item.medicine.name }}</h5>
+              <p>{{ item.medicine.manufacturer }}</p>
+              {% if item.medicine.requires_prescription %}
+              <span>Rx Required</span>
+              {% endif %}
+            </div>
+            <div>
+              <input type="number" value="{{ item.quantity }}" min="1">
+            </div>
+            <div>
+              <p>GHS {{ item.subtotal }}</p>
+            </div>
+            <div>
+              <form method="post" action="{% url 'pharmacy:remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit">
+                  <i></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div>
+      <div>
+        <div>
+          <h5>Order Summary</h5>
+          <div>
+            <span>Subtotal</span>
+            <span>GHS {{ cart.subtotal }}</span>
+          </div>
+          <div>
+            <span>Tax</span>
+            <span>GHS {{ cart.tax }}</span>
+          </div>
+          <hr>
+          <div>
+            <span>Total</span>
+            <span>GHS {{ cart.total }}</span>
+          </div>
+          <a href="{% url 'pharmacy:checkout' %}">
+            <i></i>Proceed to Checkout
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div>
+    <i></i>
+    <h4>Your cart is empty</h4>
+    <a href="{% url 'pharmacy:medicine_list' %}">Browse Medicines</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

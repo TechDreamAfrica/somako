@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% load static %}
+
+{% block title %}Chat - {{ item_name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<section style="background: #14b8a6; padding: 2rem 0;">
+  <div class="container">
+    <h1 style="color: white; font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">
+      <i class="fas fa-comments"></i> Chat
+    </h1>
+    <p style="color: rgba(255, 255, 255, 0.9);">
+      About: {{ item_name }}
+    </p>
+  </div>
+</section>
+
+<section style="padding: 2rem 0; background: #f9fafb; min-height: 70vh;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <!-- Chat Container -->
+        <div style="background: white; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden;">
+
+          <!-- Chat Header -->
+          <div style="background: #14b8a6; padding: 1.5rem; border-bottom: 2px solid #a7f3d0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; background: #14b8a6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; font-weight: 800;">
+                  {% if other_party %}
+                    {{ other_party.username.0|upper }}
+                  {% else %}
+                    <i class="fas fa-user"></i>
+                  {% endif %}
+                </div>
+                <div>
+                  <div style="font-size: 1.125rem; font-weight: 700; color: #1f2937;">
+                    {% if other_party %}
+                      {{ other_party.get_full_name|default:other_party.username }}
+                    {% else %}
+                      No messages yet
+                    {% endif %}
+                  </div>
+                  <div style="font-size: 0.875rem; color: #6b7280;">
+                    {% if is_owner %}Property Owner{% else %}Potential Renter{% endif %}
+                  </div>
+                </div>
+              </div>
+              {% if message_type == 'property' %}
+              <a href="{% url 'rent:property_detail' item.id %}" style="background: white; color: #059669; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem; border: 2px solid #d1fae5;">
+                <i class="fas fa-arrow-left"></i> View Listing
+              </a>
+              {% else %}
+              <a href="{% url 'rent:equipment_detail' item.id %}" style="background: white; color: #059669; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem; border: 2px solid #d1fae5;">
+                <i class="fas fa-arrow-left"></i> View Listing
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Chat Messages -->
+          <div id="chatMessages" style="padding: 2rem; max-height: 500px; overflow-y: auto; background: #fafafa;">
+            {% if chat_messages %}
+              {% for msg in chat_messages %}
+                {% if msg.sender == request.user %}
+                  <!-- Sent Message (Right) -->
+                  <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+                    <div style="max-width: 70%;">
+                      <div style="background: #14b8a6; color: white; padding: 1rem 1.25rem; border-radius: 1rem 1rem 0 1rem; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);">
+                        <p style="margin: 0; line-height: 1.6;">{{ msg.message }}</p>
+                      </div>
+                      <div style="text-align: right; margin-top: 0.5rem; font-size: 0.75rem; color: #9ca3af;">
+                        {{ msg.created_at|date:"M d, Y g:i A" }}
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <!-- Received Message (Left) -->
+                  <div style="display: flex; justify-content: flex-start; margin-bottom: 1.5rem;">
+                    <div style="max-width: 70%;">
+                      <div style="background: white; color: #1f2937; padding: 1rem 1.25rem; border-radius: 1rem 1rem 1rem 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 1px solid #e5e7eb;">
+                        <p style="margin: 0; line-height: 1.6;">{{ msg.message }}</p>
+                      </div>
+                      <div style="text-align: left; margin-top: 0.5rem; font-size: 0.75rem; color: #9ca3af;">
+                        {{ msg.sender.username }} • {{ msg.created_at|date:"M d, Y g:i A" }}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <div style="text-align: center; padding: 3rem; color: #9ca3af;">
+                <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p style="font-size: 1.125rem; font-weight: 600;">No messages yet</p>
+                <p style="font-size: 0.875rem;">Start the conversation by sending a message below.</p>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Message Input Form -->
+          <div style="background: #f9fafb; padding: 1.5rem; border-top: 2px solid #e5e7eb;">
+            <form method="POST" action="{% url 'rent:send_message' %}">
+              {% csrf_token %}
+              <input type="hidden" name="message_type" value="{{ message_type }}">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+
+              <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                <div style="flex: 1;">
+                  <textarea
+                    name="message"
+                    rows="3"
+                    class="form-control"
+                    placeholder="Type your message here..."
+                    required
+                    style="border: 2px solid #d1fae5; border-radius: 0.75rem; font-size: 0.9375rem; resize: none; padding: 1rem;"
+                  ></textarea>
+                </div>
+                <button type="submit" style="background: #14b8a6; color: white; border: none; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); height: fit-content;">
+                  <i class="fas fa-paper-plane"></i> Send
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Auto-scroll to bottom of chat on load
+document.addEventListener('DOMContentLoaded', function() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+});
+</script>
+{% endblock %}

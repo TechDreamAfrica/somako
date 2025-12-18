@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content_class %}app-ride{% endblock %}
+{% block title %}Ride Service{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #2563eb; padding: 8rem 0 6rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 0.625rem 1.25rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.625rem; margin-bottom: 2rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+          <i class="fas fa-shield-alt" style="color: white; font-size: 1rem;"></i>
+          <span style="color: white; font-weight: 700; font-size: 0.9375rem;">Safe & Reliable Transportation</span>
+        </div>
+
+        <h1 style="font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 900; color: white; margin-bottom: 1.5rem; letter-spacing: -2px; line-height: 1.1; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          Book Your Ride
+        </h1>
+
+        <p style="font-size: 1.375rem; color: rgba(255, 255, 255, 0.95); margin-bottom: 3rem; line-height: 1.6; max-width: 500px;">
+          Safe, reliable transportation at your fingertips. Choose from a variety of vehicles and get to your destination comfortably.
+        </p>
+
+        <div style="display: flex; gap: 1.25rem; flex-wrap: wrap;">
+          <a href="{% url 'ride:book_ride' %}" style="display: inline-flex; align-items: center; gap: 0.875rem; background: white; color: #2563eb; padding: 1.25rem 2.5rem; border-radius: 1rem; font-weight: 800; font-size: 1.125rem; text-decoration: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0, 0, 0, 0.2)'">
+            <i class="fas fa-car"></i>Book Now
+          </a>
+
+          <a href="#features" style="display: inline-flex; align-items: center; gap: 0.875rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; padding: 1.25rem 2.5rem; border-radius: 1rem; font-weight: 800; font-size: 1.125rem; text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+            <i class="fas fa-info-circle"></i>Learn More
+          </a>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div style="display: flex; gap: 2.5rem; margin-top: 3.5rem; flex-wrap: wrap;">
+          <div>
+            <div style="font-size: 2.25rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">50K+</div>
+            <div style="color: rgba(255, 255, 255, 0.85); font-size: 0.9375rem; font-weight: 600;">Happy Riders</div>
+          </div>
+          <div>
+            <div style="font-size: 2.25rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">4.9★</div>
+            <div style="color: rgba(255, 255, 255, 0.85); font-size: 0.9375rem; font-weight: 600;">Average Rating</div>
+          </div>
+          <div>
+            <div style="font-size: 2.25rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">24/7</div>
+            <div style="color: rgba(255, 255, 255, 0.85); font-size: 0.9375rem; font-weight: 600;">Available Service</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div style="position: relative; padding: 2rem;">
+          <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); border-radius: 2rem; padding: 3rem; border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+            <div style="text-align: center; color: white;">
+              <div style="width: 150px; height: 150px; background: #2563eb, rgba(255, 255, 255, 0.1)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; border: 3px solid rgba(255, 255, 255, 0.3);">
+                <i class="fas fa-car" style="font-size: 5rem; color: white;"></i>
+              </div>
+              <h3 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem;">Ready to Go?</h3>
+              <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.0625rem; margin-bottom: 2rem; line-height: 1.6;">Book a ride in just a few taps and enjoy a comfortable journey.</p>
+              <div style="display: flex; gap: 1rem; justify-content: center;">
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 1rem 1.5rem; border-radius: 1rem; flex: 1;">
+                  <i class="fas fa-clock" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                  <div style="font-size: 0.875rem; font-weight: 600;">Fast Pickup</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 1rem 1.5rem; border-radius: 1rem; flex: 1;">
+                  <i class="fas fa-dollar-sign" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                  <div style="font-size: 0.875rem; font-weight: 600;">Fair Prices</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" style="padding: 5rem 0; background: #2563eb;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <h2 style="font-size: 2.75rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem;">Why Choose Soma Ko Rides?</h2>
+      <p style="font-size: 1.125rem; color: #6b7280; max-width: 600px; margin: 0 auto;">Experience the best ride-sharing service with premium features and exceptional service.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div style="background: white; padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; text-align: center; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='#dbeafe'; this.style.boxShadow='0 20px 40px rgba(139, 92, 246, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#f3f4f6'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'">
+          <div style="width: 80px; height: 80px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <i class="fas fa-shield-alt" style="font-size: 2rem; color: #2563eb;"></i>
+          </div>
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Safe & Secure</h4>
+          <p style="color: #6b7280; line-height: 1.6; margin: 0;">All drivers are verified and vehicles are regularly inspected for your safety.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div style="background: white; padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; text-align: center; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='#dbeafe'; this.style.boxShadow='0 20px 40px rgba(139, 92, 246, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#f3f4f6'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'">
+          <div style="width: 80px; height: 80px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <i class="fas fa-dollar-sign" style="font-size: 2rem; color: #2563eb;"></i>
+          </div>
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Affordable Rates</h4>
+          <p style="color: #6b7280; line-height: 1.6; margin: 0;">Transparent pricing with no hidden fees. Know your fare before you book.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div style="background: white; padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; text-align: center; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='#dbeafe'; this.style.boxShadow='0 20px 40px rgba(139, 92, 246, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#f3f4f6'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'">
+          <div style="width: 80px; height: 80px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <i class="fas fa-clock" style="font-size: 2rem; color: #2563eb;"></i>
+          </div>
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Quick Pickup</h4>
+          <p style="color: #6b7280; line-height: 1.6; margin: 0;">Get picked up within minutes. Our drivers are always nearby and ready to go.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div style="background: white; padding: 2.5rem 2rem; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; text-align: center; transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='#dbeafe'; this.style.boxShadow='0 20px 40px rgba(139, 92, 246, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='#f3f4f6'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'">
+          <div style="width: 80px; height: 80px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <i class="fas fa-star" style="font-size: 2rem; color: #059669;"></i>
+          </div>
+          <h4 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Top Rated</h4>
+          <p style="color: #6b7280; line-height: 1.6; margin: 0;">Highly rated drivers committed to providing excellent service every ride.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
+}
+</style>
+{% endblock %}

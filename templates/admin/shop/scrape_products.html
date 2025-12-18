@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Scrape Products - {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div>
+    <h1>Scrape Products from AliExpress</h1>
+
+    <div>
+      <strong>Note:</strong> This feature uses a mock scraper to generate sample products for testing. In production, this would scrape actual products from AliExpress.
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div>
+        <div>
+          <label for="id_count">Number of Products to Generate:</label>
+          <input type="number" name="count" id="id_count" value="10" min="1" max="50" required>
+          <p>Generate between 1 and 50 sample products</p>
+        </div>
+      </div>
+
+      <div>
+        <div>
+          <label for="id_category">Category (Optional):</label>
+          <select name="category" id="id_category">
+            <option value="">--- Default (Imported Products) ---</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+          <p>Select a category to assign imported products to</p>
+        </div>
+      </div>
+
+      <div>
+        <input type="submit" value="Generate Products">
+        <a href="{% url 'admin:shop_product_changelist' %}">Cancel</a>
+      </div>
+    </form>
+
+    <div>
+      <h3>How to Use the Real Scraper:</h3>
+      <p>To scrape real products from AliExpress using the command line:</p>
+      <pre><code>
+# Scrape products with keyword search
+python manage.py scrape_aliexpress --keyword "phone accessories" --count 10
+
+# Use mock mode (current admin interface uses this)
+python manage.py scrape_aliexpress --mock --count 15
+
+# Specify a category
+python manage.py scrape_aliexpress --mock --count 10 --category electronics
+
+# Import from CSV file
+python manage.py import_products --file products.csv --format csv
+      </code></pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

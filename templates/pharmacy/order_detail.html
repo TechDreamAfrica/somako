@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}Order #{{ order.order_number }} - Pharmacy{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #a855f7; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Order #{{ order.order_number }}</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">
+          <i class="fas fa-calendar"></i> Placed on {{ order.created_at|date:"F d, Y h:i A" }}
+        </p>
+      </div>
+      <a href="{% url 'pharmacy:order_list' %}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; font-weight: 700; text-decoration: none; backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+      </a>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left - Order Items -->
+      <div class="col-lg-8">
+        <!-- Order Status -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-info-circle" style="color: #a855f7;"></i> Order Status
+          </h3>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if order.status == 'delivered' %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #6ee7b7; flex: 1;">
+              <div style="font-weight: 800; color: #065f46; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-check-circle"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #047857; font-size: 0.875rem;">Your order has been delivered successfully</div>
+            </div>
+            {% elif order.status == 'cancelled' %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #fca5a5; flex: 1;">
+              <div style="font-weight: 800; color: #991b1b; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-times-circle"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #dc2626; font-size: 0.875rem;">This order has been cancelled</div>
+            </div>
+            {% elif order.status == 'pending' %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #fcd34d; flex: 1;">
+              <div style="font-weight: 800; color: #92400e; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-clock"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #b45309; font-size: 0.875rem;">Your order is being processed</div>
+            </div>
+            {% elif order.status == 'processing' %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #d8b4fe; flex: 1;">
+              <div style="font-weight: 800; color: #7e22ce; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-spinner fa-spin"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #1d4ed8; font-size: 0.875rem;">We're preparing your order</div>
+            </div>
+            {% elif order.status == 'shipped' or order.status == 'out_for_delivery' %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #a5b4fc; flex: 1;">
+              <div style="font-weight: 800; color: #3730a3; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-truck"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #4338ca; font-size: 0.875rem;">Your order is on the way</div>
+            </div>
+            {% else %}
+            <div style="background: #a855f7; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #d8b4fe; flex: 1;">
+              <div style="font-weight: 800; color: #7e22ce; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-info-circle"></i> {{ order.get_status_display }}
+              </div>
+              <div style="color: #1d4ed8; font-size: 0.875rem;">Order status information</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-pills" style="color: #a855f7;"></i> Order Items
+          </h3>
+
+          {% for item in order.items.all %}
+          <div style="display: flex; gap: 1.5rem; padding: 1.5rem; border-radius: 0.875rem; background: #a855f7; border: 2px solid #e5e7eb; margin-bottom: 1rem;">
+            {% if item.medicine.image %}
+            <img src="{{ item.medicine.image }}" alt="{{ item.medicine.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.625rem; border: 2px solid #e5e7eb;">
+            {% else %}
+            <div style="width: 80px; height: 80px; background: #a855f7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; border: 2px solid #d8b4fe;">
+              <i class="fas fa-capsules" style="font-size: 2rem; color: #a855f7;"></i>
+            </div>
+            {% endif %}
+
+            <div style="flex: 1;">
+              <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.0625rem;">{{ item.medicine.name }}</h5>
+              <div style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                {% if item.medicine.manufacturer %}
+                  <i class="fas fa-industry"></i> {{ item.medicine.manufacturer }}
+                {% endif %}
+              </div>
+              <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                <span style="color: #6b7280; font-size: 0.875rem;">
+                  <i class="fas fa-boxes"></i> Quantity: <strong style="color: #1f2937;">{{ item.quantity }}</strong>
+                </span>
+                <span style="color: #6b7280; font-size: 0.875rem;">
+                  <i class="fas fa-tag"></i> Unit Price: <strong style="color: #1f2937;">GHS {{ item.unit_price }}</strong>
+                </span>
+                {% if item.prescription %}
+                <span style="background: #a855f7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; border: 2px solid #fcd34d;">
+                  <i class="fas fa-prescription"></i> Prescription Required
+                </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div style="text-align: right;">
+              <div style="font-weight: 900; color: #a855f7; font-size: 1.375rem;">GHS {{ item.total_price }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <p style="color: #6b7280; text-align: center; padding: 2rem;">No items in this order</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right - Order Summary & Delivery -->
+      <div class="col-lg-4">
+        <!-- Order Summary -->
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); margin-bottom: 2rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+              <i class="fas fa-receipt" style="color: #a855f7;"></i> Order Summary
+            </h3>
+
+            <div style="border-bottom: 2px solid #f3f4f6; padding-bottom: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #6b7280;">Subtotal</span>
+                <span style="font-weight: 700; color: #1f2937;">GHS {{ order.subtotal }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #6b7280;">Delivery Charge</span>
+                <span style="font-weight: 700; color: #1f2937;">GHS {{ order.delivery_charge }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #6b7280;">Tax</span>
+                <span style="font-weight: 700; color: #1f2937;">GHS {{ order.tax }}</span>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid #a855f7;">
+              <span style="font-weight: 700; font-size: 1.125rem; color: #1f2937;">Total</span>
+              <span style="font-weight: 900; font-size: 1.5rem; color: #a855f7;">GHS {{ order.total }}</span>
+            </div>
+
+            <div style="background: #a855f7; border-radius: 0.75rem; padding: 1rem; margin-top: 1.5rem; border: 2px solid #d8b4fe;">
+              <div style="font-weight: 700; color: #7e22ce; font-size: 0.875rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-credit-card"></i> Payment Method
+              </div>
+              <div style="color: #1e3a8a; font-size: 0.875rem; text-transform: capitalize;">
+                {{ order.payment_method|default:"Not specified" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Information -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+              <i class="fas fa-map-marker-alt" style="color: #a855f7;"></i> Delivery Address
+            </h3>
+
+            <div style="color: #374151; line-height: 1.6;">
+              {% if order.delivery_address %}
+              <p style="margin-bottom: 0.5rem;"><i class="fas fa-home" style="color: #a855f7; width: 20px;"></i> {{ order.delivery_address }}</p>
+              {% endif %}
+              {% if order.delivery_city %}
+              <p style="margin-bottom: 0.5rem;"><i class="fas fa-city" style="color: #a855f7; width: 20px;"></i> {{ order.delivery_city }}{% if order.delivery_state %}, {{ order.delivery_state }}{% endif %}</p>
+              {% endif %}
+              {% if order.delivery_postal_code %}
+              <p style="margin-bottom: 0.5rem;"><i class="fas fa-envelope" style="color: #a855f7; width: 20px;"></i> {{ order.delivery_postal_code }}</p>
+              {% endif %}
+              {% if order.delivery_phone %}
+              <p style="margin-bottom: 0;"><i class="fas fa-phone" style="color: #a855f7; width: 20px;"></i> {{ order.delivery_phone }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

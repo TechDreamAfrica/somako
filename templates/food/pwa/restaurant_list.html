@@ -1,0 +1,333 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load food_extras %}
+
+{% block title %}Browse Restaurants - Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block food_active %}active{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #f97316;
+  }
+
+  .hero-banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Search Bar */
+  .search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 1rem;
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .filter-chip.active {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+  }
+
+  .restaurant-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+  }
+
+  .restaurant-card:active {
+    transform: scale(0.98);
+  }
+
+  .restaurant-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  .restaurant-info {
+    padding: 1rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-featured {
+    background: #f97316;
+    color: white;
+  }
+
+  .badge-new {
+    background: #f97316;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <div class="hero-banner" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-store" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+    </div>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-store" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Browse Restaurants</h1>
+    <p class="hero-subtitle">{{ restaurants.count }} restaurants available</p>
+  </div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-bar">
+  <form method="GET" action="{% url 'food_pwa:search' %}">
+    <div style="position: relative;">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search restaurants or dishes..."
+        class="search-input"
+      >
+      <i class="fas fa-search search-icon"></i>
+    </div>
+  </form>
+</div>
+
+<!-- Filter Chips -->
+<div class="filter-chips">
+  <a href="?sort=featured{% if selected_city %}&city={{ selected_city }}{% endif %}" class="filter-chip {% if selected_sort == 'featured' or not selected_sort %}active{% endif %}">
+    <i class="fas fa-star"></i> Featured
+  </a>
+  <a href="?sort=rating{% if selected_city %}&city={{ selected_city }}{% endif %}" class="filter-chip {% if selected_sort == 'rating' %}active{% endif %}">
+    <i class="fas fa-trophy"></i> Top Rated
+  </a>
+  <a href="?sort=delivery_time{% if selected_city %}&city={{ selected_city }}{% endif %}" class="filter-chip {% if selected_sort == 'delivery_time' %}active{% endif %}">
+    <i class="fas fa-clock"></i> Fast Delivery
+  </a>
+</div>
+
+<!-- City Filter -->
+{% if cities %}
+<div style="padding: 0 1rem 1rem;">
+  <select onchange="if(this.value) { window.location.href='?city='+this.value+'&sort={{ selected_sort|default:"featured" }}'; } else { window.location.href='?sort={{ selected_sort|default:"featured" }}'; }" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.875rem;">
+    <option value="">All Cities</option>
+    {% for city in cities %}
+    <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% endif %}
+
+<!-- Restaurants List -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  {% if restaurants %}
+    {% for restaurant in restaurants %}
+    <a href="{% url 'food_pwa:restaurant_detail' restaurant.id %}" style="text-decoration: none;">
+      <div class="restaurant-card">
+        {% if restaurant.image or restaurant.logo %}
+          {% if restaurant.image %}
+          <img src="{{ restaurant.get_image_url }}" alt="{{ restaurant.name }}" class="restaurant-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="restaurant-img" style="background: #f97316; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+          </div>
+          {% else %}
+          <img src="{{ restaurant.get_logo_url }}" alt="{{ restaurant.name }}" class="restaurant-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="restaurant-img" style="background: #f97316; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+          </div>
+          {% endif %}
+        {% else %}
+        <div class="restaurant-img" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+        </div>
+        {% endif %}
+
+        <div class="restaurant-info">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin: 0;">{{ restaurant.name }}</h3>
+            {% if restaurant.is_featured %}
+            <span class="badge badge-featured">
+              <i class="fas fa-crown"></i> Featured
+            </span>
+            {% endif %}
+          </div>
+
+          <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">{{ restaurant.description|truncatewords:15 | safe }}</p>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.25rem;">
+              <i class="fas fa-star" style="color: #fbbf24; font-size: 0.875rem;"></i>
+              <span style="font-weight: 600; color: #1f2937;">{{ restaurant.average_rating|floatformat:1 }}</span>
+              <span style="color: #9ca3af; font-size: 0.875rem;">({{ restaurant.total_reviews }})</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem; color: #6b7280; font-size: 0.875rem;">
+              <span>
+                <i class="fas fa-clock"></i> {{ restaurant.delivery_time }} min
+              </span>
+              <span>
+                <i class="fas fa-map-marker-alt"></i> {{ restaurant.city }}
+              </span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+              Min GHS {{ restaurant.minimum_order_amount }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="width: 80px; height: 80px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="fas fa-search" style="font-size: 2rem; color: #dc2626;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No restaurants found</h3>
+      <p style="color: #6b7280;">Try adjusting your filters or search criteria</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-store"></i>
+    <span>Restaurants</span>
+  </a>
+  <a href="{% url 'food_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'food_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

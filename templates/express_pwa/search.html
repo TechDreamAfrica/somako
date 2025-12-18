@@ -1,0 +1,302 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Track Package - Soma Ko{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .search-box {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  }
+
+  .delivery-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .delivery-card:active {
+    transform: scale(0.98);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #d1fae5; color: #065f46; }
+  .status-assigned { background: #dbeafe; color: #1e40af; }
+  .status-picked_up { background: #e0e7ff; color: #3730a3; }
+  .status-in_transit { background: #ddd6fe; color: #5b21b6; }
+  .status-delivered { background: #d1fae5; color: #065f46; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+  .status-failed { background: #fee2e2; color: #991b1b; }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    margin-bottom: 6rem;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #1d4ed8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: #eab308;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-search" style="font-size: 4rem; color: white; opacity: 0.3;"></i>
+  </div>
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-search" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">
+      Track Package
+    </h1>
+    <p class="hero-subtitle">Search by tracking number or details</p>
+  </div>
+</div>
+
+<!-- Search Box -->
+<div class="search-box">
+  <form method="GET" action="{% url 'express_pwa:search' %}">
+    <div style="position: relative;">
+      <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        class="search-input"
+        placeholder="Search by tracking number, recipient..."
+        autofocus
+      >
+      <button
+        type="submit"
+        style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: #1d4ed8; color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer;">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Search Results -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  {% if query %}
+    {% if results %}
+      <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.875rem;">
+        Found {{ results|length }} item{{ results|length|pluralize }} for "{{ query }}"
+      </p>
+
+      {% for item in results %}
+      <a href="{% url 'express_pwa:order_detail' item.order.order_number %}" class="delivery-card">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+              {{ item.item_number }}
+            </div>
+            <div style="font-size: 0.875rem; color: #6b7280;">
+              Order: {{ item.order.order_number }}
+            </div>
+          </div>
+          <span class="status-badge status-{{ item.status }}">
+            {% if item.status == 'pending' %}⏳ Pending
+            {% elif item.status == 'assigned' %}🚛 Assigned
+            {% elif item.status == 'picked_up' %}📦 Picked Up
+            {% elif item.status == 'in_transit' %}🚚 In Transit
+            {% elif item.status == 'delivered' %}✅ Delivered
+            {% elif item.status == 'failed' %}❌ Failed
+            {% else %}{{ item.get_status_display }}{% endif %}
+          </span>
+        </div>
+
+        <div style="margin-bottom: 0.75rem;">
+          <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-user" style="color: #10b981; margin-top: 0.25rem;"></i>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.125rem;">Recipient</div>
+              <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem;">{{ item.recipient_name }}</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-map-marker-alt" style="color: #f59e0b; margin-top: 0.25rem;"></i>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.125rem;">Pickup</div>
+              <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem;">{{ item.pickup_address|truncatewords:6 }}</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: start; gap: 0.5rem;">
+            <i class="fas fa-flag-checkered" style="color: #1d4ed8; margin-top: 0.25rem;"></i>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.125rem;">Delivery</div>
+              <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem;">{{ item.delivery_address|truncatewords:6 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 0.75rem;">
+          <div style="background: #f9fafb; padding: 8px 12px; border-radius: 6px;">
+            <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.125rem;">Description</div>
+            <div style="color: #1f2937; font-size: 0.875rem;">{{ item.description|truncatewords:10 }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+          <div style="color: #6b7280; font-size: 0.875rem;">
+            <i class="far fa-clock"></i> {{ item.created_at|date:"M d, Y" }}
+          </div>
+          {% if item.estimated_cost %}
+          <div style="font-weight: 700; color: #1d4ed8; font-size: 1.125rem;">
+            GH₵{{ item.estimated_cost|floatformat:2 }}
+          </div>
+          {% elif item.value %}
+          <div style="font-weight: 600; color: #6b7280; font-size: 0.875rem;">
+            Value: GH₵{{ item.value|floatformat:2 }}
+          </div>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">No items found</h3>
+        <p style="color: #6b7280; margin-bottom: 0;">Try searching with a different item number, order number, or recipient name</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-box"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">Track Your Package</h3>
+      <p style="color: #6b7280;">Enter a tracking number or recipient name to find your deliveries</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:delivery_requests' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:search' %}" class="bottom-nav-item active">
+    <i class="fas fa-search"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

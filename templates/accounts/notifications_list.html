@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Notifications - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 0;">
+  <div class="row">
+    <div class="col-12">
+      <!-- Header -->
+      <div style="margin-bottom: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2.5rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-bell" style="color: #f59e0b;"></i>Notifications
+          </h1>
+          <p style="color: #6b7280; font-size: 1.125rem;">Stay updated with all your activities</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <a href="{% url 'accounts:notification_preferences' %}" style="padding: 0.75rem 1.5rem; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid #9ca3af; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            <i class="fas fa-cog"></i>Preferences
+          </a>
+          {% if total_unread > 0 %}
+          <form method="post" action="{% url 'accounts:mark_all_read' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="padding: 0.75rem 1.5rem; background: #059669; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+              <i class="fas fa-check-double"></i>Mark All Read
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Unread Notifications -->
+      {% if unread_notifications %}
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #e5e7eb;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-envelope" style="color: #f59e0b;"></i>
+          Unread ({{ total_unread }})
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for notification in unread_notifications %}
+          <div style="padding: 1.5rem; background: #ecfdf5; border-radius: 1rem; border: 2px solid #10b981; border-left: 5px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.2)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+            <div class="row align-items-center">
+              <div class="col-lg-10">
+                <div style="display: flex; gap: 1.25rem;">
+                  <div style="width: 50px; height: 50px; background: {% if 'ride' in notification.notification_type %}#e9d5ff{% elif 'food' in notification.notification_type %}#fee2e2{% elif 'shop' in notification.notification_type %}#dbeafe{% elif 'pharmacy' in notification.notification_type %}#d1fae5{% elif 'rental' in notification.notification_type %}#ecfdf5{% else %}#fef3c7{% endif %}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas {% if 'ride' in notification.notification_type %}fa-car{% elif 'food' in notification.notification_type %}fa-utensils{% elif 'shop' in notification.notification_type %}fa-shopping-bag{% elif 'pharmacy' in notification.notification_type %}fa-pills{% elif 'rental' in notification.notification_type %}fa-home{% else %}fa-bell{% endif %}" style="color: {% if 'ride' in notification.notification_type %}#a855f7{% elif 'food' in notification.notification_type %}#ef4444{% elif 'shop' in notification.notification_type %}#3b82f6{% elif 'pharmacy' in notification.notification_type %}#10b981{% elif 'rental' in notification.notification_type %}#059669{% else %}#f59e0b{% endif %}; font-size: 1.5rem;"></i>
+                  </div>
+                  <div style="flex: 1;">
+                    <h4 style="font-weight: 700; color: #1f2937; font-size: 1.125rem; margin-bottom: 0.5rem;">{{ notification.title }}</h4>
+                    <p style="color: #4b5563; font-size: 0.9375rem; line-height: 1.6; margin-bottom: 0.75rem;">{{ notification.message }}</p>
+                    <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; color: #6b7280;">
+                      <span><i class="fas fa-clock"></i> {{ notification.created_at|timesince }} ago</span>
+                      {% if notification.channel %}
+                      <span><i class="fas fa-{% if notification.channel == 'sms' %}mobile-alt{% elif notification.channel == 'whatsapp' %}whatsapp{% elif notification.channel == 'email' %}envelope{% else %}bell{% endif %}"></i> {{ notification.get_channel_display }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2 text-lg-end mt-3 mt-lg-0">
+                <form method="post" action="{% url 'accounts:mark_notification_read' notification.id %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" style="padding: 0.625rem 1.25rem; background: #059669; color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-check"></i> Mark Read
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Read Notifications -->
+      {% if read_notifications %}
+      <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #e5e7eb;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+          <i class="fas fa-check-circle" style="color: #10b981;"></i>
+          Earlier Notifications
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for notification in read_notifications %}
+          <div style="padding: 1.25rem; background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb; transition: all 0.2s ease;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#f9fafb'">
+            <div style="display: flex; gap: 1rem;">
+              <div style="width: 40px; height: 40px; background: {% if 'ride' in notification.notification_type %}#e9d5ff{% elif 'food' in notification.notification_type %}#fee2e2{% elif 'shop' in notification.notification_type %}#dbeafe{% elif 'pharmacy' in notification.notification_type %}#d1fae5{% elif 'rental' in notification.notification_type %}#ecfdf5{% else %}#fef3c7{% endif %}; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.7;">
+                <i class="fas {% if 'ride' in notification.notification_type %}fa-car{% elif 'food' in notification.notification_type %}fa-utensils{% elif 'shop' in notification.notification_type %}fa-shopping-bag{% elif 'pharmacy' in notification.notification_type %}fa-pills{% elif 'rental' in notification.notification_type %}fa-home{% else %}fa-bell{% endif %}" style="color: {% if 'ride' in notification.notification_type %}#a855f7{% elif 'food' in notification.notification_type %}#ef4444{% elif 'shop' in notification.notification_type %}#3b82f6{% elif 'pharmacy' in notification.notification_type %}#10b981{% elif 'rental' in notification.notification_type %}#059669{% else %}#f59e0b{% endif %}; font-size: 1.125rem;"></i>
+              </div>
+              <div style="flex: 1;">
+                <h4 style="font-weight: 700; color: #374151; font-size: 1rem; margin-bottom: 0.375rem;">{{ notification.title }}</h4>
+                <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.5; margin-bottom: 0.5rem;">{{ notification.message }}</p>
+                <span style="font-size: 0.8125rem; color: #9ca3af;"><i class="fas fa-clock"></i> {{ notification.created_at|timesince }} ago</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Empty State -->
+      {% if not unread_notifications and not read_notifications %}
+      <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px dashed #e5e7eb;">
+        <div style="width: 120px; height: 120px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+          <i class="fas fa-bell-slash" style="font-size: 4rem; color: #f59e0b;"></i>
+        </div>
+        <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 0.75rem;">No Notifications</h4>
+        <p style="color: #6b7280; font-size: 1.125rem;">You're all caught up! No notifications at this time.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

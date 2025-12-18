@@ -1,0 +1,371 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Saved Items - {{ service_name|default:"Soma Ko" }}{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+{% block pwa_app_name %}profile{% endblock %}
+
+{% block auth_banner %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f9fafb;
+  }
+
+  .edit-header {
+    background: #6366f1;
+    padding: 1.5rem 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .saved-container {
+    padding: 1rem;
+  }
+
+  .saved-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .saved-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .saved-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .saved-image {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 2rem;
+    overflow: hidden;
+  }
+
+  .saved-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .favorite-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+    font-size: 1.125rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .favorite-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .saved-info {
+    padding: 1rem;
+  }
+
+  .saved-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    min-height: 2.8em;
+  }
+
+  .saved-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .saved-price {
+    font-weight: 700;
+    color: {{ app_color|default:"#059669" }};
+    font-size: 1.125rem;
+  }
+
+  .saved-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .saved-rating i {
+    color: #fbbf24;
+  }
+
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 0.625rem;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .add-to-cart-btn:active {
+    transform: scale(0.95);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 3rem;
+  }
+
+  .empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-text {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+  }
+
+  .explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #6366f1;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .explore-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px {{ app_color|default:"#059669" }}40;
+  }
+
+  .content-spacer {
+    height: 80px;
+  }
+
+  /* Badge */
+  .badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #ef4444;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 10;
+  }
+
+  @media (min-width: 640px) {
+    .saved-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-header">
+  <a href="{% url 'accounts:pwa_profile' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <div class="header-title">Saved Items</div>
+</div>
+
+<div class="saved-container">
+  {% if saved_items %}
+    <div class="saved-grid">
+      {% for item in saved_items %}
+        <div class="saved-card">
+          <div class="saved-image">
+            {% if item.image %}
+              <img src="{{ item.image.url }}" alt="{{ item.name }}">
+            {% else %}
+              <i class="fas fa-box"></i>
+            {% endif %}
+            
+            {% if item.discount %}
+              <div class="badge">-{{ item.discount }}%</div>
+            {% endif %}
+
+            <button class="favorite-btn" onclick="removeFavorite({{ item.id }})">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+
+          <div class="saved-info">
+            <div class="saved-name">{{ item.name }}</div>
+            
+            <div class="saved-meta">
+              <div class="saved-price">₦{{ item.price|floatformat:2 }}</div>
+              {% if item.rating %}
+                <div class="saved-rating">
+                  <i class="fas fa-star"></i>
+                  {{ item.rating }}
+                </div>
+              {% endif %}
+            </div>
+
+            <button class="add-to-cart-btn" onclick="addToCart({{ item.id }})">
+              <i class="fas fa-shopping-cart"></i>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-heart"></i>
+      </div>
+      <div class="empty-title">No Saved Items</div>
+      <div class="empty-text">
+        You haven't saved any items yet. Browse and save your favorites!
+      </div>
+      <a href="{{ pwa_home_url|default:'/' }}" class="explore-btn">
+        <i class="fas fa-compass"></i>
+        Explore Now
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="content-spacer"></div>
+
+<script>
+function removeFavorite(itemId) {
+  if (confirm('Remove this item from your saved list?')) {
+    // Add AJAX call to remove from favorites
+    fetch(`/api/favorites/${itemId}/remove/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+}
+
+function addToCart(itemId) {
+  // Add AJAX call to add to cart
+  fetch(`/api/cart/add/${itemId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      alert('Item added to cart!');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

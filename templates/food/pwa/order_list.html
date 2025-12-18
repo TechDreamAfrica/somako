@@ -1,0 +1,279 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}My Orders - Food PWA{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block food_active %}active{% endblock %}
+{% block manifest_url %}/static/pwa/food/manifest.json{% endblock %}
+{% block icon_192 %}
+<link rel="icon" type="image/png" sizes="192x192" href="/static/pwa/food/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/static/pwa/food/icon-192x192.png">
+{% endblock %}
+{% block service_worker_url %}/static/pwa/food/sw.js{% endblock %}
+{% block nav_active_color %}#f97316{% endblock %}
+{% block nav_active_bg %}rgba(234, 88, 12, 0.1){% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem;
+    -webkit-overflow-scrolling: touch;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .filter-tab {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .filter-tab.active {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .order-card:active {
+    transform: scale(0.98);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #dbeafe; color: #1e40af; }
+  .status-preparing { background: #fef3c7; color: #92400e; }
+  .status-ready { background: #d1fae5; color: #065f46; }
+  .status-out_for_delivery { background: #dbeafe; color: #1e40af; }
+  .status-delivered { background: #d1fae5; color: #065f46; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+  }
+
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #f97316;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: #dc2626;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-receipt" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-receipt" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">My Orders</h1>
+    <p class="hero-subtitle">Track your food deliveries</p>
+  </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+  <a href="{% url 'food_pwa:order_list' %}" class="filter-tab {% if not status_filter %}active{% endif %}">
+    All Orders
+  </a>
+  <a href="?status=pending" class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">
+    Pending
+  </a>
+  <a href="?status=preparing" class="filter-tab {% if status_filter == 'preparing' %}active{% endif %}">
+    Preparing
+  </a>
+  <a href="?status=out_for_delivery" class="filter-tab {% if status_filter == 'out_for_delivery' %}active{% endif %}">
+    On the Way
+  </a>
+  <a href="?status=delivered" class="filter-tab {% if status_filter == 'delivered' %}active{% endif %}">
+    Delivered
+  </a>
+</div>
+
+<!-- Orders List -->
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  {% if orders %}
+    {% for order in orders %}
+    {% if order.order_number %}
+    <a href="{% url 'food_pwa:order_detail' order.order_number %}" class="order-card">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+        <div style="flex: 1;">
+          <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+            {{ order.restaurant.name }}
+          </div>
+          <div style="font-size: 0.875rem; color: #6b7280;">
+            Order #{{ order.order_number }}
+          </div>
+        </div>
+        <span class="status-badge status-{{ order.status }}">
+          {% if order.status == 'pending' %}
+            <i class="fas fa-clock"></i>
+          {% elif order.status == 'confirmed' %}
+            <i class="fas fa-check"></i>
+          {% elif order.status == 'preparing' %}
+            <i class="fas fa-utensils"></i>
+          {% elif order.status == 'ready' %}
+            <i class="fas fa-box"></i>
+          {% elif order.status == 'out_for_delivery' %}
+            <i class="fas fa-motorcycle"></i>
+          {% elif order.status == 'delivered' %}
+            <i class="fas fa-check-circle"></i>
+          {% elif order.status == 'cancelled' %}
+            <i class="fas fa-times-circle"></i>
+          {% endif %}
+          {{ order.get_status_display }}
+        </span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          <i class="far fa-clock"></i> {{ order.created_at|date:"M d, Y - g:i A" }}
+        </div>
+        <div style="font-weight: 700; color: #f97316; font-size: 1.125rem;">
+          GHS {{ order.total_amount|floatformat:2 }}
+        </div>
+      </div>
+
+      {% if order.items.count %}
+      <div style="color: #6b7280; font-size: 0.875rem; border-top: 1px solid #f3f4f6; padding-top: 0.75rem;">
+        <i class="fas fa-shopping-bag"></i> {{ order.items.count }} item{{ order.items.count|pluralize }}
+      </div>
+      {% endif %}
+    </a>
+    {% endif %}
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-receipt"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">No orders yet</h3>
+      <p style="color: #6b7280; margin-bottom: 1.5rem;">Start ordering from your favorite restaurants!</p>
+      <a href="{% url 'food_pwa:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #f97316; color: white; border-radius: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);">
+        <i class="fas fa-store"></i> Browse Restaurants
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_list' %}" class="bottom-nav-item">
+    <i class="fas fa-store"></i>
+    <span>Restaurants</span>
+  </a>
+  <a href="{% url 'food_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'food_pwa:order_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

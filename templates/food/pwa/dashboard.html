@@ -1,0 +1,322 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load food_extras %}
+
+{% block title %}Food - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block food_active %}active{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  .food-banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .hero-icon-container i {
+    font-size: 3rem;
+    color: white;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: #f97316;
+    color: white;
+    margin-bottom: 1rem;
+  }
+
+  .hero-search {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-search input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .hero-search input:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
+  }
+
+  .hero-search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f97316;
+    font-size: 1.125rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .view-all {
+    color: #f97316;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  .restaurant-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .restaurant-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .restaurant-card:active {
+    transform: scale(0.98);
+  }
+
+  .restaurant-img-container {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .restaurant-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .restaurant-info {
+    padding: 1rem;
+  }
+
+  .badge-featured {
+    background: #f97316;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner and Profile -->
+<div class="hero-header">
+  <div class="banner-container">
+    <div class="food-banner" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-utensils" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+    </div>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-burger"></i>
+    </div>
+
+    <h1 class="hero-title">Order Food 🍔</h1>
+
+    <div class="hero-badge">
+      <i class="fas fa-bolt" style="font-size: 0.875rem;"></i>
+      <span>Fast & Delicious</span>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'food_pwa:search' %}">
+      <div class="hero-search">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search restaurants or dishes..."
+        >
+        <i class="fas fa-search"></i>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <!-- Featured Restaurants -->
+  <div class="section-header" style="margin-top: 1.5rem;">
+    <h2 class="section-title">Restaurants</h2>
+    <a href="{% url 'food_pwa:restaurant_list' %}" class="view-all">
+      View All <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+
+  {% if featured_restaurants %}
+    {% for restaurant in featured_restaurants %}
+    <a href="{% url 'food_pwa:restaurant_detail' restaurant.id %}" class="restaurant-card" style="cursor: pointer;">
+      <div class="restaurant-img-container">
+        {% if restaurant.image or restaurant.logo %}
+          {% if restaurant.image %}
+          <img src="{{ restaurant.get_image_url }}" alt="{{ restaurant.name }}" class="restaurant-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="restaurant-img" style="background: #f97316; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+          </div>
+          {% else %}
+          <img src="{{ restaurant.get_logo_url }}" alt="{{ restaurant.name }}" class="restaurant-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="restaurant-img" style="background: #f97316; display: none; align-items: center; justify-content: center;">
+            <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+          </div>
+          {% endif %}
+        {% else %}
+        <div class="restaurant-img" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-utensils" style="font-size: 3rem; color: #dc2626;"></i>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="restaurant-info">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+          <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937;">{{ restaurant.name }}</h3>
+          {% if restaurant.is_featured %}
+          <span class="badge-featured">
+            <i class="fas fa-crown"></i> Featured
+          </span>
+          {% endif %}
+        </div>
+
+        <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">{{ restaurant.description|truncatewords:12 | safe }}</p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 0.25rem;">
+            <i class="fas fa-star" style="color: #fbbf24; font-size: 0.875rem;"></i>
+            <span style="font-weight: 600; color: #1f2937;">{{ restaurant.average_rating|floatformat:1 }}</span>
+            <span style="color: #9ca3af; font-size: 0.875rem;">({{ restaurant.total_reviews }})</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 1rem; color: #6b7280; font-size: 0.875rem;">
+            <span><i class="fas fa-clock"></i> {{ restaurant.delivery_time }} min</span>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+    <!-- Empty State -->
+    <div style="text-align: center; padding: 3rem 1.5rem; background: white; border-radius: 20px; margin-top: 1rem;">
+          <div style="width: 100px; height: 100px; background: #fed7aa; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);">
+        <i class="fas fa-utensils" style="font-size: 2.5rem; color: #dc2626;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.75rem; font-size: 1.25rem; font-weight: 800;">No Restaurants Yet</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem; font-size: 0.9375rem; line-height: 1.5;">We're working on bringing amazing restaurants to you. Check back soon!</p>
+      <a href="{% url 'food_pwa:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 1rem 2rem; background: #f97316; color: white; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 1rem; box-shadow: 0 6px 16px rgba(234, 88, 12, 0.3); transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+        <i class="fas fa-search"></i>
+        <span>Browse All Restaurants</span>
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_list' %}" class="bottom-nav-item">
+    <i class="fas fa-store"></i>
+    <span>Restaurants</span>
+  </a>
+  <a href="{% url 'food_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'food_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

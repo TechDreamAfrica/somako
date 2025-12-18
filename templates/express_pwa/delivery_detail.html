@@ -1,0 +1,541 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Delivery #{{ delivery.tracking_number }} - Soma Ko{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-confirmed { background: #dbeafe; color: #1e40af; }
+  .status-assigned { background: #e0e7ff; color: #4338ca; }
+  .status-picked_up { background: #fce7f3; color: #9f1239; }
+  .status-in_transit { background: #e0e7ff; color: #4338ca; }
+  .status-delivered { background: #d1fae5; color: #065f46; }
+  .status-cancelled,
+  .status-failed { background: #fee2e2; color: #991b1b; }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .btn-outline {
+    background: white;
+    color: #1d4ed8;
+    border: 2px solid #1d4ed8;
+  }
+
+  .btn-danger {
+    background: white;
+    color: #eab308;
+    border: 2px solid #eab308;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
+  .timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #1d4ed8;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #1d4ed8;
+  }
+
+  .timeline-item:after {
+    content: '';
+    position: absolute;
+    left: -1.06rem;
+    top: 1.5rem;
+    width: 2px;
+    height: calc(100% - 1rem);
+    background: #e5e7eb;
+  }
+
+  .timeline-item:last-child:after {
+    display: none;
+  }
+
+  .signature-preview {
+    max-width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.5rem;
+    background: #f9fafb;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-shipping-fast" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-box" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">{{ delivery.tracking_number }}</h1>
+    <div class="hero-info">
+      <span class="status-badge status-{{ delivery.status|lower }}">
+        {{ delivery.get_status_display }}
+      </span>
+      <span style="color: #6b7280; font-size: 0.875rem;">
+        <i class="far fa-calendar"></i> {{ delivery.created_at|date:"M d, Y" }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Status Alerts -->
+  {% if delivery.status == 'pending' %}
+  <div style="margin: 0 1rem 1rem 1rem; background: #1d4ed8; padding: 1.25rem; border-radius: 16px; border-left: 4px solid #f59e0b; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="fas fa-clock" style="color: white; font-size: 1.25rem;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #92400e; margin-bottom: 0.5rem; font-size: 1.125rem;">⏳ Pending Confirmation</div>
+        <div style="color: #78350f; font-size: 0.938rem; line-height: 1.5;">
+          Your delivery request is being processed. You'll be notified once it's confirmed and a driver is assigned.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif delivery.status == 'assigned' or delivery.status == 'confirmed' %}
+  <div style="margin: 0 1rem 1rem 1rem; background: #1d4ed8; padding: 1.25rem; border-radius: 16px; border-left: 4px solid #3b82f6; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="fas fa-user-check" style="color: white; font-size: 1.25rem;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #1e40af; margin-bottom: 0.5rem; font-size: 1.125rem;">✓ Driver Assigned</div>
+        <div style="color: #1e3a8a; font-size: 0.938rem; line-height: 1.5;">
+          {% if delivery.driver %}
+          <strong>{{ delivery.driver.get_full_name }}</strong> will pick up your package soon.
+          {% else %}
+          A driver has been assigned to your delivery.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif delivery.status == 'picked_up' or delivery.status == 'in_transit' %}
+  <div style="margin: 0 1rem 1rem 1rem; background: #1d4ed8; padding: 1.25rem; border-radius: 16px; border-left: 4px solid #ec4899; box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="fas fa-truck" style="color: white; font-size: 1.25rem;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #9f1239; margin-bottom: 0.5rem; font-size: 1.125rem;">🚚 {{ delivery.get_status_display }}</div>
+        <div style="color: #831843; font-size: 0.938rem; line-height: 1.5;">
+          Your package is on its way to the destination. Track it in real-time below.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif delivery.status == 'delivered' %}
+  <div style="margin: 0 1rem 1rem 1rem; background: #1d4ed8; padding: 1.25rem; border-radius: 16px; border-left: 4px solid #10b981; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="fas fa-check-circle" style="color: white; font-size: 1.25rem;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #065f46; margin-bottom: 0.5rem; font-size: 1.125rem;">✓ Delivered Successfully</div>
+        <div style="color: #064e3b; font-size: 0.938rem; line-height: 1.5;">
+          Your package was delivered on {{ delivery.delivery_time|date:"M d, Y 'at' g:i A" }}.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Route Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-route" style="color: #1d4ed8;"></i> Delivery Route
+    </h2>
+
+    <div style="margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: start; gap: 1rem; margin-bottom: 1rem;">
+        <div style="width: 40px; height: 40px; background: #1d4ed8; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 1.25rem;"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">PICKUP</div>
+          <div style="font-weight: 600; color: #1f2937;">{{ delivery.pickup_address }}</div>
+          {% if delivery.pickup_landmark %}
+          <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">
+            <i class="fas fa-landmark"></i> {{ delivery.pickup_landmark }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: start; gap: 1rem;">
+        <div style="width: 40px; height: 40px; background: #1d4ed8; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fas fa-flag-checkered" style="color: #1d4ed8; font-size: 1.25rem;"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">DELIVERY</div>
+          <div style="font-weight: 600; color: #1f2937;">{{ delivery.delivery_address }}</div>
+          {% if delivery.delivery_landmark %}
+          <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">
+            <i class="fas fa-landmark"></i> {{ delivery.delivery_landmark }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Package Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-box-open" style="color: #1d4ed8;"></i> Package Details
+    </h2>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Package Type</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.get_package_type_display }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Description</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.description }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Weight</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.weight }} kg</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Declared Value</span>
+      <span style="font-weight: 600; color: #1f2937;">GH₵{{ delivery.value|floatformat:2 }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Urgency</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.get_urgency_display }}</span>
+    </div>
+  </div>
+
+  <!-- Recipient Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-user" style="color: #1d4ed8;"></i> Recipient
+    </h2>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Name</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.recipient_name }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Phone</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.recipient_phone }}</span>
+    </div>
+  </div>
+
+  <!-- Driver Information -->
+  {% if delivery.driver %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-user-circle" style="color: #1d4ed8;"></i> Driver
+    </h2>
+
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <div style="width: 60px; height: 60px; background: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-user" style="color: #eab308; font-size: 1.75rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight: 700; color: #1f2937; font-size: 1.125rem;">{{ delivery.driver.get_full_name }}</div>
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          <i class="fas fa-motorcycle"></i> Delivery Driver
+        </div>
+      </div>
+    </div>
+
+    {% if delivery.driver.phone_number %}
+    <a href="tel:{{ delivery.driver.phone_number }}" style="display: block; padding: 0.875rem; background: #f9fafb; border-radius: 12px; text-decoration: none; text-align: center; font-weight: 600; color: #10b981; border: 2px solid #10b981;">
+      <i class="fas fa-phone"></i> Call Driver
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Payment Details -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-credit-card" style="color: #1d4ed8;"></i> Payment
+    </h2>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Estimated Cost</span>
+      <span style="font-weight: 600;">GH₵{{ delivery.estimated_cost|floatformat:2 }}</span>
+    </div>
+
+    {% if delivery.final_cost %}
+    <div class="info-row" style="border-top: 2px solid #e5e7eb; padding-top: 1rem; margin-top: 0.5rem;">
+      <span style="font-weight: 700; font-size: 1.125rem;">Final Cost</span>
+      <span style="font-weight: 700; color: #1d4ed8; font-size: 1.25rem;">GH₵{{ delivery.final_cost|floatformat:2 }}</span>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 1rem; padding: 0.875rem; background: #f9fafb; border-radius: 12px; text-align: center;">
+      <div style="font-size: 0.875rem; color: #6b7280;">Payment Method</div>
+      <div style="font-weight: 600; color: #1f2937;">{{ delivery.payment_method|title }}</div>
+    </div>
+  </div>
+
+  <!-- Delivery Instructions -->
+  {% if delivery.pickup_instructions or delivery.delivery_instructions %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-comment-dots" style="color: #1d4ed8;"></i> Special Instructions
+    </h2>
+
+    {% if delivery.pickup_instructions %}
+    <div style="margin-bottom: 1rem;">
+      <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 600;">PICKUP INSTRUCTIONS</div>
+      <p style="color: #1f2937; margin: 0;">{{ delivery.pickup_instructions }}</p>
+    </div>
+    {% endif %}
+
+    {% if delivery.delivery_instructions %}
+    <div>
+      <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 600;">DELIVERY INSTRUCTIONS</div>
+      <p style="color: #1f2937; margin: 0;">{{ delivery.delivery_instructions }}</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Delivery Signature -->
+  {% if delivery.recipient_signature %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-signature" style="color: #1d4ed8;"></i> Recipient Signature
+    </h2>
+
+    <div style="margin-bottom: 1rem;">
+      <img src="{{ delivery.recipient_signature }}" alt="Recipient Signature" class="signature-preview">
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Signed By</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.signed_by_name }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Signed On</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ delivery.signature_date|date:"M d, Y 'at' g:i A" }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Status Timeline -->
+  {% if status_updates %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-history" style="color: #1d4ed8;"></i> Status History
+    </h2>
+
+    <div class="timeline">
+      {% for update in status_updates %}
+      <div class="timeline-item">
+        <div style="font-weight: 600; color: #1f2937;">{{ update.get_status_display }}</div>
+        <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">
+          <i class="far fa-clock"></i> {{ update.created_at|date:"M d, Y 'at' g:i A" }}
+        </div>
+        {% if update.notes %}
+        <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px;">
+          {{ update.notes }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Actions -->
+  <div style="padding: 0 1rem;">
+    {% if delivery.status in 'assigned,picked_up,in_transit' %}
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i> Contact support for tracking information
+    </div>
+    {% endif %}
+
+    {% if delivery.can_cancel %}
+    <button onclick="if(confirm('Are you sure you want to cancel this delivery?')) window.location.href='{% url 'express_pwa:cancel_delivery' delivery.id %}'" class="action-btn btn-danger">
+      <i class="fas fa-times-circle"></i> Cancel Delivery
+    </button>
+    {% endif %}
+
+    {% if delivery.status == 'delivered' %}
+    <button onclick="window.location.href='{% url 'express_pwa:rate_delivery' delivery.id %}'" class="action-btn btn-primary">
+      <i class="fas fa-star"></i> Rate This Delivery
+    </button>
+    {% endif %}
+
+    <button onclick="window.location.href='{% url 'express_pwa:delivery_requests' %}'" class="action-btn btn-outline">
+      <i class="fas fa-list"></i> View All Deliveries
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:delivery_requests' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:order_tracking' %}" class="bottom-nav-item">
+    <i class="fas fa-shipping-fast"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

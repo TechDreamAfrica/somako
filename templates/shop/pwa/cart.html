@@ -1,0 +1,215 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load image_extras %}
+
+{% block title %}Cart - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block shop_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cart-header {
+    background: #8b5cf6;
+    color: white;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  }
+
+  .cart-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .cart-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0.95;
+    font-size: 0.875rem;
+  }
+
+  .cart-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 0.25rem;
+  }
+
+  .quantity-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: white;
+    border-radius: 6px;
+    color: #8b5cf6;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quantity-btn:active {
+    transform: scale(0.9);
+  }
+
+  .checkout-btn {
+    position: fixed;
+    bottom: calc(4rem + env(safe-area-inset-bottom));
+    left: 1rem;
+    right: 1rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-header">
+  <h1>My Cart</h1>
+  <div class="cart-header-info">
+    <span>
+      <i class="fas fa-shopping-bag"></i>
+      {{ cart_items.count }} item{{ cart_items.count|pluralize }}
+    </span>
+    {% if cart_items %}
+    <a href="{% url 'shop_pwa:clear_cart' %}" style="color: white; text-decoration: none; font-size: 0.875rem;" onclick="return confirm('Clear all items from cart?')">
+      <i class="fas fa-trash"></i> Clear Cart
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 10rem;">
+  {% if cart_items %}
+    {% for item in cart_items %}
+    <div class="cart-item">
+      <div style="display: flex; gap: 1rem;">
+  {% if item.variant.product.get_primary_image_url %}
+  <img src="{{ item.variant.product.get_primary_image_url|external_image }}" alt="{{ item.variant.product.name }}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div style="width: 80px; height: 80px; border-radius: 8px; background: #ddd6fe; display: none; align-items: center; justify-content: center;">
+          <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+        </div>
+        {% else %}
+        <div style="width: 80px; height: 80px; border-radius: 8px; background: #ddd6fe; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+        </div>
+        {% endif %}
+
+        <div style="flex: 1;">
+          <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">{{ item.variant.product.name }}</h3>
+          {% if item.variant %}
+          <p style="color: #6b7280; font-size: 0.875rem;">{{ item.variant.name }}</p>
+          {% endif %}
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+            <div class="quantity-control">
+              <form method="POST" action="{% url 'shop_pwa:update_cart_item' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
+                <button type="submit" class="quantity-btn">-</button>
+              </form>
+              <span style="font-weight: 600; min-width: 24px; text-align: center;">{{ item.quantity }}</span>
+              <form method="POST" action="{% url 'shop_pwa:update_cart_item' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
+                <button type="submit" class="quantity-btn">+</button>
+              </form>
+            </div>
+
+            <div style="text-align: right;">
+              <div style="font-weight: 700; color: #8b5cf6; font-size: 1.125rem;">
+                GHS {{ item.total_price|floatformat:2 }}
+              </div>
+              <form method="POST" action="{% url 'shop_pwa:remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit" style="background: none; border: none; color: #ef4444; font-size: 0.875rem; cursor: pointer; padding: 0; margin-top: 0.25rem;">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Summary -->
+    <div style="background: white; border-radius: 12px; padding: 1rem; margin-top: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span style="color: #6b7280;">Subtotal</span>
+        <span style="font-weight: 600; color: #1f2937;">GHS {{ subtotal|floatformat:2 }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span style="color: #6b7280;">Shipping Fee</span>
+        <span style="font-weight: 600; color: #1f2937;">GHS {{ shipping_fee|floatformat:2 }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+        <span style="color: #6b7280;">Tax</span>
+        <span style="font-weight: 600; color: #1f2937;">GHS {{ tax|floatformat:2 }}</span>
+      </div>
+      <div style="border-top: 2px solid #e5e7eb; margin: 0.75rem 0; padding-top: 0.75rem; display: flex; justify-content: space-between;">
+        <span style="font-weight: 700; color: #1f2937; font-size: 1.125rem;">Total</span>
+        <span style="font-weight: 700; color: #8b5cf6; font-size: 1.25rem;">GHS {{ total|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <!-- Checkout Button -->
+    <button onclick="window.location.href='{% url 'shop_pwa:checkout' %}'" class="checkout-btn">
+      Proceed to Checkout • GHS {{ total|floatformat:2 }}
+    </button>
+
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1rem;">
+      <div style="width: 100px; height: 100px; background: #ddd6fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-shopping-cart" style="font-size: 2.5rem; color: #8b5cf6;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-size: 1.25rem;">Your cart is empty</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem;">Add some amazing products to get started!</p>
+      <a href="{% url 'shop_pwa:product_list' %}" style="display: inline-block; background: #8b5cf6; color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        Browse Products
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'shop_pwa:product_list' %}" class="bottom-nav-item">
+    <i class="fas fa-th"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:cart' %}" class="bottom-nav-item active">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'shop_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

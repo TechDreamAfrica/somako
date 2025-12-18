@@ -1,0 +1,39 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Track Order - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem;">
+  <h1 style="font-size: 1.5rem; font-weight: 700;">Order #{{ order.order_number }}</h1>
+</div>
+
+<div style="padding: 2rem 1rem; margin-bottom: 6rem;">
+  <!-- Order Tracking Timeline -->
+  <div style="background: white; border-radius: 12px; padding: 2rem 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+    {% for stage in stages %}
+    <div style="display: flex; gap: 1rem; {% if not forloop.last %}margin-bottom: 2rem;{% endif %}">
+      <!-- Icon -->
+      <div style="flex-shrink: 0;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: {% if order.status == stage.status or forloop.counter0 < stages|length %}#8b5cf6{% else %}#e5e7eb{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem;">
+          <i class="fas {{ stage.icon }}"></i>
+        </div>
+        {% if not forloop.last %}
+        <div style="width: 2px; height: 40px; background: {% if forloop.counter0 < stages|length %}#8b5cf6{% else %}#e5e7eb{% endif %}; margin: 0.5rem auto;"></div>
+        {% endif %}
+      </div>
+
+      <!-- Content -->
+      <div style="flex: 1; {% if order.status != stage.status %}opacity: 0.5;{% endif %}">
+        <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">{{ stage.label }}</h3>
+        {% if order.status == stage.status %}
+        <p style="color: #8b5cf6; font-weight: 600; font-size: 0.875rem;">Current Status</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

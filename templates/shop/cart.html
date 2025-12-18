@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}Shopping Cart - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #22c55e; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="text-center">
+      <h1 style="font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 900; color: white; margin-bottom: 1rem; letter-spacing: -1.5px;">Shopping Cart</h1>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95);">Review your items and proceed to checkout</p>
+    </div>
+  </div>
+</section>
+
+<!-- Cart Content -->
+<section style="padding: 4rem 0; background: #22c55e; margin-top: -2rem;">
+  <div class="container">
+    {% if cart_items %}
+    <div class="row g-4">
+      <!-- Cart Items -->
+      <div class="col-lg-8">
+        {% for item in cart_items %}
+        <div style="background: white; border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+          <div class="row align-items-center g-3">
+            <!-- Product Image -->
+            <div class="col-md-2">
+              {% with first_image=item.variant.product.images.first %}
+              {% if first_image %}
+              <img src="{{ first_image.image.url }}" alt="{{ item.variant.product.name }}" style="width: 100%; border-radius: 0.75rem; border: 2px solid #dcfce7;">
+              {% else %}
+              <div style="width: 100%; aspect-ratio: 1; background: #dcfce7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-box" style="font-size: 2rem; color: #22c55e; opacity: 0.5;"></i>
+              </div>
+              {% endif %}
+              {% endwith %}
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-md-4">
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">{{ item.variant.product.name }}</h5>
+              <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.25rem;">{{ item.variant.name }}</p>
+              <p style="color: #22c55e; font-size: 0.875rem; font-weight: 600; margin: 0;">SKU: {{ item.variant.sku }}</p>
+            </div>
+
+            <!-- Price -->
+            <div class="col-md-2 text-center">
+              <p style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Unit Price</p>
+              <p style="font-size: 1.25rem; font-weight: 800; color: #22c55e; margin: 0;">GHS {{ item.unit_price }}</p>
+            </div>
+
+            <!-- Quantity -->
+            <div class="col-md-2">
+              <form method="post" action="{% url 'shop:update_cart' item.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <label style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem; display: block; text-align: center;">Quantity</label>
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.stock_quantity }}" style="width: 100%; padding: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; text-align: center; font-weight: 600;" onchange="this.form.submit()">
+              </form>
+            </div>
+
+            <!-- Total & Remove -->
+            <div class="col-md-2 text-center">
+              <p style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Total</p>
+              <p style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 0.75rem;">GHS {{ item.total_price }}</p>
+              <form method="post" action="{% url 'shop:update_cart' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove">
+                <button type="submit" style="background: #fee2e2; color: #dc2626; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <!-- Continue Shopping -->
+        <a href="{% url 'shop:product_list' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: white; color: #22c55e; border: 2px solid #22c55e; border-radius: 0.75rem; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='white'">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.25rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin-bottom: 1.5rem;">Order Summary</h4>
+
+            <div style="margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Subtotal</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ subtotal }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Tax (10%)</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ tax_amount }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Shipping</span>
+                <span style="color: #1f2937; font-weight: 700;">GHS {{ shipping_cost }}</span>
+              </div>
+            </div>
+
+            <hr style="margin: 1.5rem 0; border-color: #e5e7eb;">
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+              <span style="font-size: 1.25rem; font-weight: 800; color: #1f2937;">Total</span>
+              <span style="font-size: 1.75rem; font-weight: 900; color: #22c55e;">GHS {{ total }}</span>
+            </div>
+
+            <a href="{% url 'shop:checkout' %}" style="width: 100%; padding: 1.125rem; background: #22c55e; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.75rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <i class="fas fa-lock"></i> Proceed to Checkout
+            </a>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #f0fdf4; border-radius: 0.75rem; border: 2px solid #bbf7d0;">
+              <p style="display: flex; align-items: center; gap: 0.5rem; color: #166534; font-size: 0.875rem; font-weight: 600; margin: 0;">
+                <i class="fas fa-shield-alt"></i> Secure Checkout Guaranteed
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart -->
+    <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+      <div style="width: 100px; height: 100px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #22c55e; opacity: 0.5;"></i>
+      </div>
+      <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Your cart is empty</h4>
+      <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem;">Start shopping to add items to your cart</p>
+      <a href="{% url 'shop:product_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.875rem 2rem; background: #22c55e; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <i class="fas fa-shopping-bag"></i> Browse Products
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

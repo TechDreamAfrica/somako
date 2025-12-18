@@ -1,0 +1,357 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Recipient Signature - Soma Ko{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  }
+
+  #signature-canvas {
+    width: 100%;
+    height: 250px;
+    border: 3px solid #e5e7eb;
+    border-radius: 12px;
+    touch-action: none;
+    cursor: crosshair;
+    background: white;
+  }
+
+  .canvas-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .btn-secondary {
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: #4b5563;
+  }
+
+  .confirm-btn {
+    width: 100%;
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    margin: 0 1rem 6rem 1rem;
+    width: calc(100% - 2rem);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  }
+
+  .delivery-info-card {
+    background: #1d4ed8;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    border-left: 4px solid #1d4ed8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-signature" style="font-size: 4rem; color: white; opacity: 0.3;"></i>
+  </div>
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-signature" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Delivery Confirmation</h1>
+    <p class="hero-subtitle">Recipient signature required</p>
+  </div>
+</div>
+
+<!-- Delivery Info -->
+<div class="delivery-info-card">
+  <div style="font-weight: 700; color: #eab308; margin-bottom: 0.5rem; font-size: 1.125rem;">
+    {{ delivery.tracking_number }}
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.875rem;">
+    <div>
+      <div style="color: #6b7280;">Package Type</div>
+      <div style="font-weight: 600; color: #1f2937;">{{ delivery.get_package_type_display }}</div>
+    </div>
+    <div>
+      <div style="color: #6b7280;">Recipient</div>
+      <div style="font-weight: 600; color: #1f2937;">{{ delivery.recipient_name }}</div>
+    </div>
+  </div>
+</div>
+
+<form method="post" id="signatureForm">
+  {% csrf_token %}
+
+  <!-- Recipient Name Confirmation -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-user-check"></i> Recipient Information
+    </h2>
+
+    <div class="form-group">
+      <label class="form-label" for="recipient_name">Confirm Your Full Name</label>
+      <input type="text" name="recipient_name" id="recipient_name" class="form-control" placeholder="Enter your full name" value="{{ delivery.recipient_name }}" required>
+      <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">This name will be recorded as proof of delivery</div>
+    </div>
+  </div>
+
+  <!-- Signature Pad -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-pen"></i> Draw Your Signature
+    </h2>
+
+    <div style="margin-bottom: 1rem;">
+      <canvas id="signature-canvas"></canvas>
+      <input type="hidden" name="signature" id="signature-data" required>
+    </div>
+
+    <div class="canvas-actions">
+      <button type="button" id="clear-btn" class="btn-secondary">
+        <i class="fas fa-eraser"></i> Clear
+      </button>
+      <div style="flex: 1; text-align: right; color: #6b7280; font-size: 0.875rem; padding: 0.75rem;">
+        <i class="fas fa-info-circle"></i> Draw your signature above
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Button -->
+  <button type="submit" class="confirm-btn" id="submit-btn">
+    <i class="fas fa-check-circle"></i> Confirm Delivery & Submit
+  </button>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<!-- No bottom nav for this page -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('signature-canvas');
+  const ctx = canvas.getContext('2d');
+  const clearBtn = document.getElementById('clear-btn');
+  const signatureData = document.getElementById('signature-data');
+  const form = document.getElementById('signatureForm');
+
+  // Set canvas size
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // Drawing state
+  let isDrawing = false;
+  let hasDrawn = false;
+
+  // Get coordinates
+  function getCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.type.includes('touch') ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.type.includes('touch') ? e.touches[0].clientY : e.clientY) - rect.top;
+    return { x, y };
+  }
+
+  // Start drawing
+  function startDrawing(e) {
+    e.preventDefault();
+    isDrawing = true;
+    hasDrawn = true;
+    const { x, y } = getCoordinates(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+
+  // Draw
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const { x, y } = getCoordinates(e);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  }
+
+  // Stop drawing
+  function stopDrawing() {
+    if (isDrawing) {
+      isDrawing = false;
+      // Save signature as base64
+      signatureData.value = canvas.toDataURL('image/png');
+    }
+  }
+
+  // Mouse events
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseout', stopDrawing);
+
+  // Touch events
+  canvas.addEventListener('touchstart', startDrawing);
+  canvas.addEventListener('touchmove', draw);
+  canvas.addEventListener('touchend', stopDrawing);
+
+  // Clear button
+  clearBtn.addEventListener('click', function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    signatureData.value = '';
+    hasDrawn = false;
+  });
+
+  // Form submission
+  form.addEventListener('submit', function(e) {
+    if (!hasDrawn || !signatureData.value || signatureData.value === 'data:,') {
+      e.preventDefault();
+      alert('Please draw your signature before submitting');
+      return false;
+    }
+
+    const recipientName = document.getElementById('recipient_name').value.trim();
+    if (!recipientName) {
+      e.preventDefault();
+      alert('Please confirm your name');
+      return false;
+    }
+
+    // Disable button to prevent double submission
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    return true;
+  });
+});
+</script>
+{% endblock %}

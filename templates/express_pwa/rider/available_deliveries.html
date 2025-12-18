@@ -1,0 +1,517 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+{% load food_extras %}
+
+{% block title %}Available Deliveries - Express Rider{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .page-header {
+    background: white;
+    padding: 0;
+    margin: 1rem 0 1.5rem 0;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .filter-bar {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #1d4ed8;
+  }
+
+  .filter-group {
+    margin-bottom: 1rem;
+  }
+
+  .filter-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .filter-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .filter-select {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.938rem;
+    background: white;
+    transition: all 0.3s;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
+  }
+
+  .delivery-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+
+  .delivery-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 6px 20px rgba(29, 78, 216, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+  }
+
+  .tracking-number {
+    font-weight: 700;
+    color: #1d4ed8;
+    font-size: 0.875rem;
+  }
+
+  .urgency-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .urgency-urgent {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .urgency-express {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .urgency-standard {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-in_progress {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-delivered {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .route-section {
+    margin-bottom: 1rem;
+  }
+
+  .route-item {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .route-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+  }
+
+  .route-details {
+    flex: 1;
+  }
+
+  .route-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .route-address {
+    color: #1f2937;
+    font-size: 0.938rem;
+    line-height: 1.4;
+  }
+
+  .delivery-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 2px solid #f3f4f6;
+  }
+
+  .package-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .package-icon {
+    width: 28px;
+    height: 28px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1d4ed8;
+  }
+
+  .earnings {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #10b981;
+  }
+
+  .accept-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.75rem;
+  }
+
+  .accept-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #9ca3af;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="banner-container">
+    <div style="text-align: center;">
+      <h1 class="page-title">
+        <i class="fas fa-clipboard-list"></i>
+        My Assigned Orders
+      </h1>
+      <p class="page-subtitle">
+        {{ total_orders }} assigned order{{ total_orders|pluralize }} | {{ total_assigned }} total item{{ total_assigned|pluralize }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Filters -->
+  <div class="filter-bar">
+    <form method="get" id="filterForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="filter-group">
+          <label class="filter-label" for="status">Status</label>
+          <select name="status" id="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="">All Statuses</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if value == status_filter %}selected{% endif %}>
+              {{ label }}{% with status_info=status_counts|lookup:value %}{% if status_info %} ({{ status_info.count }}){% endif %}{% endwith %}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label" for="urgency">Urgency</label>
+          <select name="urgency" id="urgency" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="">All</option>
+            {% for value, label in urgency_choices %}
+            <option value="{{ value }}" {% if value == urgency_filter %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" for="package_type">Package Type</label>
+          <select name="package_type" id="package_type" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="">All</option>
+            {% for value, label in package_type_choices %}
+            <option value="{{ value }}" {% if value == package_type_filter %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      {% if status_counts %}
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <span style="font-size: 0.875rem; color: #6b7280; font-weight: 600;">Quick filters:</span>
+        {% for status_key, status_info in status_counts.items %}
+        <a href="?status={{ status_key }}" style="padding: 0.25rem 0.75rem; background: #f3f4f6; border-radius: 16px; text-decoration: none; font-size: 0.75rem; color: #374151; font-weight: 600;">
+          {{ status_info.label }} ({{ status_info.count }})
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+
+
+  <!-- Assigned Orders -->
+  {% if assigned_orders %}
+    <div style="margin: 0 1rem 1rem 1rem; padding: 1rem; background: #faf5ff; border-radius: 12px; border-left: 4px solid #7c3aed;">
+      <h3 style="font-weight: 700; color: #1f2937; margin: 0; font-size: 1rem;">
+        <i class="fas fa-clipboard-check" style="color: #7c3aed;"></i> My Assigned Orders ({{ assigned_orders|length }})
+      </h3>
+    </div>
+    {% for order in assigned_orders %}
+    <a href="{% url 'express_pwa:order_detail_rider' order.id %}" style="text-decoration: none; color: inherit;">
+      <div class="delivery-card" style="border-left: 4px solid #1d4ed8; cursor: pointer; transition: all 0.3s ease; hover: transform: translateY(-2px); hover: box-shadow: 0 8px 24px rgba(29, 78, 216, 0.15);">
+        <!-- Order Header -->
+        <div class="delivery-header">
+          <div>
+            <span class="tracking-number" style="color: #1d4ed8;">
+              <i class="fas fa-shopping-cart"></i> {{ order.order_number }}
+            </span>
+            <div style="margin-top: 0.5rem;">
+              <span class="status-badge" style="background: #dbeafe; color: #1e40af;">
+                <i class="fas fa-info-circle"></i> {{ order.get_status_display|upper }}
+              </span>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.875rem; color: #6b7280;">Total Earnings</div>
+            <div class="earnings">GHS {{ order.total_earnings|floatformat:2 }}</div>
+          </div>
+        </div>
+
+        <!-- Order Info Summary -->
+        <div style="background: #f8fafc; border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center;">
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Total Items</div>
+              <div style="font-weight: 600; color: #1f2937; font-size: 1.25rem;">{{ order.total_items }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Pending</div>
+              <div style="font-weight: 600; color: #f59e0b; font-size: 1.25rem;">{{ order.pending_items }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">In Progress</div>
+              <div style="font-weight: 600; color: #1d4ed8; font-size: 1.25rem;">{{ order.in_progress_items }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Delivered</div>
+              <div style="font-weight: 600; color: #10b981; font-size: 1.25rem;">{{ order.delivered_items }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Details -->
+        <div style="margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: #6b7280;">Sender</div>
+              <div style="font-weight: 600; color: #1f2937;">{{ order.sender.get_full_name|default:order.sender.username }}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.875rem; color: #6b7280;">Created</div>
+              <div style="font-weight: 600; color: #1f2937;">{{ order.created_at|date:"M d, Y" }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Actions -->
+        {% if order.pending_items > 0 %}
+        <div style="padding: 0.875rem; background: #f59e0b; color: white; border-radius: 12px; text-align: center; font-weight: 700; margin-top: 0.75rem;">
+          <i class="fas fa-clock"></i> {{ order.pending_items }} item{{ order.pending_items|pluralize }} ready for pickup
+        </div>
+        {% elif order.in_progress_items > 0 %}
+        <div style="padding: 0.875rem; background: #1d4ed8; color: white; border-radius: 12px; text-align: center; font-weight: 700; margin-top: 0.75rem;">
+          <i class="fas fa-truck"></i> {{ order.in_progress_items }} item{{ order.in_progress_items|pluralize }} in progress
+        </div>
+        {% elif order.delivered_items == order.total_items %}
+        <div style="padding: 0.875rem; background: #10b981; color: white; border-radius: 12px; text-align: center; font-weight: 700; margin-top: 0.75rem;">
+          <i class="fas fa-check-circle"></i> Order completed - all items delivered
+        </div>
+        {% endif %}
+
+        <!-- Click to View Items Indicator -->
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.813rem; color: #6b7280;">
+            <span>
+              <i class="fas fa-receipt"></i> {{ order.total_items }} item{{ order.total_items|pluralize }} assigned
+            </span>
+            <span>
+              <i class="fas fa-clock"></i> {{ order.created_at|timesince }} ago
+            </span>
+          </div>
+          <div style="text-align: center; margin-top: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 6px; font-size: 0.75rem; color: #6b7280;">
+            <i class="fas fa-mouse-pointer"></i> Tap to view items and manage deliveries
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Empty State -->
+  {% if not order_items %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-inbox"></i>
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">
+        No Orders Assigned
+      </h2>
+      <p style="color: #6b7280; margin-bottom: 1.5rem; line-height: 1.6;">
+        {% if urgency_filter or package_type_filter or status_filter %}
+          No assigned orders match your current filters. Try adjusting them to see all your orders.
+        {% else %}
+          You don't have any orders assigned to you yet. Contact the admin to get assigned to orders.
+        {% endif %}
+      </p>
+
+      {% if urgency_filter or package_type_filter %}
+      <a href="{% url 'express_pwa:rider_available_deliveries' %}"
+         style="display: inline-block; padding: 0.875rem 1.5rem; background: #1d4ed8; color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        <i class="fas fa-times"></i> Clear Filters
+      </a>
+      {% else %}
+      <a href="{% url 'express_pwa:rider_dashboard' %}"
+         style="display: inline-block; padding: 0.875rem 1.5rem; background: #1d4ed8; color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-tachometer-alt"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item active">
+    <i class="fas fa-search"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item">
+    <i class="fas fa-box"></i>
+    <span>Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-wallet"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,478 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Scan Prescription - Pharmacy PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .scanner-container {
+    padding: 1rem;
+    min-height: calc(100vh - 120px);
+  }
+
+  .camera-preview {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #1f2937;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  #video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #canvas {
+    display: none;
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #111827;
+  }
+
+  .camera-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .control-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: #8b5cf6;
+    color: white;
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+  }
+
+  .upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+  }
+
+  .upload-area:hover {
+    border-color: #8b5cf6;
+    background: #f0fdf4;
+  }
+
+  .upload-area.dragover {
+    border-color: #8b5cf6;
+    background: #d1fae5;
+  }
+
+  .prescription-form {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .guide-card {
+    background: #f0fdf4;
+    border: 1px solid #d1fae5;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .guide-card h3 {
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .guide-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .guide-card li {
+    padding-left: 1.5rem;
+    position: relative;
+    color: #065f46;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .guide-card li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #8b5cf6;
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; padding: 1rem; color: white;">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" style="color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+    <i class="fas fa-arrow-left"></i>
+    Back
+  </a>
+  <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Upload Prescription</h1>
+  <p style="opacity: 0.9; margin: 0.5rem 0 0 0; font-size: 0.875rem;">Take a photo or upload your prescription</p>
+</div>
+
+<div class="scanner-container">
+  <!-- Guide -->
+  <div class="guide-card">
+    <h3><i class="fas fa-lightbulb"></i> Tips for best results:</h3>
+    <ul>
+      <li>Ensure good lighting</li>
+      <li>Keep the prescription flat and steady</li>
+      <li>Capture all text clearly</li>
+      <li>Avoid shadows and glare</li>
+    </ul>
+  </div>
+
+  <!-- Camera Preview -->
+  <div class="camera-preview" id="cameraPreview" style="display: none;">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Captured Image Preview -->
+  <div class="camera-preview" id="imagePreview" style="display: none;">
+    <img id="capturedImage" class="preview-image" alt="Captured prescription">
+  </div>
+
+  <!-- Upload Area -->
+  <div class="upload-area" id="uploadArea">
+    <i class="fas fa-cloud-upload" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 1rem;"></i>
+    <p style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Drop prescription image here</p>
+    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">or</p>
+    <label for="fileInput" style="display: inline-block; padding: 0.75rem 1.5rem; background: #8b5cf6; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+      Choose File
+    </label>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+  </div>
+
+  <!-- Camera Controls -->
+  <div class="camera-controls" id="cameraControls">
+    <button class="control-btn btn-primary" id="startCameraBtn">
+      <i class="fas fa-camera"></i>
+      Open Camera
+    </button>
+  </div>
+
+  <div class="camera-controls" id="captureControls" style="display: none;">
+    <button class="control-btn btn-danger" id="stopCameraBtn">
+      <i class="fas fa-times"></i>
+      Cancel
+    </button>
+    <button class="control-btn btn-primary" id="captureBtn">
+      <i class="fas fa-camera"></i>
+      Capture
+    </button>
+  </div>
+
+  <div class="camera-controls" id="retakeControls" style="display: none;">
+    <button class="control-btn btn-secondary" id="retakeBtn">
+      <i class="fas fa-redo"></i>
+      Retake
+    </button>
+    <button class="control-btn btn-primary" id="usePhotoBtn">
+      <i class="fas fa-check"></i>
+      Use This Photo
+    </button>
+  </div>
+
+  <!-- Prescription Form -->
+  <form method="POST" enctype="multipart/form-data" id="prescriptionForm" style="display: none;">
+    {% csrf_token %}
+    <div class="prescription-form">
+      <h3 style="color: #1f2937; font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem;">Prescription Details</h3>
+      
+      <input type="hidden" name="prescription_image" id="prescriptionImageData">
+      
+      <div class="form-group">
+        <label for="patient_name">Patient Name *</label>
+        <input type="text" id="patient_name" name="patient_name" required placeholder="Enter patient name">
+      </div>
+
+      <div class="form-group">
+        <label for="doctor_name">Doctor's Name</label>
+        <input type="text" id="doctor_name" name="doctor_name" placeholder="Prescribing doctor">
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Additional Notes</label>
+        <textarea id="notes" name="notes" placeholder="Any special instructions or information..."></textarea>
+      </div>
+
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;">
+        <p style="color: #92400e; font-size: 0.75rem; margin: 0;">
+          <i class="fas fa-info-circle"></i> Your prescription will be reviewed by our pharmacist within 24 hours.
+        </p>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-paper-plane"></i> Submit Prescription
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const cameraPreview = document.getElementById('cameraPreview');
+  const imagePreview = document.getElementById('imagePreview');
+  const capturedImage = document.getElementById('capturedImage');
+  const prescriptionForm = document.getElementById('prescriptionForm');
+  const prescriptionImageData = document.getElementById('prescriptionImageData');
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput = document.getElementById('fileInput');
+
+  const startCameraBtn = document.getElementById('startCameraBtn');
+  const stopCameraBtn = document.getElementById('stopCameraBtn');
+  const captureBtn = document.getElementById('captureBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const usePhotoBtn = document.getElementById('usePhotoBtn');
+
+  const cameraControls = document.getElementById('cameraControls');
+  const captureControls = document.getElementById('captureControls');
+  const retakeControls = document.getElementById('retakeControls');
+
+  let stream = null;
+  let capturedImageData = null;
+
+  // Start Camera
+  startCameraBtn.addEventListener('click', async () => {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' },
+        audio: false 
+      });
+      video.srcObject = stream;
+      cameraPreview.style.display = 'block';
+      uploadArea.style.display = 'none';
+      cameraControls.style.display = 'none';
+      captureControls.style.display = 'flex';
+    } catch (err) {
+      alert('Unable to access camera: ' + err.message);
+    }
+  });
+
+  // Stop Camera
+  stopCameraBtn.addEventListener('click', () => {
+    stopCamera();
+    cameraPreview.style.display = 'none';
+    uploadArea.style.display = 'block';
+    cameraControls.style.display = 'flex';
+    captureControls.style.display = 'none';
+  });
+
+  // Capture Photo
+  captureBtn.addEventListener('click', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    
+    capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
+    capturedImage.src = capturedImageData;
+    
+    stopCamera();
+    cameraPreview.style.display = 'none';
+    imagePreview.style.display = 'block';
+    captureControls.style.display = 'none';
+    retakeControls.style.display = 'flex';
+  });
+
+  // Retake Photo
+  retakeBtn.addEventListener('click', () => {
+    imagePreview.style.display = 'none';
+    uploadArea.style.display = 'block';
+    retakeControls.style.display = 'none';
+    cameraControls.style.display = 'flex';
+    capturedImageData = null;
+  });
+
+  // Use Photo
+  usePhotoBtn.addEventListener('click', () => {
+    if (capturedImageData) {
+      prescriptionImageData.value = capturedImageData;
+      prescriptionForm.style.display = 'block';
+      retakeControls.style.display = 'none';
+      imagePreview.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  // File Upload
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        capturedImageData = e.target.result;
+        capturedImage.src = capturedImageData;
+        prescriptionImageData.value = capturedImageData;
+        
+        uploadArea.style.display = 'none';
+        imagePreview.style.display = 'block';
+        cameraControls.style.display = 'none';
+        retakeControls.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Drag and Drop
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+
+  uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+  });
+
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        capturedImageData = e.target.result;
+        capturedImage.src = capturedImageData;
+        prescriptionImageData.value = capturedImageData;
+        
+        uploadArea.style.display = 'none';
+        imagePreview.style.display = 'block';
+        cameraControls.style.display = 'none';
+        retakeControls.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Helper function to stop camera
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+  }
+
+  // Form submission
+  document.getElementById('prescriptionForm').addEventListener('submit', (e) => {
+    const submitBtn = e.target.querySelector('.submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+  });
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', stopCamera);
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:medicine_list' %}" class="bottom-nav-item">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:cart' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% load content_type_tags %}
+{% block title %}{{ restaurant.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Back Button -->
+<section style="position: relative; background: #f97316; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <a href="{% url 'food:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.75rem 1.5rem; border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 0.9375rem; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; margin-bottom: 1.5rem;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'; this.style.transform='translateX(-5px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.transform='translateX(0)'">
+      <i class="fas fa-arrow-left"></i>Back to Restaurants
+    </a>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section style="padding: 3rem 0; background: #f97316; margin-top: -2rem; position: relative; z-index: 10;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column - Restaurant Info -->
+      <div class="col-lg-8">
+        <!-- Header Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
+          <div class="row g-4">
+            <div class="col-md-5">
+              {% if restaurant.image or restaurant.logo %}
+              <div style="background: #f9fafb; border-radius: 1.25rem; overflow: hidden; height: 350px; border: 2px solid #fde68a; position: relative;">
+                {% if restaurant.image %}
+                <img src="{{ restaurant.get_image_url }}" alt="{{ restaurant.name }} banner" style="width: 100%; height: 100%; object-fit: cover;" onerror="console.error('Failed to load banner image:', this.src); this.style.display='none'; this.parentElement.style.background='#fef3c7'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; var icon=document.createElement('i'); icon.className='fas fa-utensils'; icon.style.cssText='font-size: 6rem; color: #f97316; opacity: 0.3;'; this.parentElement.appendChild(icon);">
+                {% elif restaurant.logo %}
+                <img src="{{ restaurant.get_logo_url }}" alt="{{ restaurant.name }} banner" style="width: 100%; height: 100%; object-fit: cover;" onerror="console.error('Failed to load logo as banner:', this.src); this.style.display='none'; this.parentElement.style.background='#fef3c7'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; var icon=document.createElement('i'); icon.className='fas fa-utensils'; icon.style.cssText='font-size: 6rem; color: #f97316; opacity: 0.3;'; this.parentElement.appendChild(icon);">
+                {% endif %}
+                <div style="position: absolute; inset: 0; background: #f97316 100%);"></div>
+                {% if restaurant.logo and restaurant.image %}
+                <div style="position: absolute; bottom: 1.5rem; left: 1.5rem;">
+                  <img src="{{ restaurant.get_logo_url }}" alt="{{ restaurant.name }} logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" onerror="console.error('Failed to load logo:', this.src); this.style.display='none';">
+                </div>
+                {% endif %}
+              </div>
+              {% else %}
+              <div style="height: 350px; background: #fef3c7; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; position: relative;">
+                <i class="fas fa-utensils" style="font-size: 6rem; color: #f97316; opacity: 0.3;"></i>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-7">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <span style="background: #fef3c7; color: #92400e; padding: 0.5rem 1.125rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; border: 2px solid #fcd34d;">{{ restaurant.cuisine_type }}</span>
+                {% if restaurant.avg_rating %}
+                <span style="display: flex; align-items: center; gap: 0.5rem; background: #fef3c7; padding: 0.5rem 1.125rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; color: #92400e; border: 2px solid #fcd34d;">
+                  <i class="fas fa-star" style="color: #f97316;"></i>{{ restaurant.avg_rating|floatformat:1 }}
+                </span>
+                {% endif %}
+              </div>
+
+              <h1 style="font-size: 2.25rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem; line-height: 1.2;">{{ restaurant.name }}</h1>
+
+              <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 2rem;">
+                <i class="fas fa-map-marker-alt" style="color: #f97316; font-size: 1.125rem;"></i>
+                <p style="margin: 0; color: #6b7280; font-size: 1.0625rem; font-weight: 600;">{{ restaurant.address }}, {{ restaurant.city }}</p>
+              </div>
+
+              <div style="background: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fde68a; margin-bottom: 1.5rem;">
+                <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.625rem;">
+                  <i class="fas fa-info-circle" style="color: #f97316;"></i>About
+                </h5>
+                <p style="color: #4b5563; line-height: 1.7; margin: 0;">{{ restaurant.description }}</p>
+              </div>
+
+              <div style="background: #fef3c7; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fcd34d;">
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 0.625rem;">
+                    <div style="width: 45px; height: 45px; background: #fde68a; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-shipping-fast" style="color: #92400e; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                      <p style="margin: 0; color: #1f2937; font-size: 0.875rem; font-weight: 700;">Fast Delivery</p>
+                      <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">30-45 minutes</p>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.625rem;">
+                    <div style="width: 45px; height: 45px; background: #d1fae5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-utensils" style="color: #065f46; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                      <p style="margin: 0; color: #1f2937; font-size: 0.875rem; font-weight: 700;">Fresh Food</p>
+                      <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">Quality guaranteed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu Section -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+          <h3 style="font-size: 1.875rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-book-open" style="color: #f97316;"></i>Menu
+          </h3>
+
+          {% if menu_items %}
+          <div class="row g-3">
+            {% for item in menu_items %}
+            <div class="col-md-6">
+              <div style="background: #f9fafb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #f3f4f6; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#fde68a'; this.style.boxShadow='0 8px 20px rgba(245, 158, 11, 0.15)'" onmouseout="this.style.borderColor='#f3f4f6'; this.style.boxShadow='none'">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                  <h5 style="font-size: 1.0625rem; font-weight: 800; color: #1f2937; margin: 0;">{{ item.name }}</h5>
+                  <span style="font-size: 1.375rem; font-weight: 800; color: #f97316; white-space: nowrap; margin-left: 1rem;">GHS {{ item.price }}</span>
+                </div>
+                <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1rem;">{{ item.description|truncatewords:15 }}</p>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  {% if item.is_vegetarian %}
+                  <span style="background: #d1fae5; color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; border: 1px solid #6ee7b7;">
+                    <i class="fas fa-leaf"></i> Vegetarian
+                  </span>
+                  {% else %}
+                  <span></span>
+                  {% endif %}
+                  {% if user.is_authenticated %}
+                  <form action="{% url 'food:add_to_cart' %}" method="post" class="add-to-cart-form" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" style="background: #f97316; color: white; padding: 0.5rem 1rem; border-radius: 0.625rem; font-weight: 600; font-size: 0.8125rem; border: none; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                      <i class="fas fa-plus"></i> Add
+                    </button>
+                  </form>
+                  {% else %}
+                  <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="background: #f97316; color: white; padding: 0.5rem 1rem; border-radius: 0.625rem; font-weight: 600; font-size: 0.8125rem; border: none; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                    <i class="fas fa-plus"></i> Add
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div style="background: #f9fafb; border-radius: 1rem; padding: 3rem 2rem; text-align: center; border: 2px solid #f3f4f6;">
+            <div style="width: 80px; height: 80px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+              <i class="fas fa-book-open" style="font-size: 2.5rem; color: #f97316; opacity: 0.5;"></i>
+            </div>
+            <h5 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 0.75rem;">Menu Coming Soon</h5>
+            <p style="color: #6b7280; font-size: 0.9375rem;">Check back later for delicious menu items</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Column - Quick Info -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <!-- Contact Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-phone" style="color: #f97316;"></i>Contact
+            </h4>
+
+            {% if restaurant.phone %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
+              <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-phone-alt" style="color: #f97316; font-size: 1rem;"></i>
+              </div>
+              <div>
+                <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">Phone</p>
+                <p style="margin: 0; color: #1f2937; font-size: 0.9375rem; font-weight: 700;">{{ restaurant.phone }}</p>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if restaurant.email %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
+              <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-envelope" style="color: #3b82f6; font-size: 1rem;"></i>
+              </div>
+              <div style="overflow: hidden;">
+                <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">Email</p>
+                <p style="margin: 0; color: #1f2937; font-size: 0.9375rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ restaurant.email }}</p>
+              </div>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <a href="tel:{{ restaurant.phone }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #f97316; color: white; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-phone-alt"></i>Call Now
+              </a>
+
+              {% if user.is_authenticated and user != restaurant.owner %}
+              <button onclick="document.getElementById('messageModal').style.display='flex'" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-comment"></i>Send Message
+              </button>
+              {% elif not user.is_authenticated %}
+              <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #3b82f6; color: white; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-comment"></i>Send Message
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Hours Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-clock" style="color: #f97316;"></i>Hours
+            </h4>
+
+            {% if restaurant.opening_hours %}
+            <div style="background: #fef3c7; padding: 1.25rem; border-radius: 0.875rem; border: 2px solid #fcd34d; text-align: center;">
+              <p style="margin: 0; color: #92400e; font-size: 0.9375rem; font-weight: 700; line-height: 1.6;">{{ restaurant.opening_hours }}</p>
+            </div>
+            {% else %}
+            <div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.875rem; border: 2px solid #e5e7eb; text-align: center;">
+              <p style="margin: 0; color: #6b7280; font-size: 0.9375rem; font-weight: 600;">Hours not specified</p>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Features Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-certificate" style="color: #f97316;"></i>Features
+            </h4>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #d1fae5; border-radius: 0.75rem; border: 1px solid #6ee7b7;">
+                <i class="fas fa-check-circle" style="color: #059669; font-size: 1.25rem;"></i>
+                <span style="color: #065f46; font-weight: 700; font-size: 0.875rem;">Quality Ingredients</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #fef3c7; border-radius: 0.75rem; border: 1px solid #fcd34d;">
+                <i class="fas fa-shipping-fast" style="color: #f97316; font-size: 1.25rem;"></i>
+                <span style="color: #92400e; font-weight: 700; font-size: 0.875rem;">Fast Delivery</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; background: #dbeafe; border-radius: 0.75rem; border: 1px solid #93c5fd;">
+                <i class="fas fa-shield-alt" style="color: #3b82f6; font-size: 1.25rem;"></i>
+                <span style="color: #1e40af; font-weight: 700; font-size: 0.875rem;">Food Safety Certified</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Message Modal -->
+{% if user.is_authenticated and user != restaurant.owner %}
+<div id="messageModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+  <div style="background: white; border-radius: 1.5rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlide 0.3s ease-out;">
+    <div style="padding: 2rem; border-bottom: 2px solid #f3f4f6;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #1f2937; margin: 0;">
+          <i class="fas fa-comment" style="color: #3b82f6;"></i> Send Message
+        </h3>
+        <button onclick="document.getElementById('messageModal').style.display='none'" style="width: 35px; height: 35px; border-radius: 50%; background: #f3f4f6; border: none; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <form method="post" action="{% url 'messaging:send' %}" style="padding: 2rem;">
+      {% csrf_token %}
+      <input type="hidden" name="app_type" value="food">
+      <input type="hidden" name="content_type_id" value="{{ restaurant|get_content_type_id }}">
+      <input type="hidden" name="object_id" value="{{ restaurant.id }}">
+      <input type="hidden" name="receiver_id" value="{{ restaurant.owner.id }}">
+      <input type="hidden" name="next" value="{{ request.path }}">
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: #374151; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+          To: {{ restaurant.owner.get_full_name|default:restaurant.owner.username }}
+        </label>
+        <div style="background: #f9fafb; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+          <div style="color: #6b7280; font-size: 0.875rem;">Regarding: <strong style="color: #1f2937;">{{ restaurant.name }}</strong></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: #374151; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+          Your Message
+        </label>
+        <textarea name="message" rows="5" required placeholder="Type your message here..." style="width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; font-family: inherit; resize: vertical; transition: all 0.3s ease;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" onclick="document.getElementById('messageModal').style.display='none'" style="flex: 1; padding: 1rem; background: #f3f4f6; color: #6b7280; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+          Cancel
+        </button>
+        <button type="submit" style="flex: 1; padding: 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(59, 130, 246, 0.3)'">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+@keyframes modalSlide {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle add to cart forms with AJAX
+    const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+
+    addToCartForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const button = form.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            // Get form data
+            const formData = new FormData(form);
+
+            // Send AJAX request
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Show success feedback
+                    button.innerHTML = '<i class="fas fa-check"></i> Added!';
+                    button.style.background = '#10b981';
+
+                    // Show success message
+                    showToast('Item added to cart successfully!', 'success');
+
+                    // Update cart count if exists
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount && data.cart_count) {
+                        cartCount.textContent = data.cart_count;
+                    }
+
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '#f97316';
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    // Show error
+                    showToast(data.message || 'Failed to add item to cart', 'error');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred. Please try again.', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        });
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+});
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

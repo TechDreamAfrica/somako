@@ -1,0 +1,428 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Track Ride - Soma Ko Ride{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block ride_active %}active{% endblock %}
+
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+    text-align: center;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin: 0 auto 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 2rem 1rem;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 3.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    z-index: 2;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 23px;
+    top: 48px;
+    bottom: -32px;
+    width: 2px;
+    background: #e5e7eb;
+  }
+
+  .timeline-item.completed .timeline-icon {
+    background: #eab308;
+    color: white;
+  }
+
+  .timeline-item.active .timeline-icon {
+    background: #eab308;
+    color: white;
+    animation: pulse 2s infinite;
+  }
+
+  .timeline-item.pending .timeline-icon {
+    background: #f3f4f6;
+    color: #9ca3af;
+  }
+
+  .timeline-item.completed .timeline-line {
+    background: #10b981;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(234, 88, 12, 0);
+    }
+  }
+
+  /* Map Styles */
+  .leaflet-container {
+    font-family: inherit;
+    z-index: 1;
+  }
+
+  #trackingMap {
+    height: 300px;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Custom marker styles */
+  .custom-pickup-marker, .custom-destination-marker {
+    background: transparent;
+    border: none;
+  }
+
+  .marker-pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .pickup-pin {
+    color: #10b981; /* Green for pickup */
+  }
+
+  .destination-pin {
+    color: #ef4444; /* Red for destination */
+  }
+
+  .marker-pin::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-route" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-car" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Ride #{{ ride.ride_id }}</h1>
+    <p class="hero-subtitle">Track your ride status</p>
+  </div>
+</div>
+
+<div class="timeline">
+  {% for stage in stages %}
+  <div class="timeline-item {% if stage.status == ride.status %}active{% elif 'CANCELLED' in ride.status %}pending{% else %}pending{% endif %}">
+    <div class="timeline-icon">
+      <i class="fas {{ stage.icon }}"></i>
+    </div>
+    {% if not forloop.last %}
+    <div class="timeline-line"></div>
+    {% endif %}
+    <div>
+      <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">{{ stage.label }}</h3>
+      <p style="color: #6b7280; font-size: 0.875rem;">
+        {% if stage.status == ride.status %}
+          {% if ride.status == 'REQUESTED' %}
+            Finding a driver for you...
+          {% elif ride.status == 'ACCEPTED' %}
+            Driver is on the way to pick you up
+          {% elif ride.status == 'DRIVER_ARRIVED' %}
+            Driver has arrived at pickup location
+          {% elif ride.status == 'IN_PROGRESS' %}
+            You're on your way to destination
+          {% elif ride.status == 'COMPLETED' %}
+            Ride completed successfully!
+          {% endif %}
+        {% elif 'CANCELLED' in ride.status %}
+          Ride was cancelled
+        {% else %}
+          Pending
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Live Tracking Map -->
+<div style="padding: 0 1rem; margin-bottom: 1rem;">
+  <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+      <i class="fas fa-map-marked-alt" style="color: #eab308; font-size: 1.25rem;"></i>
+      <h2 style="font-weight: 700; color: #1f2937; margin: 0;">Route Map</h2>
+    </div>
+    
+    <div id="trackingMap"></div>
+  </div>
+</div>
+
+<!-- Ride Info Card -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+    <h2 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Ride Information</h2>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+      <span style="color: #6b7280;">Pickup</span>
+      <span style="font-weight: 600; color: #1f2937; text-align: right;">{{ ride.pickup_address|truncatewords:5 }}</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+      <span style="color: #6b7280;">Dropoff</span>
+      <span style="font-weight: 600; color: #1f2937; text-align: right;">{{ ride.dropoff_address|truncatewords:5 }}</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+      <span style="color: #6b7280;">Requested At</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.requested_at|date:"h:i A" }}</span>
+    </div>
+
+    {% if ride.driver %}
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+      <span style="color: #6b7280;">Driver</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.driver.user.get_full_name }}</span>
+    </div>
+    {% endif %}
+
+    <div style="display: flex; justify-content: space-between;">
+      <span style="color: #6b7280;">Fare</span>
+      <span style="font-weight: 700; color: #eab308; font-size: 1.125rem;">GHS {{ ride.total_fare|floatformat:2 }}</span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="margin-top: 1.5rem; display: grid; gap: 0.75rem;">
+    <button onclick="window.location.href='{% url 'ride_pwa:ride_detail' ride.id %}'" style="width: 100%; background: #eab308; color: white; border: none; border-radius: 12px; padding: 1rem; font-weight: 700;">
+      <i class="fas fa-receipt"></i> View Ride Details
+    </button>
+
+    {% if ride.can_be_cancelled %}
+    <button onclick="if(confirm('Cancel this ride?')) window.location.href='{% url 'ride_pwa:cancel_ride' ride.id %}'" style="width: 100%; background: white; color: #ef4444; border: 2px solid #ef4444; border-radius: 12px; padding: 1rem; font-weight: 700;">
+      <i class="fas fa-times-circle"></i> Cancel Ride
+    </button>
+    {% endif %}
+
+    {% if ride.driver %}
+    <button onclick="window.location.href='tel:{{ ride.driver.user.phone_number }}'" style="width: 100%; background: white; color: #10b981; border: 2px solid #10b981; border-radius: 12px; padding: 1rem; font-weight: 700;">
+      <i class="fas fa-phone"></i> Call Driver
+    </button>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'ride_pwa:book_ride' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Book</span>
+  </a>
+  <a href="{% url 'ride_pwa:ride_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Rides</span>
+  </a>
+  <a href="{% url 'ride_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if Leaflet is loaded and if we have coordinates
+  if (typeof L === 'undefined') {
+    console.error('Leaflet library failed to load');
+    document.getElementById('trackingMap').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100px; color: #ef4444;"><p><i class="fas fa-exclamation-triangle"></i> Map failed to load.</p></div>';
+    return;
+  }
+
+  // Get ride coordinates from Django template
+  const pickupLat = {{ ride.pickup_latitude|default:"null" }};
+  const pickupLng = {{ ride.pickup_longitude|default:"null" }};
+  const dropoffLat = {{ ride.dropoff_latitude|default:"null" }};
+  const dropoffLng = {{ ride.dropoff_longitude|default:"null" }};
+
+  // Check if we have valid coordinates
+  if (!pickupLat || !pickupLng || !dropoffLat || !dropoffLng) {
+    document.getElementById('trackingMap').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100px; color: #6b7280;"><p><i class="fas fa-info-circle"></i> No location data available</p></div>';
+    return;
+  }
+
+  try {
+    // Initialize map centered between pickup and dropoff
+    const centerLat = (pickupLat + dropoffLat) / 2;
+    const centerLng = (pickupLng + dropoffLng) / 2;
+    const map = L.map('trackingMap').setView([centerLat, centerLng], 13);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Custom marker icons
+    const pickupIcon = L.divIcon({
+      className: 'custom-pickup-marker',
+      html: '<div class="marker-pin pickup-pin"><i class="fas fa-map-marker-alt"></i></div>',
+      iconSize: [30, 42],
+      iconAnchor: [15, 42],
+      popupAnchor: [0, -42]
+    });
+
+    const destinationIcon = L.divIcon({
+      className: 'custom-destination-marker',
+      html: '<div class="marker-pin destination-pin"><i class="fas fa-map-marker-alt"></i></div>',
+      iconSize: [30, 42],
+      iconAnchor: [15, 42],
+      popupAnchor: [0, -42]
+    });
+
+    // Add pickup marker
+    const pickupMarker = L.marker([pickupLat, pickupLng], {icon: pickupIcon})
+      .addTo(map)
+      .bindPopup(`
+        <div style="text-align: center; min-width: 200px;">
+          <div style="font-weight: 700; color: #10b981; margin-bottom: 0.5rem; font-size: 1rem;">
+            <i class="fas fa-map-marker-alt"></i> Pickup Location
+          </div>
+          <div style="color: #6b7280; font-size: 0.875rem;">
+            {{ ride.pickup_address|truncatewords:8 }}
+          </div>
+        </div>
+      `);
+
+    // Add destination marker
+    const destinationMarker = L.marker([dropoffLat, dropoffLng], {icon: destinationIcon})
+      .addTo(map)
+      .bindPopup(`
+        <div style="text-align: center; min-width: 200px;">
+          <div style="font-weight: 700; color: #ef4444; margin-bottom: 0.5rem; font-size: 1rem;">
+            <i class="fas fa-map-marker-alt"></i> Destination
+          </div>
+          <div style="color: #6b7280; font-size: 0.875rem;">
+            {{ ride.dropoff_address|truncatewords:8 }}
+          </div>
+        </div>
+      `);
+
+    // Draw route line
+    const routeLine = L.polyline([[pickupLat, pickupLng], [dropoffLat, dropoffLng]], {
+      color: '#eab308',
+      weight: 4,
+      opacity: 0.8,
+      dashArray: '10, 10'
+    }).addTo(map);
+
+    // Fit bounds to show both markers
+    const bounds = L.latLngBounds([[pickupLat, pickupLng], [dropoffLat, dropoffLng]]);
+    map.fitBounds(bounds, {padding: [20, 20]});
+
+    // Force map to render properly
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 100);
+
+  } catch (error) {
+    console.error('Map initialization error:', error);
+    document.getElementById('trackingMap').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100px; color: #ef4444; text-align: center;"><p><i class="fas fa-exclamation-triangle"></i><br>Unable to load map</p></div>';
+  }
+});
+</script>
+{% endblock %}

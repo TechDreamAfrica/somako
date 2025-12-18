@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}Order Success - Soma Ko Food{% endblock %}
+
+{% block content %}
+<style>
+@keyframes checkmarkAnimation {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.success-icon {
+  animation: checkmarkAnimation 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.fade-in-up-delay-1 { animation-delay: 0.2s; }
+.fade-in-up-delay-2 { animation-delay: 0.4s; }
+.fade-in-up-delay-3 { animation-delay: 0.6s; }
+</style>
+
+<!-- Success Hero Section -->
+<section style="position: relative; background: #f97316; padding: 4rem 0; text-align: center; overflow: hidden;">
+  <!-- Background Pattern -->
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="success-icon" style="background: white; border-radius: 50%; width: 140px; height: 140px; margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); border: 6px solid rgba(255, 255, 255, 0.2);">
+      <i class="fas fa-check-circle" style="font-size: 5rem; color: #10b981;"></i>
+    </div>
+    <h1 class="fade-in-up" style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; color: white; margin-bottom: 1rem; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); letter-spacing: -1px;">Order Placed Successfully!</h1>
+    <p class="fade-in-up fade-in-up-delay-1" style="font-size: 1.25rem; color: rgba(255, 255, 255, 0.95); margin-bottom: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">Your delicious meal is on its way</p>
+
+    <!-- Order Number Badge -->
+    <div class="fade-in-up fade-in-up-delay-2" style="display: inline-block; background: white; color: #059669; padding: 1rem 2rem; border-radius: 1rem; font-size: 1.125rem; font-weight: 800; margin-top: 1rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+      Order #{{ order.order_number }}
+    </div>
+  </div>
+</section>
+
+<!-- Order Details Section -->
+<section style="padding: 3rem 0; background: #f97316;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Order Summary Card -->
+        <div class="fade-in-up fade-in-up-delay-3" style="background: #ffffff; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); margin-bottom: 2rem; border: 2px solid #e5e7eb;">
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-block; background: #d1fae5; color: #065f46; padding: 0.75rem 2rem; border-radius: 50px; font-size: 0.875rem; font-weight: 800; border: 2px solid #6ee7b7; margin-bottom: 1.5rem;">
+              <i class="fas fa-check-double" style="margin-right: 0.5rem;"></i>ORDER CONFIRMED
+            </div>
+            <h2 style="font-size: 2rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem;">Thank You!</h2>
+            <p style="color: #6b7280; font-size: 1.0625rem;">We've received your order and are getting it ready</p>
+          </div>
+
+          <!-- Order Details Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; padding: 2rem; background: white; border-radius: 1rem; border: 2px solid #f3f4f6;">
+            <div style="text-align: center;">
+              <div style="background: #dbeafe; width: 50px; height: 50px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                <i class="fas fa-store" style="color: #3b82f6; font-size: 1.25rem;"></i>
+              </div>
+              <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">Restaurant</div>
+              <div style="font-weight: 800; color: #1f2937; font-size: 1rem;">{{ order.restaurant.name }}</div>
+            </div>
+
+            <div style="text-align: center;">
+              <div style="background: #fef3c7; width: 50px; height: 50px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                <i class="fas fa-clock" style="color: #f97316; font-size: 1.25rem;"></i>
+              </div>
+              <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">Estimated Time</div>
+              <div style="font-weight: 800; color: #1f2937; font-size: 1rem;">{{ order.restaurant.estimated_delivery_time }} mins</div>
+            </div>
+
+            <div style="text-align: center;">
+              <div style="background: #d1fae5; width: 50px; height: 50px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                <i class="fas fa-money-bill-wave" style="color: #10b981; font-size: 1.25rem;"></i>
+              </div>
+              <div style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">Total Amount</div>
+              <div style="font-weight: 900; color: #10b981; font-size: 1.25rem;">GHS {{ order.total_amount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- What's Next Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; border: 2px solid #f3f4f6;">
+          <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 2rem;">
+            <i class="fas fa-info-circle" style="color: #f97316; margin-right: 0.5rem;"></i>What's Next?
+          </h3>
+
+          <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #f3f4f6;">
+            <div style="width: 50px; height: 50px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-receipt" style="color: #f97316; font-size: 1.25rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.125rem;">Order Confirmation</h4>
+              <p style="color: #6b7280; margin: 0; font-size: 0.9375rem;">You'll receive a confirmation notification shortly</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid #f3f4f6;">
+            <div style="width: 50px; height: 50px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-utensils" style="color: #f97316; font-size: 1.25rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.125rem;">Preparation</h4>
+              <p style="color: #6b7280; margin: 0; font-size: 0.9375rem;">{{ order.restaurant.name }} will start preparing your meal</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.5rem;">
+            <div style="width: 50px; height: 50px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-truck" style="color: #f97316; font-size: 1.25rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.125rem;">Delivery</h4>
+              <p style="color: #6b7280; margin: 0; font-size: 0.9375rem;">Your order will be delivered to {{ order.delivery_address }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <a href="{% url 'food:track_order' order.order_number %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1.25rem; background: #10b981; color: white; border-radius: 1rem; font-weight: 700; font-size: 1.0625rem; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 30px rgba(16, 185, 129, 0.4)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.3)'; this.style.borderColor='transparent'">
+            <i class="fas fa-map-marker-alt"></i>Track Order
+          </a>
+          <a href="{% url 'food:order_detail' order.order_number %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1.25rem; background: #3b82f6; color: white; border-radius: 1rem; font-weight: 700; font-size: 1.0625rem; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3); border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 30px rgba(59, 130, 246, 0.4)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.3)'; this.style.borderColor='transparent'">
+            <i class="fas fa-receipt"></i>View Details
+          </a>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="{% url 'food:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 1rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#d1d5db'; this.style.color='#1f2937'" onmouseout="this.style.background='white'; this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+            <i class="fas fa-store"></i>Order More Food
+          </a>
+        </div>
+
+        <!-- Contact Support -->
+        <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: #f9fafb; border-radius: 1rem; border: 2px solid #e5e7eb;">
+          <h4 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">Need Help?</h4>
+          <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.9375rem;">Our customer support team is here to assist you</p>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="tel:+233000000000" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #059669; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#047857'" onmouseout="this.style.color='#059669'">
+              <i class="fas fa-phone"></i>Call Support
+            </a>
+            <a href="mailto:support@somako.com" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #059669; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.color='#047857'" onmouseout="this.style.color='#059669'">
+              <i class="fas fa-envelope"></i>Email Us
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Confetti effect (optional enhancement)
+window.addEventListener('load', function() {
+  // Scroll to top smoothly
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+{% endblock %}

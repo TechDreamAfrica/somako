@@ -1,0 +1,203 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Manage Menu - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .add-btn {
+    position: fixed !important;
+    bottom: calc(5rem + 1rem) !important;
+    right: 1.5rem !important;
+    width: 60px !important;
+    height: 60px !important;
+    background: #f97316 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5), 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    color: white !important;
+    text-decoration: none !important;
+    z-index: 1000 !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+  }
+
+  .add-btn i {
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+  }
+
+  .add-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 8px 28px rgba(234, 88, 12, 0.6), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .add-btn:active {
+    transform: scale(0.95) !important;
+  }
+
+  .menu-item-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 1rem;
+  }
+
+  .menu-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .menu-info {
+    flex: 1;
+  }
+
+  .availability-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .available {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .unavailable {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .action-btn {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 1.125rem;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+    color: #f97316;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <h1 style="font-size: 1.875rem; font-weight: 800; margin: 1.5rem 0; color: #1f2937;">
+    <i class="fas fa-utensils"></i> Manage Menu
+  </h1>
+
+  <!-- Category Filter -->
+  {% if categories %}
+  <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding: 1rem 0; -webkit-overflow-scrolling: touch; margin-bottom: 1rem;">
+    <a href="?" style="flex-shrink: 0; padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid {% if not category_filter %}#f97316{% else %}#e5e7eb{% endif %}; background: {% if not category_filter %}#f97316{% else %}white{% endif %}; color: {% if not category_filter %}white{% else %}#6b7280{% endif %}; font-weight: 600; font-size: 0.875rem; text-decoration: none;">
+      All Items
+    </a>
+    {% for cat in categories %}
+    <a href="?category={{ cat }}" style="flex-shrink: 0; padding: 0.5rem 1rem; border-radius: 20px; border: 2px solid {% if category_filter == cat %}#f97316{% else %}#e5e7eb{% endif %}; background: {% if category_filter == cat %}#f97316{% else %}white{% endif %}; color: {% if category_filter == cat %}white{% else %}#6b7280{% endif %}; font-weight: 600; font-size: 0.875rem; text-decoration: none;">
+      {{ cat }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Menu Items -->
+  {% if menu_items %}
+    {% for item in menu_items %}
+    <div class="menu-item-card">
+      {% if item.image %}
+      <img src="{{ item.get_image_url }}" alt="{{ item.name }}" class="menu-img">
+      {% else %}
+      <div class="menu-img" style="background: #f97316; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-utensils" style="color: #dc2626; font-size: 1.5rem;"></i>
+      </div>
+      {% endif %}
+
+      <div class="menu-info">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+          <div>
+            <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+              {{ item.name }}
+            </div>
+            <div style="font-size: 0.875rem; color: #6b7280;">
+              {{ item.category }}
+            </div>
+          </div>
+          <span class="availability-badge {% if item.is_available %}available{% else %}unavailable{% endif %}">
+            {% if item.is_available %}Available{% else %}Unavailable{% endif %}
+          </span>
+        </div>
+
+        <div style="font-weight: 700; color: #f97316; font-size: 1.125rem; margin-bottom: 0.75rem;">
+          GHS {{ item.base_price|floatformat:2 }}
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <a href="{% url 'food_pwa:edit_menu_item' item.id %}" style="padding: 0.5rem 1rem; background: #f3f4f6; color: #6b7280; border-radius: 8px; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+            <i class="fas fa-eye"></i> View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1.5rem; background: white; border-radius: 20px; margin-top: 2rem;">
+      <div style="width: 80px; height: 80px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="fas fa-utensils" style="font-size: 2rem; color: #dc2626;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">No Menu Items</h3>
+      <p style="color: #6b7280; margin: 0 0 1.5rem 0; font-size: 0.875rem;">
+        Add your first menu item to get started
+      </p>
+      <a href="{% url 'food_pwa:add_menu_item' %}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #f97316; color: white; border-radius: 12px; font-weight: 600; text-decoration: none;">
+        <i class="fas fa-plus"></i> Add Menu Item
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item active">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

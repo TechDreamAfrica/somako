@@ -1,0 +1,249 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Complete Ride - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+
+{% block extra_css %}
+<style>
+  .completion-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .completion-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .completion-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: #eab308;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .completion-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .completion-message {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .ride-summary {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .summary-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .summary-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .summary-value {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .fare-value {
+    color: #eab308;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .btn-complete {
+    width: 100%;
+    padding: 1rem;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-complete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-back {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1rem;
+    background: white;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .btn-back:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+
+  .driver-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .driver-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+
+  .driver-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .driver-details {
+    flex: 1;
+    text-align: left;
+  }
+
+  .driver-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .driver-vehicle {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="completion-container">
+  <div class="completion-card">
+    <div class="completion-icon">
+      <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    </div>
+
+    <h1 class="completion-title">Confirm Ride Completion</h1>
+    <p class="completion-message">
+      Your driver has marked this ride as complete. Please confirm that you have safely arrived at your destination.
+    </p>
+
+    <!-- Driver Info -->
+    <div class="driver-info">
+      <div class="driver-avatar">
+        {% if ride.driver.profile_photo %}
+          <img src="{{ ride.driver.profile_photo.url }}" alt="{{ ride.driver.user.get_full_name }}">
+        {% else %}
+          {{ ride.driver.user.first_name|first }}{{ ride.driver.user.last_name|first }}
+        {% endif %}
+      </div>
+      <div class="driver-details">
+        <div class="driver-name">{{ ride.driver.user.get_full_name }}</div>
+        <div class="driver-vehicle">
+          {% if ride.vehicle %}
+            {{ ride.vehicle.make }} {{ ride.vehicle.model }} • {{ ride.vehicle.plate_number }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Ride Summary -->
+    <div class="ride-summary">
+      <div class="summary-row">
+        <span class="summary-label">Ride ID</span>
+        <span class="summary-value">#{{ ride.ride_id }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">From</span>
+        <span class="summary-value">{{ ride.pickup_address|truncatewords:5 }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">To</span>
+        <span class="summary-value">{{ ride.dropoff_address|truncatewords:5 }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Distance</span>
+        <span class="summary-value">
+          {% if ride.actual_distance_km %}
+            {{ ride.actual_distance_km }} km
+          {% else %}
+            {{ ride.estimated_distance_km }} km (est.)
+          {% endif %}
+        </span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Total Fare</span>
+        <span class="fare-value">GHS {{ ride.total_fare|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <!-- Completion Form -->
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-complete">
+        ✓ Confirm Completion
+      </button>
+    </form>
+
+    <a href="{% url 'ride_pwa:ride_detail' ride.id %}" class="btn-back">
+      View Ride Details
+    </a>
+  </div>
+</div>
+{% endblock %}

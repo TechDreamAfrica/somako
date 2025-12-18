@@ -1,0 +1,554 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Rider Profile - Express{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f8fafc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .hero-header {
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    padding: 2rem 1rem 2.5rem;
+    color: white;
+    border-radius: 0 0 32px 32px;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(180deg); }
+  }
+
+  .profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.9);
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+
+  .profile-photo:hover {
+    transform: scale(1.05);
+  }
+
+  .profile-default {
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .profile-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .form-section {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 0 1rem 2rem 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(29, 78, 216, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .section-title {
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    font-size: 1rem;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .form-input:valid {
+    border-color: #10b981;
+  }
+
+  .divider {
+    text-align: center;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+  }
+
+  .divider-text {
+    background: white;
+    color: #6b7280;
+    font-weight: 700;
+    padding: 0 1.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .file-input {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px dashed #d1d5db;
+    border-radius: 16px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-input-label:hover {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(29, 78, 216, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(29, 78, 216, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Payment Method Toggle */
+  .payment-toggle {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .payment-toggle-btn {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+  }
+
+  .payment-toggle-btn.active {
+    background: white;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .payment-section {
+    display: none;
+  }
+
+  .payment-section.active {
+    display: block;
+    animation: fadeInUp 0.3s ease;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .status-verified {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .form-section {
+      margin: 0 0.5rem 1.5rem 0.5rem;
+      padding: 1.5rem;
+    }
+
+    .profile-photo {
+      width: 100px;
+      height: 100px;
+    }
+
+    .profile-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+  {% if driver_profile.profile_photo %}
+  <img src="{{ driver_profile.profile_photo.url }}" alt="Profile" class="profile-photo">
+  {% else %}
+  <div class="profile-photo profile-default">
+    <i class="fas fa-user"></i>
+  </div>
+  {% endif %}
+  
+  <h1 class="profile-title">{{ user.get_full_name|default:user.username }}</h1>
+  <div class="profile-subtitle">
+    <i class="fas fa-id-card"></i> License: {{ driver_profile.driver_license_number }}
+  </div>
+  
+  {% if driver_profile.status == 'APPROVED' %}
+  <div class="status-badge status-verified">
+    <i class="fas fa-check-circle"></i> Verified Driver
+  </div>
+  {% else %}
+  <div class="status-badge status-pending">
+    <i class="fas fa-clock"></i> Pending Verification
+  </div>
+  {% endif %}
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <form method="post" enctype="multipart/form-data" id="profileForm">
+    {% csrf_token %}
+
+    <div class="form-section">
+      <h2 class="section-title">
+        <div class="section-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        Payment Information
+      </h2>
+
+      <div class="payment-toggle">
+        <button type="button" class="payment-toggle-btn active" data-target="mobile-money">
+          <i class="fas fa-mobile-alt"></i> Mobile Money
+        </button>
+        <button type="button" class="payment-toggle-btn" data-target="bank-account">
+          <i class="fas fa-university"></i> Bank Account
+        </button>
+      </div>
+
+      <div id="mobile-money" class="payment-section active">
+        <div class="form-group">
+          <label class="form-label" for="mobile_money_provider">
+            <i class="fas fa-sim-card"></i> Mobile Money Provider
+          </label>
+          <select id="mobile_money_provider" name="mobile_money_provider" class="form-input form-select" required>
+            <option value="">Choose your provider</option>
+            <option value="MTN" {% if driver_profile.mobile_money_provider == 'MTN' %}selected{% endif %}>
+              📱 MTN Mobile Money
+            </option>
+            <option value="Vodafone" {% if driver_profile.mobile_money_provider == 'Vodafone' %}selected{% endif %}>
+              📱 Vodafone Cash
+            </option>
+            <option value="AirtelTigo" {% if driver_profile.mobile_money_provider == 'AirtelTigo' %}selected{% endif %}>
+              📱 AirtelTigo Money
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="mobile_money_number">
+            <i class="fas fa-phone"></i> Mobile Money Number
+          </label>
+          <input 
+            type="tel" 
+            id="mobile_money_number" 
+            name="mobile_money_number" 
+            class="form-input" 
+            value="{{ driver_profile.mobile_money_number }}"
+            placeholder="0XXXXXXXXX"
+            pattern="[0-9]{10}"
+          >
+        </div>
+      </div>
+
+      <div id="bank-account" class="payment-section">
+        <div class="form-group">
+          <label class="form-label" for="bank_name">
+            <i class="fas fa-university"></i> Bank Name
+          </label>
+          <input 
+            type="text" 
+            id="bank_name" 
+            name="bank_name" 
+            class="form-input" 
+            value="{{ driver_profile.bank_name }}"
+            placeholder="e.g., GCB Bank, Ecobank"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="account_number">
+            <i class="fas fa-credit-card"></i> Account Number
+          </label>
+          <input 
+            type="text" 
+            id="account_number" 
+            name="account_number" 
+            class="form-input" 
+            value="{{ driver_profile.account_number }}"
+            placeholder="Enter your account number"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="account_holder_name">
+            <i class="fas fa-user-circle"></i> Account Holder Name
+          </label>
+          <input 
+            type="text" 
+            id="account_holder_name" 
+            name="account_holder_name" 
+            class="form-input" 
+            value="{{ driver_profile.account_holder_name }}"
+            placeholder="Full name as on bank account"
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">
+        <div class="section-icon">
+          <i class="fas fa-camera"></i>
+        </div>
+        Profile Photo
+      </h2>
+      
+      <div class="file-input-wrapper">
+        <input 
+          type="file" 
+          name="profile_photo" 
+          accept="image/*" 
+          class="file-input"
+          id="profile_photo"
+        >
+        <label for="profile_photo" class="file-input-label">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Choose photo or take selfie</span>
+        </label>
+      </div>
+      
+      <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.75rem; text-align: center;">
+        <i class="fas fa-info-circle"></i> Recommended: Clear photo showing your face (max 5MB)
+      </div>
+    </div>
+
+    <div style="padding: 0 1rem;">
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-save"></i> Update Profile
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Payment method toggle
+  const toggleBtns = document.querySelectorAll('.payment-toggle-btn');
+  const paymentSections = document.querySelectorAll('.payment-section');
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const target = this.dataset.target;
+      
+      // Update active states
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show/hide sections
+      paymentSections.forEach(section => {
+        if (section.id === target) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // File input enhancement
+  const fileInput = document.getElementById('profile_photo');
+  const fileLabel = document.querySelector('.file-input-label span');
+  
+  fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      const fileName = this.files[0].name;
+      fileLabel.textContent = `Selected: ${fileName}`;
+    }
+  });
+
+  // Form validation feedback
+  const inputs = document.querySelectorAll('.form-input');
+  inputs.forEach(input => {
+    input.addEventListener('blur', function() {
+      if (this.value.trim() !== '') {
+        this.style.borderColor = '#10b981';
+      }
+    });
+  });
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item"><i class="fas fa-search"></i><span>Available</span></a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item"><i class="fas fa-box"></i><span>Deliveries</span></a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item"><i class="fas fa-wallet"></i><span>Earnings</span></a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item active"><i class="fas fa-user"></i><span>Profile</span></a>
+</div>
+{% endblock %}

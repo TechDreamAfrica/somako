@@ -1,0 +1,416 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Ride #{{ ride.ride_id }} - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+{% block login_banner_color_1 %}#eab308{% endblock %}
+{% block login_banner_color_2 %}#ffffff{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .status-requested { background: #fef3c7; color: #92400e; }
+  .status-accepted { background: #dbeafe; color: #1e40af; }
+  .status-driver_arrived { background: #d1fae5; color: #065f46; }
+  .status-in_progress { background: #e0e7ff; color: #4338ca; }
+  .status-completed { background: #d1fae5; color: #065f46; }
+  .status-cancelled_by_passenger,
+  .status-cancelled_by_driver { background: #fee2e2; color: #991b1b; }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: #eab308;
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+  }
+
+  .btn-outline {
+    background: white;
+    color: #eab308;
+    border: 2px solid #eab308;
+  }
+
+  .btn-danger {
+    background: white;
+    color: #ef4444;
+    border: 2px solid #ef4444;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-car-side" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-car" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Ride #{{ ride.ride_id }}</h1>
+    <div class="hero-info">
+      <span class="status-badge status-{{ ride.status|lower }}">
+        {{ ride.get_status_display }}
+      </span>
+      <span style="color: #6b7280; font-size: 0.875rem;">
+        <i class="far fa-calendar"></i> {{ ride.requested_at|date:"M d, Y" }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Waiting for Driver Acceptance Banner -->
+  {% if ride.status == 'REQUESTED' %}
+  <div style="margin: 0 1rem 1rem 1rem; background: #eab308; padding: 1.25rem; border-radius: 16px; border-left: 4px solid #eab308; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="width: 48px; height: 48px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="fas fa-clock" style="color: white; font-size: 1.25rem;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; color: #92400e; margin-bottom: 0.5rem; font-size: 1.125rem;">⏳ Waiting for Driver</div>
+        <div style="color: #78350f; font-size: 0.938rem; line-height: 1.5;">
+          Your ride request has been sent to <strong>{{ ride.driver.user.get_full_name }}</strong>. 
+          They will accept or decline shortly. You'll be notified once they respond.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Route Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-route" style="color: #eab308;"></i> Route
+    </h2>
+
+    <div style="margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: start; gap: 1rem; margin-bottom: 1rem;">
+        <div style="width: 40px; height: 40px; background: #eab308; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 1.25rem;"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">PICKUP</div>
+          <div style="font-weight: 600; color: #1f2937;">{{ ride.pickup_address }}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: start; gap: 1rem;">
+        <div style="width: 40px; height: 40px; background: #eab308; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fas fa-flag-checkered" style="color: #ef4444; font-size: 1.25rem;"></i>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600;">DROPOFF</div>
+          <div style="font-weight: 600; color: #1f2937;">{{ ride.dropoff_address }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+      <div>
+        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Distance</div>
+        <div style="font-weight: 700; color: #1f2937;">{{ ride.estimated_distance_km }} km</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Duration</div>
+        <div style="font-weight: 700; color: #1f2937;">{{ ride.estimated_duration_minutes }} mins</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Information -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-car-side" style="color: #eab308;"></i> Vehicle
+    </h2>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Category</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.vehicle_category.name }}</span>
+    </div>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Passengers</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.passenger_count }}</span>
+    </div>
+
+    {% if ride.vehicle %}
+    <div class="info-row">
+      <span style="color: #6b7280;">Vehicle</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.vehicle.make }} {{ ride.vehicle.model }}</span>
+    </div>
+    <div class="info-row">
+      <span style="color: #6b7280;">Plate Number</span>
+      <span style="font-weight: 600; color: #1f2937;">{{ ride.vehicle.license_plate }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Driver Information -->
+  {% if ride.driver %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-user-circle" style="color: #eab308;"></i> Driver
+    </h2>
+
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <div style="width: 60px; height: 60px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-user" style="color: #ffffff; font-size: 1.75rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight: 700; color: #1f2937; font-size: 1.125rem;">{{ ride.driver.user.get_full_name }}</div>
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          <i class="fas fa-star" style="color: #fbbf24;"></i>
+          {{ ride.driver.average_rating|floatformat:1|default:"New" }}
+        </div>
+      </div>
+    </div>
+
+    {% if ride.driver.user.phone_number %}
+    <a href="tel:{{ ride.driver.user.phone_number }}" style="display: block; padding: 0.875rem; background: #f9fafb; border-radius: 12px; text-decoration: none; text-align: center; font-weight: 600; color: #10b981; border: 2px solid #10b981;">
+      <i class="fas fa-phone"></i> Call Driver
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Payment Details -->
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-credit-card" style="color: #eab308;"></i> Payment
+    </h2>
+
+    <div class="info-row">
+      <span style="color: #6b7280;">Base Fare</span>
+      <span style="font-weight: 600;">GHS {{ ride.base_fare|floatformat:2 }}</span>
+    </div>
+
+    {% if ride.distance_fare > 0 %}
+    <div class="info-row">
+      <span style="color: #6b7280;">Distance Fare</span>
+      <span style="font-weight: 600;">GHS {{ ride.distance_fare|floatformat:2 }}</span>
+    </div>
+    {% endif %}
+
+    {% if ride.time_fare > 0 %}
+    <div class="info-row">
+      <span style="color: #6b7280;">Time Fare</span>
+      <span style="font-weight: 600;">GHS {{ ride.time_fare|floatformat:2 }}</span>
+    </div>
+    {% endif %}
+
+    <div class="info-row" style="border-top: 2px solid #e5e7eb; padding-top: 1rem; margin-top: 0.5rem;">
+      <span style="font-weight: 700; font-size: 1.125rem;">Total Fare</span>
+      <span style="font-weight: 700; color: #eab308; font-size: 1.25rem;">GHS {{ ride.total_fare|floatformat:2 }}</span>
+    </div>
+
+    <div style="margin-top: 1rem; padding: 0.875rem; background: #f9fafb; border-radius: 12px; text-align: center;">
+      <div style="font-size: 0.875rem; color: #6b7280;">Payment Method</div>
+      <div style="font-weight: 600; color: #1f2937;">{{ ride.get_payment_method_display|default:"Cash" }}</div>
+    </div>
+  </div>
+
+  <!-- Special Requests -->
+  {% if ride.special_requests %}
+  <div class="info-card">
+    <h2 class="info-title">
+      <i class="fas fa-comment-dots" style="color: #eab308;"></i> Special Requests
+    </h2>
+    <p style="color: #6b7280; margin: 0;">{{ ride.special_requests }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Actions -->
+  <div style="padding: 0 1rem;">
+    {% if ride.driver_completed and not ride.passenger_completed %}
+    <!-- Driver has completed, waiting for passenger confirmation -->
+    <div style="background: #fef3c7; border: 2px solid #eab308; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; text-align: center;">
+      <div style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">
+        <i class="fas fa-clock"></i> Driver has marked this ride as complete
+      </div>
+      <div style="color: #78350f; font-size: 0.875rem;">
+        Please confirm that you have safely arrived at your destination
+      </div>
+    </div>
+    <button onclick="window.location.href='{% url 'ride_pwa:complete_ride' ride.id %}'" class="action-btn btn-primary">
+      <i class="fas fa-check-circle"></i> Confirm Ride Completion
+    </button>
+    {% elif ride.passenger_completed and not ride.driver_completed %}
+    <!-- Passenger has completed, waiting for driver confirmation -->
+    <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; text-align: center;">
+      <div style="color: #1e40af; font-weight: 600; margin-bottom: 0.5rem;">
+        <i class="fas fa-check"></i> You have confirmed completion
+      </div>
+      <div style="color: #1e3a8a; font-size: 0.875rem;">
+        Waiting for driver to confirm
+      </div>
+    </div>
+    {% elif ride.driver_completed and ride.passenger_completed %}
+    <!-- Both confirmed -->
+    <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; text-align: center;">
+      <div style="color: #065f46; font-weight: 600; margin-bottom: 0.5rem;">
+        <i class="fas fa-check-double"></i> Ride Completed
+      </div>
+      <div style="color: #064e3b; font-size: 0.875rem;">
+        Both you and the driver have confirmed completion
+      </div>
+    </div>
+    {% endif %}
+
+    {% if ride.status in 'REQUESTED,ACCEPTED,DRIVER_ARRIVED,IN_PROGRESS' %}
+    <button onclick="window.location.href='{% url 'ride_pwa:track_ride' ride.id %}'" class="action-btn btn-primary">
+      <i class="fas fa-map-marked-alt"></i> Track Ride
+    </button>
+    {% endif %}
+
+    {% if can_cancel %}
+    <button onclick="if(confirm('Are you sure you want to cancel this ride?')) window.location.href='{% url 'ride_pwa:cancel_ride' ride.id %}'" class="action-btn btn-danger">
+      <i class="fas fa-times-circle"></i> Cancel Ride
+    </button>
+    {% endif %}
+
+    {% if ride.status == 'COMPLETED' and can_rate %}
+    <button onclick="window.location.href='{% url 'ride_pwa:rate_ride' ride.id %}'" class="action-btn btn-primary">
+      <i class="fas fa-star"></i> Rate This Ride
+    </button>
+    {% endif %}
+
+    <button onclick="window.location.href='{% url 'ride_pwa:ride_list' %}'" class="action-btn btn-outline">
+      <i class="fas fa-list"></i> View All Rides
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'ride_pwa:book_ride' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Book</span>
+  </a>
+  <a href="{% url 'ride_pwa:ride_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Rides</span>
+  </a>
+  <a href="{% url 'ride_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

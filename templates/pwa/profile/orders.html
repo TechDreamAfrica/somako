@@ -1,0 +1,347 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Order History - {{ service_name|default:"Soma Ko" }}{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+{% block pwa_app_name %}profile{% endblock %}
+
+{% block auth_banner %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f9fafb;
+  }
+
+  .edit-header {
+    background: #6366f1;
+    padding: 1.5rem 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .orders-container {
+    padding: 1rem;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .order-number {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 1rem;
+  }
+
+  .order-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .status-completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .status-processing {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .order-body {
+    margin-bottom: 0.75rem;
+  }
+
+  .order-items {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .item-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ app_color|default:"#059669" }};
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .item-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .item-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-count {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .order-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .order-total {
+    font-weight: 700;
+    color: {{ app_color|default:"#059669" }};
+    font-size: 1.125rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 3rem;
+  }
+
+  .empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-text {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+  }
+
+  .explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #6366f1;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .explore-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px {{ app_color|default:"#059669" }}40;
+  }
+
+  .content-spacer {
+    height: 80px;
+  }
+
+  /* Filter Tabs */
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: white;
+    border: 2px solid #e5e7eb;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-tab.active {
+    background: {{ app_color|default:"#059669" }};
+    border-color: {{ app_color|default:"#059669" }};
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-header">
+  <a href="{% url 'accounts:pwa_profile' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <div class="header-title">Order History</div>
+</div>
+
+<div class="filter-tabs">
+  <div class="filter-tab active">All</div>
+  <div class="filter-tab">Completed</div>
+  <div class="filter-tab">Processing</div>
+  <div class="filter-tab">Cancelled</div>
+</div>
+
+<div class="orders-container">
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-card">
+        <div class="order-header">
+          <div class="order-number">#{{ order.order_number }}</div>
+          <div class="order-status status-{{ order.status }}">{{ order.get_status_display }}</div>
+        </div>
+
+        <div class="order-body">
+          {% if order.items.all %}
+            {% for item in order.items.all|slice:":2" %}
+              <div class="order-items">
+                <div class="item-icon">
+                  {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                  {% else %}
+                    <i class="fas fa-box"></i>
+                  {% endif %}
+                </div>
+                <div class="item-details">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-count">Qty: {{ item.quantity }}</div>
+                </div>
+              </div>
+            {% endfor %}
+            {% if order.items.count > 2 %}
+              <div class="item-count" style="padding-left: 58px;">
+                +{{ order.items.count|add:"-2" }} more items
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <div class="order-footer">
+          <div class="order-date">
+            <i class="far fa-calendar"></i>
+            {{ order.created_at|date:"M d, Y" }}
+          </div>
+          <div class="order-total">₦{{ order.total_amount|floatformat:2 }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-receipt"></i>
+      </div>
+      <div class="empty-title">No Orders Yet</div>
+      <div class="empty-text">
+        You haven't placed any orders yet. Start exploring and place your first order!
+      </div>
+      <a href="{{ pwa_home_url|default:'/' }}" class="explore-btn">
+        <i class="fas fa-shopping-bag"></i>
+        Start Shopping
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="content-spacer"></div>
+
+<script>
+// Filter functionality
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    // Add filter logic here
+  });
+});
+</script>
+{% endblock %}

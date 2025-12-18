@@ -1,0 +1,252 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Manage Orders - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem;
+    background: white;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-tab {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .filter-tab.active {
+    background: #f97316;
+    color: white;
+    border-color: #f97316;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .order-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-preparing {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  .status-ready {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-picked_up {
+    background: #fed7aa;
+    color: #dc2626;
+  }
+
+  .status-on_the_way {
+    background: #e9d5ff;
+    color: #7c3aed;
+  }
+
+  .status-delivered {
+    background: #d1fae5;
+    color: #047857;
+  }
+
+  .status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <h1 style="font-size: 1.875rem; font-weight: 800; margin: 1.5rem 0; color: #1f2937;">
+    <i class="fas fa-list"></i> Manage Orders
+  </h1>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <a href="?status=" class="filter-tab {% if not status_filter %}active{% endif %}">All Orders</a>
+    <a href="?status=pending" class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+    <a href="?status=confirmed" class="filter-tab {% if status_filter == 'confirmed' %}active{% endif %}">Confirmed</a>
+    <a href="?status=preparing" class="filter-tab {% if status_filter == 'preparing' %}active{% endif %}">Preparing</a>
+    <a href="?status=ready" class="filter-tab {% if status_filter == 'ready' %}active{% endif %}">Ready</a>
+    <a href="?status=delivered" class="filter-tab {% if status_filter == 'delivered' %}active{% endif %}">Delivered</a>
+    <a href="?status=cancelled" class="filter-tab {% if status_filter == 'cancelled' %}active{% endif %}">Cancelled</a>
+  </div>
+
+  <!-- Orders List -->
+  {% if orders %}
+    {% for order in orders %}
+    <div class="order-card">
+      <a href="{% url 'food_pwa:order_detail_owner' order.id %}" style="text-decoration: none; display: block; margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+          <div>
+            <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+              Order #{{ order.id }}
+            </div>
+            <div style="font-size: 0.875rem; color: #6b7280;">
+              {{ order.customer.get_full_name|default:order.customer.username }}
+            </div>
+          </div>
+          <span class="order-status status-{{ order.status }}">
+            {{ order.get_status_display }}
+          </span>
+        </div>
+
+        <div style="margin-bottom: 0.75rem;">
+          <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">
+            <i class="far fa-clock"></i> {{ order.created_at|date:"M d, Y - g:i A" }}
+          </div>
+          <div style="font-size: 0.875rem; color: #6b7280;">
+            <i class="fas fa-map-marker-alt"></i> {{ order.delivery_city }}
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="color: #6b7280; font-size: 0.875rem;">
+            {{ order.items.count }} item{{ order.items.count|pluralize }}
+          </div>
+          <div style="font-weight: 700; color: #f97316; font-size: 1.125rem;">
+            GHS {{ order.total_amount|floatformat:2 }}
+          </div>
+        </div>
+      </a>
+
+      <!-- Quick Status Actions -->
+      {% if order.status == 'pending' %}
+      <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="flex: 1;" onsubmit="return confirm('Confirm this order?');">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="confirmed">
+          <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+            <i class="fas fa-check"></i> Confirm
+          </button>
+        </form>
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" style="flex: 1;" onsubmit="return confirm('Cancel this order?');">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="cancelled">
+          <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </form>
+      </div>
+      {% elif order.status == 'confirmed' %}
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as preparing?');">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="preparing">
+          <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+            <i class="fas fa-fire"></i> Start Preparing
+          </button>
+        </form>
+      </div>
+      {% elif order.status == 'preparing' %}
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as ready?');">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="ready">
+          <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+            <i class="fas fa-check-circle"></i> Mark as Ready
+          </button>
+        </form>
+      </div>
+      {% elif order.status == 'ready' %}
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+        <form method="POST" action="{% url 'food_pwa:update_order_status' order.id %}" onsubmit="return confirm('Mark as picked up?');">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="picked_up">
+          <button type="submit" style="width: 100%; padding: 0.625rem; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+            <i class="fas fa-hand-holding-box"></i> Picked Up
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 4rem 1.5rem; background: white; border-radius: 20px; margin-top: 2rem;">
+      <div style="width: 80px; height: 80px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+        <i class="fas fa-inbox" style="font-size: 2rem; color: #dc2626;"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem; font-weight: 700;">No Orders Found</h3>
+      <p style="color: #6b7280; margin: 0; font-size: 0.875rem;">
+        {% if status_filter %}
+          No {{ status_filter }} orders at the moment
+        {% else %}
+          Orders will appear here when customers place them
+        {% endif %}
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item active">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}Browse Equipment - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section>
+  <div>
+    <div></div>
+  </div>
+
+  <div>
+    <div>
+      <span>
+        <i></i>Equipment Rentals
+      </span>
+      <h1>Rent Equipment</h1>
+      <p>Find the equipment you need for your projects</p>
+    </div>
+  </div>
+</section>
+
+<!-- Equipment Grid Section -->
+<section>
+  <div>
+    <div>
+      {% for equipment in equipment_list %}
+      <div>
+        {% if equipment.equipmentimage_set.first %}
+        <div>
+          <img src="{{ equipment.equipmentimage_set.first.get_image_url }}" alt="{{ equipment.name }}">
+          <div></div>
+          <div>
+            <button>
+              <i></i>
+            </button>
+          </div>
+        </div>
+        {% else %}
+        <div>
+          <i></i>
+        </div>
+        {% endif %}
+
+        <div>
+          <div>
+            <span>{{ equipment.category.name }}</span>
+          </div>
+
+          <h3>{{ equipment.name }}</h3>
+
+          <p>{{ equipment.brand }}</p>
+
+          <div>
+            <div>
+              <span>GHS {{ equipment.price_per_period }}</span>
+              <span>/{{ equipment.rental_period }}</span>
+            </div>
+            <a href="{% url 'rent:equipment_detail' equipment.pk %}">
+              View
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div>
+        <div>
+          <div>
+            <i></i>
+          </div>
+          <h4>No Equipment Available</h4>
+          <p>Check back later for new equipment</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,1045 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Express - Soma Ko{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+{% block fab_color_1 %}#1d4ed8{% endblock %}
+{% block fab_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #1d4ed8;
+    --primary-light: #3b82f6;
+    --primary-dark: #1e40af;
+    --secondary-color: #f59e0b;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+  }
+
+  /* Global Styles */
+  body {
+    background: var(--bg-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Hero Section */
+  .hero-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    padding: 2.5rem 1rem 3rem;
+    margin-bottom: 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .hero-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: float 20s infinite linear;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-20px, -20px) rotate(360deg); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .hero-title .hero-icon {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+  }
+
+  /* Hero Statistics */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .hero-stat {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero-stat:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 1);
+  }
+
+  .hero-stat-number {
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin-bottom: 0.25rem;
+    color: #1d4ed8 !important;
+    text-shadow: none;
+  }
+
+  .hero-stat-label {
+    font-size: 0.8rem;
+    opacity: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #374151 !important;
+  }
+
+  /* Active Delivery Card */
+  .active-delivery-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: 1.75rem;
+    margin: -1rem 1rem 1.5rem 1rem;
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--primary-color);
+    position: relative;
+    overflow: hidden;
+    transform: translateY(-10px);
+    z-index: 10;
+  }
+
+  .active-delivery-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 0 var(--border-radius) 0 100%;
+    opacity: 0.1;
+  }
+
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tracking-badge {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Quick Actions Grid */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 0 1rem 2rem 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .quick-action-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: 1.75rem 1rem;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .quick-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 0 var(--border-radius) 0 100%;
+    opacity: 0.08;
+    transition: all 0.3s ease;
+  }
+
+  .quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .quick-action-card:hover::before {
+    opacity: 0.12;
+    width: 60px;
+    height: 60px;
+  }
+
+  .action-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem auto;
+    color: white;
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .quick-action-card:hover .action-icon {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.4);
+  }
+
+  .action-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .action-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    position: relative;
+    z-index: 1;
+    line-height: 1.4;
+  }
+
+  /* Recent Deliveries */
+  .recent-delivery-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .recent-delivery-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  }
+
+  .recent-delivery-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .delivery-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .delivery-details h4 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .delivery-details p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .section-header {
+    padding: 0 1rem;
+    margin: 2rem 0 1rem 0;
+  }
+
+  .section-title {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-title i {
+    color: var(--primary-color);
+  }
+
+  /* Status Badges */
+  .status-badge, .delivery-status {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .status-pending, .delivery-status.pending { 
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+    color: #92400e; 
+    border: 1px solid #f59e0b;
+  }
+
+  .status-confirmed, .delivery-status.confirmed { 
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+    color: #1e40af; 
+    border: 1px solid #3b82f6;
+  }
+
+  .status-assigned, .delivery-status.assigned { 
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); 
+    color: #065f46; 
+    border: 1px solid #10b981;
+  }
+
+  .status-picked_up, .delivery-status.picked_up { 
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); 
+    color: #4338ca; 
+    border: 1px solid #6366f1;
+  }
+
+  .status-in_transit, .delivery-status.in_transit { 
+    background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); 
+    color: #0f766e; 
+    border: 1px solid #14b8a6;
+  }
+
+  .status-delivered, .delivery-status.delivered { 
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); 
+    color: #047857; 
+    border: 1px solid #059669;
+  }
+
+  .status-cancelled, .delivery-status.cancelled { 
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
+    color: #991b1b; 
+    border: 1px solid #ef4444;
+  }
+
+  .status-failed, .delivery-status.failed { 
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
+    color: #991b1b; 
+    border: 1px solid #ef4444;
+  }
+
+  .content-padding {
+    padding: 0 1rem;
+    margin-bottom: 6rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    margin: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+  }
+
+  .empty-state h3 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  .empty-state p {
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .hero-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    
+    .quick-action-card {
+      padding: 1.5rem;
+    }
+    
+    .action-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Loading Animation */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 0 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 2px solid #fee2e2;
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    border-color: #1d4ed8;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: #1d4ed8;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.813rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Active Delivery Card */
+  .active-delivery-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  .active-delivery-card .section-title {
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  .delivery-info {
+    margin-bottom: 1.25rem;
+  }
+
+  .info-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .info-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: white;
+    font-size: 1rem;
+  }
+
+  .delivery-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-action-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 2px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(29, 78, 216, 0.15);
+    border-color: #3b82f6;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+
+  .action-icon {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    transition: transform 0.3s;
+  }
+
+  .quick-action-card:hover .action-icon {
+    transform: scale(1.1);
+  }
+
+  .action-icon i {
+    color: white;
+    font-size: 1.25rem;
+  }
+
+  .action-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .action-subtitle {
+    font-size: 0.813rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  /* Button Styles */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+    color: white;
+    text-decoration: none;
+  }
+
+  /* Section Headers */
+  .section-header {
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  /* Recent Deliveries */
+  .content-padding {
+    padding: 0 1rem;
+  }
+
+  .recent-delivery-card {
+    display: block;
+    text-decoration: none;
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 2px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .recent-delivery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(29, 78, 216, 0.15);
+    border-color: #3b82f6;
+    text-decoration: none;
+  }
+
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .delivery-main {
+    flex: 1;
+  }
+
+  .tracking-info {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tracking-info i {
+    color: #3b82f6;
+  }
+
+  .recipient-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .delivery-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+  }
+
+  .delivery-date {
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .delivery-cost {
+    font-weight: 700;
+    color: #059669;
+    font-size: 1rem;
+  }
+
+  .view-all-btn {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    color: #3b82f6;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .view-all-btn:hover {
+    background: #e2e8f0;
+    color: #1d4ed8;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .empty-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 640px) {
+    .quick-actions {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .quick-action-card {
+      padding: 1rem;
+    }
+
+    .action-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .action-title {
+      font-size: 0.875rem;
+    }
+
+    .action-subtitle {
+      font-size: 0.75rem;
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 0.875rem;
+    }
+
+    .hero-stats {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .hero-stat-number {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="hero-header">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      <i class="fas fa-shipping-fast hero-icon"></i>
+      Express Delivery
+    </h1>
+    <p class="hero-subtitle">
+      Send packages quickly and securely across the city
+    </p>
+    
+    <!-- Hero Statistics -->
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-number">{% if stats.total_sent is not None %}{{ stats.total_sent }}{% else %}0{% endif %}</div>
+        <div class="hero-stat-label">Total Sent</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">{% if stats.pending_deliveries is not None %}{{ stats.pending_deliveries }}{% else %}0{% endif %}</div>
+        <div class="hero-stat-label">In Progress</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">{% if stats.delivered is not None %}{{ stats.delivered }}{% else %}0{% endif %}</div>
+        <div class="hero-stat-label">Delivered</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active Delivery -->
+{% if active_order %}
+<div class="active-delivery-card">
+  <h3 class="section-title">
+    <i class="fas fa-box hero-icon"></i>
+    Active Delivery
+  </h3>
+  <div class="delivery-info">
+    <div class="info-item">
+      <div class="info-label">Tracking Number</div>
+      <div class="info-value">{{ active_order.order_number }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Recipient</div>
+      <div class="info-value">{{ active_order.items.count }} item{{ active_order.items.count|pluralize }}</div>
+    </div>
+  </div>
+  <div class="delivery-actions">
+    <span class="delivery-status status-{{ active_order.status }}">
+      {{ active_order.get_status_display }}
+    </span>
+    <a href="{% url 'express_pwa:order_detail' active_order.order_number %}" class="btn btn-primary">
+      View Order <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="quick-actions">
+  {% if is_driver %}
+  <!-- Driver Actions -->
+  <a href="{% url 'express_pwa:order_list' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-truck"></i>
+    </div>
+    <div class="action-title">My Orders</div>
+    <div class="action-subtitle">Assigned deliveries</div>
+  </a>
+
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-tachometer-alt"></i>
+    </div>
+    <div class="action-title">Driver Dashboard</div>
+    <div class="action-subtitle">Manage your work</div>
+  </a>
+
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-wallet"></i>
+    </div>
+    <div class="action-title">Earnings</div>
+    <div class="action-subtitle">View your income</div>
+  </a>
+
+  <a href="{% url 'express_pwa:delivery_history' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-history"></i>
+    </div>
+    <div class="action-title">History</div>
+    <div class="action-subtitle">Past deliveries</div>
+  </a>
+  {% else %}
+  <!-- Customer Actions -->
+  <a href="{% url 'express_pwa:create_order' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-plus-circle"></i>
+    </div>
+    <div class="action-title">Create Order</div>
+    <div class="action-subtitle">Start a new delivery</div>
+  </a>
+
+  <a href="{% url 'express_pwa:order_tracking' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-map-marker-alt"></i>
+    </div>
+    <div class="action-title">Track Orders</div>
+    <div class="action-subtitle">View & track all orders</div>
+  </a>
+
+  <a href="{% url 'express_pwa:create_order' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-box"></i>
+    </div>
+    <div class="action-title">Single Package</div>
+    <div class="action-subtitle">Quick single delivery</div>
+  </a>
+
+  <a href="{% url 'express_pwa:order_tracking' %}" class="quick-action-card">
+    <div class="action-icon">
+      <i class="fas fa-shipping-fast"></i>
+    </div>
+    <div class="action-title">Track Package</div>
+    <div class="action-subtitle">View your deliveries</div>
+  </a>
+  {% endif %}
+</div>
+
+<!-- Recent Deliveries -->
+{% if recent_orders %}
+<div class="section-header">
+  <h2 class="section-title">
+    <i class="fas fa-history hero-icon"></i> Recent Deliveries
+  </h2>
+</div>
+
+<div class="content-padding">
+  {% for order in recent_orders %}
+  <a href="{% url 'express_pwa:order_detail' order.order_number %}" class="recent-delivery-card">
+    <div class="delivery-header">
+      <div class="delivery-main">
+        <div class="tracking-info">
+          <i class="fas fa-box"></i>
+          {{ order.order_number }}
+        </div>
+        <div class="recipient-info">
+          {{ order.items.count }} item{{ order.items.count|pluralize }}
+        </div>
+      </div>
+      <span class="delivery-status status-{{ order.status }}">
+        {{ order.get_status_display }}
+      </span>
+    </div>
+    <div class="delivery-footer">
+      <span class="delivery-date">
+        <i class="far fa-calendar"></i>
+        {{ order.created_at|date:"M d, Y" }}
+      </span>
+      {% if order.total_cost %}
+      <span class="delivery-cost">
+        GH₵{{ order.total_cost|floatformat:2 }}
+      </span>
+      {% endif %}
+    </div>
+  </a>
+  {% endfor %}
+
+  <a href="{% url 'express_pwa:order_list' %}" class="view-all-btn">
+    View All Orders <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-shipping-fast empty-icon"></i>
+  <p class="empty-title">No Recent Orders</p>
+  <p class="empty-subtitle">Create your first order to get started!</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:order_tracking' %}" class="bottom-nav-item">
+    <i class="fas fa-map-marker-alt"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'express_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

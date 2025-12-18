@@ -1,0 +1,282 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Restaurant Settings - Soma Ko Food{% endblock %}
+{% block theme_color %}#f97316{% endblock %}
+{% block pwa_app_name %}food{% endblock %}
+{% block login_banner_color_1 %}#f97316{% endblock %}
+{% block login_banner_color_2 %}#dc2626{% endblock %}
+{% block fab_color_1 %}#f97316{% endblock %}
+{% block fab_color_2 %}#dc2626{% endblock %}
+
+{% block extra_css %}
+<style>
+  .settings-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+  }
+
+  .form-input:disabled {
+    opacity: 1;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: not-allowed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.4s;
+    border-radius: 28px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .toggle-slider {
+    background: #f97316;
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+  .info-note {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+  }
+
+  .info-note i {
+    color: #f59e0b;
+    margin-top: 0.15rem;
+  }
+
+  .info-note-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #92400e;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <h1 style="font-size: 1.875rem; font-weight: 800; margin: 1.5rem 0; color: #1f2937;">
+    <i class="fas fa-info-circle"></i> Restaurant Information
+  </h1>
+
+  <div class="info-note">
+    <i class="fas fa-lock"></i>
+    <div class="info-note-text">
+      <strong>View Only:</strong> Restaurant details can only be modified by administrators. If you need to update any information, please contact support.
+    </div>
+  </div>
+
+    <!-- Basic Information -->
+    <div class="settings-section">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle" style="color: #f97316;"></i>
+        Basic Information
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Restaurant Name</label>
+        <input type="text" value="{{ restaurant.name }}" class="form-input" disabled readonly>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea rows="4" class="form-input" disabled readonly>{{ restaurant.description|striptags }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" value="{{ restaurant.phone }}" class="form-input" disabled readonly>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" value="{{ restaurant.email }}" class="form-input" disabled readonly>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="settings-section">
+      <h2 class="section-title">
+        <i class="fas fa-map-marker-alt" style="color: #f97316;"></i>
+        Location
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea rows="3" class="form-input" disabled readonly>{{ restaurant.address|striptags }}</textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input type="text" value="{{ restaurant.city }}" class="form-input" disabled readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <input type="text" value="{{ restaurant.state }}" class="form-input" disabled readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- Business Settings -->
+    <div class="settings-section">
+      <h2 class="section-title">
+        <i class="fas fa-business-time" style="color: #f97316;"></i>
+        Business Settings
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Minimum Order Amount (GHS)</label>
+        <input type="number" value="{{ restaurant.minimum_order_amount }}" step="0.01" class="form-input" disabled readonly>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Delivery Time (minutes)</label>
+        <input type="number" value="{{ restaurant.delivery_time }}" class="form-input" disabled readonly>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 12px;">
+        <div>
+          <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">Restaurant Status</div>
+          <div style="font-size: 0.875rem; color: #6b7280;">{{ restaurant.get_status_display }}</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" {% if restaurant.status == 'active' %}checked{% endif %} disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Images -->
+    <div class="settings-section">
+      <h2 class="section-title">
+        <i class="fas fa-images" style="color: #f97316;"></i>
+        Images
+      </h2>
+
+      <div class="form-group">
+        <label class="form-label">Logo</label>
+        {% if restaurant.logo %}
+        <div style="margin-top: 0.75rem;">
+          <img src="{{ restaurant.get_logo_url }}" alt="Logo" style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid #e5e7eb;">
+        </div>
+        {% else %}
+        <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; text-align: center; color: #6b7280; font-size: 0.875rem;">
+          No logo uploaded
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Banner Image</label>
+        {% if restaurant.image %}
+        <div style="margin-top: 0.75rem;">
+          <img src="{{ restaurant.get_image_url }}" alt="Banner" style="width: 100%; height: 150px; border-radius: 12px; object-fit: cover; border: 2px solid #e5e7eb;">
+        </div>
+        {% else %}
+        <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; text-align: center; color: #6b7280; font-size: 0.875rem;">
+          No banner uploaded
+        </div>
+        {% endif %}
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'food_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'food_pwa:manage_menu' %}" class="bottom-nav-item">
+    <i class="fas fa-utensils"></i>
+    <span>Menu</span>
+  </a>
+  <a href="{% url 'food_pwa:restaurant_settings' %}" class="bottom-nav-item active">
+    <i class="fas fa-cog"></i>
+    <span>Settings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

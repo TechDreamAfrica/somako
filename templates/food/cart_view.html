@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}Shopping Cart - Food{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #f97316; padding: 3rem 0;">
+  <div class="container">
+    <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; margin-bottom: 0.5rem;">Your Cart</h1>
+    <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.125rem;">Review your items and proceed to checkout</p>
+  </div>
+</section>
+
+<!-- Cart Content -->
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    {% if cart_items %}
+    <div class="row g-4">
+      <!-- Left Column - Cart Items -->
+      <div class="col-lg-8">
+        {% if multiple_restaurants %}
+        <div style="background: #fef3c7; border-radius: 1rem; padding: 1.25rem; margin-bottom: 2rem; border: 2px solid #fcd34d;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-exclamation-triangle" style="color: #92400e; font-size: 1.5rem;"></i>
+            <div>
+              <div style="color: #92400e; font-weight: 700; margin-bottom: 0.25rem;">Multiple Restaurants</div>
+              <div style="color: #78350f; font-size: 0.9375rem;">You can only checkout items from one restaurant at a time. Please review your cart.</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #e5e7eb;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-shopping-bag" style="color: #f97316;"></i>Cart Items ({{ cart_items.count }})
+          </h2>
+
+          {% for item in cart_items %}
+          <div style="border-bottom: 2px solid #f3f4f6; padding-bottom: 1.5rem; margin-bottom: 1.5rem; {% if forloop.last %}border-bottom: none; margin-bottom: 0; padding-bottom: 0;{% endif %}">
+            <div style="display: flex; gap: 1.5rem; align-items: start;">
+              <!-- Item Image -->
+              <div style="flex-shrink: 0;">
+                {% if item.menu_item.image %}
+                <img src="{{ item.menu_item.get_image_url }}" alt="{{ item.menu_item.name }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+                {% else %}
+                <div style="width: 100px; height: 100px; background: #fef3c7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-utensils" style="font-size: 2rem; color: #f97316; opacity: 0.5;"></i>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Item Details -->
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                  <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.375rem;">{{ item.menu_item.name }}</h3>
+                    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                      <i class="fas fa-store" style="color: #f97316;"></i> {{ item.menu_item.restaurant.name }}
+                    </p>
+                    {% if item.special_instructions %}
+                    <p style="color: #9ca3af; font-size: 0.8125rem; font-style: italic;">Note: {{ item.special_instructions }}</p>
+                    {% endif %}
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-size: 1.375rem; font-weight: 800; color: #f97316;">GHS {{ item.get_total_price }}</div>
+                  </div>
+                </div>
+
+                <!-- Addons -->
+                {% if item.addons.all %}
+                <div style="background: #f9fafb; border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 0.75rem;">
+                  <div style="font-size: 0.8125rem; font-weight: 600; color: #6b7280; margin-bottom: 0.5rem;">Add-ons:</div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for addon in item.addons.all %}
+                    <span style="background: white; padding: 0.375rem 0.75rem; border-radius: 50px; font-size: 0.8125rem; color: #4b5563; border: 1px solid #e5e7eb;">
+                      {{ addon.name }} (+GHS {{ addon.price }})
+                    </span>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+
+                <!-- Quantity Controls -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                  <form method="post" action="{% url 'food:update_cart' %}" style="display: flex; align-items: center; gap: 0.75rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="cart_item_id" value="{{ item.id }}">
+                    <label style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">Quantity:</label>
+                    <div style="display: flex; align-items: center; border: 2px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
+                      <button type="submit" name="action" value="decrease" style="padding: 0.5rem 0.875rem; background: white; border: none; color: #6b7280; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <span style="padding: 0.5rem 1.25rem; background: #f9fafb; font-weight: 700; color: #1f2937; min-width: 60px; text-align: center;">{{ item.quantity }}</span>
+                      <button type="submit" name="action" value="increase" style="padding: 0.5rem 0.875rem; background: white; border: none; color: #6b7280; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </form>
+
+                  <form method="post" action="{% url 'food:update_cart' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="cart_item_id" value="{{ item.id }}">
+                    <button type="submit" name="action" value="remove" style="padding: 0.5rem 1rem; background: #fee2e2; color: #dc2626; border: 2px solid #fca5a5; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#dc2626'; this.style.color='white'; this.style.borderColor='#dc2626'" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626'; this.style.borderColor='#fca5a5'">
+                      <i class="fas fa-trash"></i> Remove
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+          <!-- Continue Shopping -->
+          <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #f3f4f6;">
+            <a href="{% url 'food:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; color: #f97316; text-decoration: none; font-weight: 600; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(-5px)'" onmouseout="this.style.transform='translateX(0)'">
+              <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #e5e7eb;">
+            <h3 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-receipt" style="color: #f97316;"></i>Order Summary
+            </h3>
+
+            <div style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Subtotal</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">GHS {{ subtotal }}</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Delivery Fee</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">GHS {{ delivery_fee }}</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Tax (10%)</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">GHS {{ tax }}</span>
+              </div>
+
+              <div style="border-top: 2px solid #f3f4f6; margin-top: 1rem; padding-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="color: #1f2937; font-weight: 700; font-size: 1.125rem;">Total</span>
+                  <span style="color: #f97316; font-weight: 900; font-size: 1.75rem;">GHS {{ total }}</span>
+                </div>
+              </div>
+            </div>
+
+            <a href="{% url 'food:checkout' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: #f97316; color: white; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; margin-bottom: 1rem; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(245, 158, 11, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(245, 158, 11, 0.3)'">
+              <i class="fas fa-shopping-cart"></i>Proceed to Checkout
+            </a>
+
+            <!-- Promo Box -->
+            <div style="background: #ecfdf5; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #a7f3d0;">
+              <h4 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 700; color: #047857; margin-bottom: 0.75rem;">
+                <i class="fas fa-tag"></i>Have a promo code?
+              </h4>
+              <form style="display: flex; gap: 0.5rem;">
+                <input type="text" placeholder="Enter code" style="flex: 1; padding: 0.75rem; border: 2px solid #6ee7b7; border-radius: 0.5rem; font-size: 0.875rem;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#6ee7b7'">
+                <button type="submit" style="padding: 0.75rem 1.25rem; background: #059669; color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; white-space: nowrap;" onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#059669'">
+                  Apply
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart -->
+    <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <div style="width: 120px; height: 120px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-shopping-cart" style="font-size: 4rem; color: #f97316; opacity: 0.5;"></i>
+      </div>
+      <h2 style="font-size: 1.875rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Your cart is empty</h2>
+      <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem;">Add some delicious items to get started!</p>
+      <a href="{% url 'food:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1.125rem 2.5rem; background: #f97316; color: white; text-decoration: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 30px rgba(245, 158, 11, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(245, 158, 11, 0.3)'">
+        <i class="fas fa-utensils"></i>Browse Restaurants
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- App Switcher FAB - Only for General Users -->
+{% if user.is_authenticated and not user.is_staff and not user.is_superuser %}
+<div class="fab-container">
+  <button class="fab-button" onclick="toggleFabMenu()" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+    <i class="fas fa-th"></i>
+  </button>
+  
+  <div class="fab-menu" id="fabMenu">
+    <a href="/pwa/food/" class="fab-menu-item">
+      <i class="fas fa-utensils" style="color: #ea580c;"></i>
+      <span>Food Delivery</span>
+    </a>
+    
+    <a href="/pwa/ride/" class="fab-menu-item">
+      <i class="fas fa-car" style="color: #8b5cf6;"></i>
+      <span>Ride Services</span>
+    </a>
+    
+    <a href="/pwa/shop/" class="fab-menu-item">
+      <i class="fas fa-shopping-bag" style="color: #3b82f6;"></i>
+      <span>Shopping</span>
+    </a>
+    
+    <a href="/pwa/pharmacy/" class="fab-menu-item">
+      <i class="fas fa-pills" style="color: #dc2626;"></i>
+      <span>Pharmacy</span>
+    </a>
+    
+    <a href="/pwa/rent/" class="fab-menu-item">
+      <i class="fas fa-home" style="color: #059669;"></i>
+      <span>Rentals</span>
+    </a>
+    
+    <a href="/pwa/express/" class="fab-menu-item">
+      <i class="fas fa-shipping-fast" style="color: #eab308;"></i>
+      <span>Express Delivery</span>
+    </a>
+    
+    <div class="fab-menu-divider"></div>
+    
+    <a href="/" class="fab-menu-item">
+      <i class="fas fa-globe" style="color: #6b7280;"></i>
+      <span>Main Website</span>
+    </a>
+  </div>
+</div>
+
+<!-- FAB Styles (copied from pwa_base.html) -->
+<style>
+.fab-container {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.fab-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.fab-button::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.fab-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.5);
+}
+
+.fab-button:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.fab-button.open {
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+.fab-menu {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) scale(0.9);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.fab-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.fab-menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(234, 88, 12, 0.05));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.fab-menu-item:hover {
+  background: rgba(249, 115, 22, 0.08);
+  transform: translateX(5px);
+  color: #1f2937;
+}
+
+.fab-menu-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+  margin: 8px 0;
+}
+</style>
+
+<!-- FAB JavaScript -->
+<script>
+function toggleFabMenu() {
+  const fabMenu = document.getElementById('fabMenu');
+  const fabButton = document.querySelector('.fab-button');
+  
+  fabMenu.classList.toggle('show');
+  fabButton.classList.toggle('open');
+}
+
+// Close FAB menu when clicking outside
+document.addEventListener('click', function(e) {
+  const fabContainer = document.querySelector('.fab-container');
+  if (fabContainer && !fabContainer.contains(e.target)) {
+    document.getElementById('fabMenu').classList.remove('show');
+    document.querySelector('.fab-button').classList.remove('open');
+  }
+});
+</script>
+{% endif %}
+
+<!-- Bottom Navigation for Food -->
+<nav style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.1); padding: 8px 0; z-index: 1000; display: flex; justify-content: space-around; align-items: center;">
+  <a href="{% url 'food:restaurant_list' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
+    <i class="fas fa-home" style="font-size: 20px; margin-bottom: 4px;"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'food:restaurant_list' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
+    <i class="fas fa-compass" style="font-size: 20px; margin-bottom: 4px;"></i>
+    <span>Explore</span>
+  </a>
+  <a href="{% url 'food:cart' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #f97316; font-size: 12px; font-weight: 600; padding: 8px; position: relative; transition: all 0.2s ease;">
+    <i class="fas fa-shopping-cart" style="font-size: 20px; margin-bottom: 4px;"></i>
+    <span>Cart</span>
+    {% if cart_items %}
+    <div style="position: absolute; top: 0; right: 2px; background: #f97316; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+      {{ cart_items|length }}
+    </div>
+    {% endif %}
+  </a>
+  <a href="{% url 'food:orders' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
+    <i class="fas fa-receipt" style="font-size: 20px; margin-bottom: 4px;"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:profile' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
+    <i class="fas fa-user" style="font-size: 20px; margin-bottom: 4px;"></i>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<!-- Add bottom padding to prevent content being hidden behind nav -->
+<style>
+body {
+  padding-bottom: 80px;
+}
+</style>
+
+{% endblock %}

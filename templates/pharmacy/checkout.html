@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}Checkout - Pharmacy{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #a855f7; padding: 2rem 0;">
+  <div class="container">
+    <h1 style="font-size: 2rem; font-weight: 900; color: white;">Checkout</h1>
+    <p style="color: rgba(255, 255, 255, 0.9);">Complete your pharmacy order</p>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <form method="post" id="checkoutForm">
+      {% csrf_token %}
+      <div class="row g-4">
+        <!-- Left - Delivery Info -->
+        <div class="col-lg-8">
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;"><i class="fas fa-map-marker-alt" style="color: #a855f7;"></i> Delivery Address</h3>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Full Address</label>
+              <input type="text" name="address" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" placeholder="Enter your delivery address">
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">City</label>
+                <input type="text" name="city" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" placeholder="City">
+              </div>
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">State/Region</label>
+                <input type="text" name="state" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" placeholder="State/Region">
+              </div>
+            </div>
+
+            <div class="row g-3" style="margin-top: 1rem;">
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Postal Code</label>
+                <input type="text" name="postal_code" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" placeholder="Postal Code">
+              </div>
+              <div class="col-md-6">
+                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Phone Number</label>
+                <input type="tel" name="phone" required style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.9375rem;" placeholder="Phone Number">
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;"><i class="fas fa-credit-card" style="color: #a855f7;"></i> Payment Method</h3>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: #a855f7; border: 2px solid #a855f7; border-radius: 0.875rem; cursor: pointer;">
+                  <input type="radio" name="payment_method" value="card" checked style="width: 20px; height: 20px;">
+                  <div>
+                    <div style="font-weight: 700; color: #7e22ce;"><i class="fas fa-credit-card"></i> Card Payment</div>
+                    <div style="color: #7e22ce; font-size: 0.8125rem;">Pay with Paystack</div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="col-md-6">
+                <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: white; border: 2px solid #e5e7eb; border-radius: 0.875rem; cursor: pointer;">
+                  <input type="radio" name="payment_method" value="cash" style="width: 20px; height: 20px;">
+                  <div>
+                    <div style="font-weight: 700; color: #1f2937;"><i class="fas fa-money-bill-wave"></i> Cash</div>
+                    <div style="color: #6b7280; font-size: 0.8125rem;">Pay on delivery</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Card Details (Paystack Inline) -->
+            <div id="cardDetails" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f3f4f6;">
+              <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 1.5rem;"><i class="fas fa-lock" style="color: #a855f7;"></i> Your payment is secure and encrypted with Paystack</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right - Order Summary -->
+        <div class="col-lg-4">
+          <div style="position: sticky; top: 2rem;">
+            <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+              <h3 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;"><i class="fas fa-receipt" style="color: #a855f7;"></i> Order Summary</h3>
+
+              {% for item in cart_items %}
+              <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+                <div>
+                  <div style="font-weight: 600; color: #1f2937;">{{ item.medicine.name }}</div>
+                  <div style="color: #6b7280; font-size: 0.875rem;">Qty: {{ item.quantity }}</div>
+                </div>
+                <div style="font-weight: 700; color: #a855f7;">GHS {{ item.subtotal }}</div>
+              </div>
+              {% endfor %}
+
+              <div style="border-top: 2px solid #f3f4f6; padding-top: 1rem; margin-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span style="color: #6b7280;">Subtotal</span>
+                  <span style="font-weight: 700;">GHS {{ cart.subtotal }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                  <span style="color: #6b7280;">Tax</span>
+                  <span style="font-weight: 700;">GHS {{ cart.tax }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid #a855f7;">
+                  <span style="font-weight: 700; font-size: 1.125rem; color: #1f2937;">Total</span>
+                  <span style="font-weight: 900; font-size: 1.5rem; color: #a855f7;">GHS {{ total }}</span>
+                </div>
+              </div>
+
+              <button type="submit" id="payButton" style="width: 100%; padding: 1.125rem; background: #a855f7; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <i class="fas fa-lock"></i> Place Order & Pay
+              </button>
+
+              <p style="text-align: center; color: #9ca3af; font-size: 0.8125rem; margin-top: 1rem;">
+                <i class="fas fa-shield-alt"></i> Secure checkout powered by Paystack
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkoutForm');
+    const payButton = document.getElementById('payButton');
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+        if (selectedMethod === 'card') {
+            // Paystack inline payment
+            payWithPaystack();
+        } else {
+            // Cash on delivery - submit form normally
+            form.submit();
+        }
+    });
+
+    function payWithPaystack() {
+        payButton.disabled = true;
+        payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        const handler = PaystackPop.setup({
+            key: '{{ PAYSTACK_PUBLIC_KEY }}',
+            email: '{{ user.email }}',
+            amount: {{ total|floatformat:2 }} * 100, // Amount in pesewas
+            currency: 'GHS',
+            ref: 'PHARM-' + Math.floor((Math.random() * 1000000000) + 1),
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Customer Name",
+                        variable_name: "customer_name",
+                        value: "{{ user.get_full_name }}"
+                    }
+                ]
+            },
+            callback: function(response) {
+                // Payment successful
+                const paymentRef = response.reference;
+
+                // Add payment reference to form
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'payment_reference';
+                input.value = paymentRef;
+                form.appendChild(input);
+
+                // Submit form
+                form.submit();
+            },
+            onClose: function() {
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-lock"></i> Place Order & Pay';
+            }
+        });
+
+        handler.openIframe();
+    }
+});
+</script>
+{% endblock %}

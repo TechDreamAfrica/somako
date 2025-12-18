@@ -1,0 +1,174 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Seller Dashboard - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block content %}
+<div style="background: #8b5cf6; color: white; padding: 2rem 1rem; padding-top: calc(2rem + env(safe-area-inset-top));">
+  <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">Seller Dashboard</h1>
+  <p style="opacity: 0.9;">Manage your shop</p>
+</div>
+
+<!-- Getting Started (show if no products) -->
+{% if total_products == 0 %}
+<div style="padding: 1rem; margin-top: -1rem;">
+  <div style="background: #ddd6fe; border-radius: 16px; padding: 2rem 1rem; text-align: center;">
+    <div style="width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+      <i class="fas fa-rocket" style="font-size: 2rem; color: #8b5cf6;"></i>
+    </div>
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Getting Started</h2>
+    <p style="color: #4b5563; margin-bottom: 1.5rem; font-size: 0.9375rem;">Welcome to your seller dashboard! Here's how to start selling:</p>
+    
+    <div style="background: white; border-radius: 12px; padding: 1rem; text-align: left; margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: start; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div style="width: 28px; height: 28px; background: #8b5cf6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Add Your First Product</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Create a product listing with name, price, and image URL</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: start; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div style="width: 28px; height: 28px; background: #8b5cf6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Manage Inventory</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Keep your products active and up to date</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: start; gap: 0.75rem;">
+        <div style="width: 28px; height: 28px; background: #8b5cf6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937;">Track Orders</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Get notified when customers place orders</div>
+        </div>
+      </div>
+    </div>
+    
+    <a href="{% url 'shop_pwa:add_product' %}" style="background: #8b5cf6; color: white; padding: 0.875rem 2rem; border-radius: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);">
+      <i class="fas fa-plus"></i> Add Your First Product
+    </a>
+  </div>
+</div>
+{% else %}
+
+<!-- Stats Grid -->
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; padding: 1rem; margin-top: -1rem;">
+  <div style="background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+    <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Total Orders</div>
+    <div style="color: #8b5cf6; font-weight: 700; font-size: 1.75rem;">{{ total_orders }}</div>
+  </div>
+  <div style="background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+    <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Pending</div>
+    <div style="color: #f59e0b; font-weight: 700; font-size: 1.75rem;">{{ pending_orders }}</div>
+  </div>
+  <div style="background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+    <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Today's Orders</div>
+    <div style="color: #10b981; font-weight: 700; font-size: 1.75rem;">{{ today_orders }}</div>
+  </div>
+  <div style="background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+    <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.25rem;">Today Revenue</div>
+    <div style="color: #8b5cf6; font-weight: 700; font-size: 1.25rem;">GHS {{ today_revenue|floatformat:2 }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions (show if has products) -->
+{% if total_products > 0 %}
+<div style="padding: 0 1rem; margin-bottom: 1.5rem;">
+  <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Quick Actions</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+    <a href="{% url 'shop_pwa:manage_orders' %}" style="text-decoration: none;">
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <div style="width: 48px; height: 48px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fas fa-shopping-bag" style="color: white; font-size: 1.25rem;"></i>
+        </div>
+        <div style="font-weight: 600; color: #1f2937;">Orders</div>
+      </div>
+    </a>
+
+    <a href="{% url 'shop_pwa:manage_products' %}" style="text-decoration: none;">
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fas fa-box" style="color: white; font-size: 1.25rem;"></i>
+        </div>
+        <div style="font-weight: 600; color: #1f2937;">Products</div>
+      </div>
+    </a>
+
+    <a href="{% url 'shop_pwa:add_product' %}" style="text-decoration: none;">
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <div style="width: 48px; height: 48px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fas fa-plus" style="color: white; font-size: 1.25rem;"></i>
+        </div>
+        <div style="font-weight: 600; color: #1f2937;">Add Product</div>
+      </div>
+    </a>
+
+    <a href="{% url 'shop_pwa:analytics' %}" style="text-decoration: none;">
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fas fa-chart-line" style="color: white; font-size: 1.25rem;"></i>
+        </div>
+        <div style="font-weight: 600; color: #1f2937;">Analytics</div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent Orders (show if has products) -->
+{% if total_products > 0 %}
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Recent Orders</h2>
+
+  {% if recent_orders %}
+    {% for order in recent_orders %}
+    <a href="{% url 'shop_pwa:order_detail_owner' order.id %}" style="text-decoration: none;">
+      <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="font-weight: 600; color: #1f2937;">#{{ order.order_number }}</span>
+          <span style="background: #ddd6fe; color: #8b5cf6; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+            {{ order.get_status_display }}
+          </span>
+        </div>
+        <div style="color: #6b7280; font-size: 0.875rem;">
+          {{ order.created_at|date:"M d, Y - H:i" }}
+        </div>
+        <div style="font-weight: 700; color: #8b5cf6; margin-top: 0.5rem;">GHS {{ order.total_amount|floatformat:2 }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+    <div style="text-align: center; padding: 2rem; background: white; border-radius: 12px;">
+      <p style="color: #6b7280;">No recent orders</p>
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:owner_dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-shopping-bag"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'shop_pwa:manage_products' %}" class="bottom-nav-item">
+    <i class="fas fa-box"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:analytics' %}" class="bottom-nav-item">
+    <i class="fas fa-chart-bar"></i>
+    <span>Analytics</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

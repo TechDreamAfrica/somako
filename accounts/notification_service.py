@@ -1,0 +1,177 @@
+from django.conf import settings
+from twilio.rest import Client
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class NotificationService:
+    """Service for sending notifications via SMS, WhatsApp, and in-app"""
+
+    def __init__(self):
+        # Initialize Twilio client
+        self.twilio_account_sid = getattr(settings, 'TWILIO_ACCOUNT_SID', None)
+        self.twilio_auth_token = getattr(settings, 'TWILIO_AUTH_TOKEN', None)
+        self.twilio_phone_number = getattr(settings, 'TWILIO_PHONE_NUMBER', None)
+        self.twilio_whatsapp_number = getattr(settings, 'TWILIO_WHATSAPP_NUMBER', 'whatsapp:+14155238886')
+
+        if self.twilio_account_sid and self.twilio_auth_token:
+            self.client = Client(self.twilio_account_sid, self.twilio_auth_token)
+        else:
+            self.client = None
+            logger.warning("Twilio credentials not configured. SMS/WhatsApp notifications will be disabled.")
+
+    def create_notification(self, user, notification_type, title, message, channels=None,
+                          reference_id=None, reference_type=None, data=None):
+        """Create notification in database"""
+        from .notification_models import Notification, NotificationPreference
+
+        # Get user preferences
+        try:
+            prefs = user.notification_preferences
+        except NotificationPreference.DoesNotExist:
+            prefs = NotificationPreference.objects.create(user=user)
+
+        # Default to in-app if no channels specified
+        if channels is None:
+            channels = prefs.get_enabled_channels()
+
+        notifications_created = []
+
+        for channel in channels:
+            # Check if user has enabled this channel
+            if channel == 'sms' and not prefs.enable_sms:
+                continue
+            if channel == 'whatsapp' and not prefs.enable_whatsapp:
+                continue
+            if channel == 'email' and not prefs.enable_email:
+                continue
+
+            notification = Notification.objects.create(
+                user=user,
+                notification_type=notification_type,
+                channel=channel,
+                title=title,
+                message=message,
+                reference_id=reference_id,
+                reference_type=reference_type,
+                data=data,
+                phone_number=user.phone_number if channel in ['sms', 'whatsapp'] else ''
+            )
+            notifications_created.append(notification)
+
+        return notifications_created
+
+    def send_sms(self, notification):
+        """Send SMS via Twilio"""
+        if not self.client:
+            logger.error("Twilio client not initialized")
+            notification.mark_as_failed()
+            return False
+
+        if not notification.phone_number:
+            logger.error(f"No phone number for user {notification.user.username}")
+            notification.mark_as_failed()
+            return False
+
+        try:
+            # Format phone number (ensure it has country code)
+            phone = notification.phone_number
+            if not phone.startswith('+'):
+                phone = f"+{phone}"
+
+            message = self.client.messages.create(
+                body=f"{notification.title}\n\n{notification.message}",
+                from_=self.twilio_phone_number,
+                to=phone
+            )
+
+            notification.mark_as_sent(message_sid=message.sid)
+            logger.info(f"SMS sent to {phone}: {message.sid}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to send SMS to {notification.phone_number}: {str(e)}")
+            notification.mark_as_failed()
+            return False
+
+    def send_whatsapp(self, notification):
+        """Send WhatsApp message via Twilio"""
+        if not self.client:
+            logger.error("Twilio client not initialized")
+            notification.mark_as_failed()
+            return False
+
+        if not notification.phone_number:
+            logger.error(f"No phone number for user {notification.user.username}")
+            notification.mark_as_failed()
+            return False
+
+        try:
+            # Format phone number
+            phone = notification.phone_number
+            if not phone.startswith('+'):
+                phone = f"+{phone}"
+
+            message = self.client.messages.create(
+                body=f"*{notification.title}*\n\n{notification.message}",
+                from_=self.twilio_whatsapp_number,
+                to=f"whatsapp:{phone}"
+            )
+
+            notification.mark_as_sent(message_sid=message.sid)
+            logger.info(f"WhatsApp sent to {phone}: {message.sid}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to send WhatsApp to {notification.phone_number}: {str(e)}")
+            notification.mark_as_failed()
+            return False
+
+    def send_notification(self, user, notification_type, title, message, channels=None,
+                         reference_id=None, reference_type=None, data=None):
+        """Create and send notifications across all specified channels"""
+
+        # Create notifications
+        notifications = self.create_notification(
+            user=user,
+            notification_type=notification_type,
+            title=title,
+            message=message,
+            channels=channels,
+            reference_id=reference_id,
+            reference_type=reference_type,
+            data=data
+        )
+
+        # Send via respective channels
+        for notification in notifications:
+            if notification.channel == 'sms':
+                self.send_sms(notification)
+            elif notification.channel == 'whatsapp':
+                self.send_whatsapp(notification)
+            elif notification.channel == 'in_app':
+                # In-app notifications are already created, just mark as sent
+                notification.mark_as_sent()
+            elif notification.channel == 'email':
+                # Email will be handled separately via Django's email system
+                pass
+
+        return notifications
+
+
+# Convenience function
+def send_notification(user, notification_type, title, message, channels=None,
+                     reference_id=None, reference_type=None, data=None):
+    """Shortcut function to send notification"""
+    service = NotificationService()
+    return service.send_notification(
+        user=user,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        channels=channels,
+        reference_id=reference_id,
+        reference_type=reference_type,
+        data=data
+    )

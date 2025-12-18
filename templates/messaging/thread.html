@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ other_user.get_full_name|default:other_user.username }} - Soma Ko{% endblock %}
+
+{% block content %}
+<style>
+@keyframes messageSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message-bubble {
+  animation: messageSlide 0.3s ease-out;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+</style>
+
+<!-- Header -->
+<section style="background: #6366f1; padding: 1.5rem 0; border-bottom: 2px solid rgba(255, 255, 255, 0.2);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="{% url 'messaging:inbox' %}" style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; border: 3px solid rgba(255, 255, 255, 0.5); color: white; font-weight: 900; font-size: 1.25rem;">
+          {{ other_user.username|slice:":1"|upper }}
+        </div>
+        <div>
+          <h1 style="font-size: 1.5rem; font-weight: 900; color: white; margin: 0 0 0.25rem 0;">
+            {{ other_user.get_full_name|default:other_user.username }}
+          </h1>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.875rem;">
+            <i class="fas fa-comment"></i> {{ related_object.name|default:related_object.title|default:"Conversation" }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Chat Messages -->
+<section style="background: #f3f4f6; min-height: 60vh;">
+  <div class="container" style="max-width: 900px; padding: 2rem 1rem;">
+    <div id="messages-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+      {% if thread_messages %}
+        {% for msg in thread_messages %}
+        <div class="message-bubble" style="display: flex; {% if msg.sender == request.user %}justify-content: flex-end{% else %}justify-content: flex-start{% endif %};">
+          <div style="max-width: 70%; display: flex; gap: 0.75rem; {% if msg.sender == request.user %}flex-direction: row-reverse{% endif %};">
+            <!-- Avatar -->
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: {% if msg.sender == request.user %}#10b981{% else %}#3b82f6{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; flex-shrink: 0;">
+              {{ msg.sender.username|slice:":1"|upper }}
+            </div>
+
+            <!-- Message Content -->
+            <div>
+              <div style="background: {% if msg.sender == request.user %}#10b981{% else %}white{% endif %}; color: {% if msg.sender == request.user %}white{% else %}#1f2937{% endif %}; padding: 1rem 1.25rem; border-radius: {% if msg.sender == request.user %}1.25rem 1.25rem 0.25rem 1.25rem{% else %}1.25rem 1.25rem 1.25rem 0.25rem{% endif %}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 2px solid {% if msg.sender == request.user %}rgba(255, 255, 255, 0.2){% else %}#e5e7eb{% endif %};">
+                <p style="margin: 0; line-height: 1.6; font-size: 0.9375rem;">{{ msg.message }}</p>
+              </div>
+              <div style="margin-top: 0.5rem; {% if msg.sender == request.user %}text-align: right{% endif %};">
+                <span style="color: #6b7280; font-size: 0.75rem;">
+                  {{ msg.created_at|date:"M d, g:i A" }}
+                  {% if msg.sender == request.user and msg.is_read %}
+                  <i class="fas fa-check-double" style="color: #10b981;"></i>
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 3rem 1rem;">
+          <div style="width: 80px; height: 80px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+            <i class="fas fa-comments" style="font-size: 2.5rem; color: #3b82f6; opacity: 0.5;"></i>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">Start the conversation</h3>
+          <p style="color: #6b7280;">Send your first message below</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Message Input (Fixed at bottom) -->
+<section style="background: white; border-top: 2px solid #e5e7eb; padding: 1.5rem 0; position: sticky; bottom: 0; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);">
+  <div class="container" style="max-width: 900px;">
+    <form method="post" style="display: flex; gap: 1rem; align-items: end;">
+      {% csrf_token %}
+      <div style="flex: 1;">
+        <textarea name="message" rows="3" required placeholder="Type your message..." class="message-input" style="width: 100%; padding: 1rem 1.25rem; border: 2px solid #e5e7eb; border-radius: 1rem; font-size: 0.9375rem; font-family: inherit; resize: none; transition: all 0.3s ease;"></textarea>
+      </div>
+      <button type="submit" style="padding: 1rem 2rem; background: #3b82f6; color: white; border: none; border-radius: 1rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); height: fit-content;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(59, 130, 246, 0.3)'">
+        <i class="fas fa-paper-plane"></i> Send
+      </button>
+    </form>
+  </div>
+</section>
+
+<script>
+// Auto-scroll to bottom of messages
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('messages-container');
+  if (container) {
+    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  // Auto-expand textarea
+  const textarea = document.querySelector('.message-input');
+  if (textarea) {
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+    });
+  }
+});
+</script>
+{% endblock %}

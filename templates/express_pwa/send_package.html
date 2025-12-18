@@ -1,0 +1,1102 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Send Package - Soma Ko{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#1d4ed8{% endblock %}
+{% block login_banner_color_2 %}#eab308{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  }
+
+  .package-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .package-type-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .package-type-card:hover {
+    border-color: #1d4ed8;
+  }
+
+  .package-type-card.selected {
+    border-color: #1d4ed8;
+    background: #fef2f2;
+  }
+
+  .urgency-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .urgency-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .urgency-card:hover {
+    border-color: #1d4ed8;
+  }
+
+  .urgency-card.selected {
+    border-color: #1d4ed8;
+    background: #fef2f2;
+  }
+
+  /* Rider Slider Styles */
+  .riders-slider-container {
+    position: relative;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .riders-slider {
+    display: flex;
+    overflow: visible;
+    gap: 1rem;
+    padding: 0.5rem;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+  }
+
+  .rider-slide {
+    flex: 0 0 280px;
+    transition: all 0.3s ease;
+  }
+
+  .rider-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    height: 180px;
+    position: relative;
+  }
+
+  .rider-card:hover {
+    border-color: #1d4ed8;
+    background: #f8fafc;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(29, 78, 216, 0.15);
+  }
+
+  .rider-card.selected {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(29, 78, 216, 0.25);
+  }
+
+  .rider-card.featured {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  }
+
+  .rider-card.featured:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.25);
+  }
+
+  .rider-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    position: relative;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .rider-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rider-avatar i {
+    font-size: 1.5rem;
+    color: #6b7280;
+  }
+
+  .auto-assign .rider-avatar {
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  }
+
+  .auto-assign .rider-avatar i {
+    color: white;
+  }
+
+  .online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    background: #10b981;
+    border: 2px solid white;
+    border-radius: 50%;
+  }
+
+  .rider-info {
+    flex: 1;
+    width: 100%;
+  }
+
+  .rider-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  .rider-stats {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .rider-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .rider-badge.recommended {
+    background: #10b981;
+    color: white;
+  }
+
+  .rider-badge.featured {
+    background: #f59e0b;
+    color: white;
+  }
+
+  .rider-availability {
+    font-size: 0.7rem;
+  }
+
+  .availability-online {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .availability-offline {
+    color: #6b7280;
+  }
+
+  .rider-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-top: auto;
+  }
+
+  /* Slider Navigation */
+  .slider-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .slider-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #6b7280;
+  }
+
+  .slider-btn:hover {
+    background: #1d4ed8;
+    color: white;
+  }
+
+  .slider-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .slider-dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .slider-dot:hover {
+    background: #9ca3af;
+    transform: scale(1.1);
+  }
+
+  .slider-dot.active {
+    background: #1d4ed8;
+    transform: scale(1.3);
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+  }
+
+  /* Mobile responsive styles */
+  @media (max-width: 640px) {
+    .rider-slide {
+      flex: 0 0 260px;
+    }
+
+    .rider-card {
+      height: 160px;
+      padding: 1rem;
+    }
+
+    .rider-avatar {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 0.5rem;
+    }
+
+    .rider-name {
+      font-size: 0.85rem;
+    }
+
+    .slider-nav {
+      margin-top: 0.75rem;
+    }
+
+    .slider-btn {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1023px) {
+    .rider-slide {
+      flex: 0 0 240px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .rider-slide {
+      flex: 0 0 220px;
+    }
+
+    .riders-slider {
+      justify-content: center;
+    }
+  }
+
+  .send-btn {
+    width: 100%;
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    margin: 0 1rem 6rem 1rem;
+    width: calc(100% - 2rem);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .cost-estimate-card {
+    background: #1d4ed8;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    border-left: 4px solid #1d4ed8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-box" style="font-size: 4rem; color: white; opacity: 0.3;"></i>
+  </div>
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-box" style="font-size: 3rem; color: white;"></i>
+    </div>
+    {% if order %}
+    <h1 class="hero-title">Add Item to Order</h1>
+    <p class="hero-subtitle">Order {{ order.order_number }} - {{ order.items.count }} item(s) already added</p>
+    {% else %}
+    <h1 class="hero-title">Send Package</h1>
+    <p class="hero-subtitle">Ship your package today</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if order %}
+<!-- Order Summary Card -->
+<div style="background: white; border-radius: 16px; padding: 1.25rem; margin: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #1d4ed8;">
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+    <i class="fas fa-shopping-cart" style="color: #1d4ed8; font-size: 1.25rem;"></i>
+    <h3 style="margin: 0; color: #1f2937; font-size: 1.125rem; font-weight: 700;">Order {{ order.order_number }}</h3>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+    <div>
+      <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Items Added</div>
+      <div style="font-size: 1.125rem; font-weight: 700; color: #1d4ed8;">{{ order.items.count }}</div>
+    </div>
+    <div>
+      <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Total Cost</div>
+      <div style="font-size: 1.125rem; font-weight: 700; color: #059669;">GH₵{{ order.total_estimated_cost|floatformat:2 }}</div>
+    </div>
+  </div>
+  <a href="{% url 'express_pwa:order_detail' order.order_number %}" style="display: block; margin-top: 0.75rem; padding: 0.5rem; text-align: center; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600;">
+    <i class="fas fa-arrow-left"></i> Back to Order
+  </a>
+</div>
+{% endif %}
+
+<form method="post" id="sendPackageForm">
+  {% csrf_token %}
+
+  <!-- Package Information -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-box"></i> Package Details
+    </h2>
+
+    <div class="form-group">
+      <label class="form-label">Package Type</label>
+      <div class="package-type-grid">
+        <div class="package-type-card" data-type="document">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📄</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Document</div>
+        </div>
+        <div class="package-type-card" data-type="electronics">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">💻</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Electronics</div>
+        </div>
+        <div class="package-type-card" data-type="clothing">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">👕</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Clothing</div>
+        </div>
+        <div class="package-type-card" data-type="food">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🍕</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Food</div>
+        </div>
+        <div class="package-type-card" data-type="fragile">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚠️</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Fragile</div>
+        </div>
+        <div class="package-type-card" data-type="other">
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📦</div>
+          <div style="font-size: 0.75rem; font-weight: 600;">Other</div>
+        </div>
+      </div>
+      <input type="hidden" name="package_type" id="package_type" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">Description</label>
+      <textarea name="description" id="description" class="form-control" rows="3" placeholder="Brief description of package contents" required></textarea>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div class="form-group">
+        <label class="form-label" for="weight">Weight (kg)</label>
+        <input type="number" name="weight" id="weight" class="form-control" step="0.1" min="0.1" placeholder="e.g., 2.5" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="value">Value (GHS)</label>
+        <input type="number" name="value" id="value" class="form-control" step="0.01" min="0" placeholder="0.00">
+      </div>
+    </div>
+  </div>
+
+  <!-- Urgency -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-bolt"></i> Delivery Speed
+    </h2>
+
+    <div class="urgency-grid">
+      <div class="urgency-card" data-urgency="standard">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🚶</div>
+        <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.25rem;">Standard</div>
+        <div style="font-size: 0.75rem; color: #6b7280;">24-48h</div>
+      </div>
+      <div class="urgency-card" data-urgency="express">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏃</div>
+        <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.25rem;">Express</div>
+        <div style="font-size: 0.75rem; color: #6b7280;">Same day</div>
+      </div>
+      <div class="urgency-card" data-urgency="urgent">
+        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚡</div>
+        <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.25rem;">Urgent</div>
+        <div style="font-size: 0.75rem; color: #6b7280;">2-4h</div>
+      </div>
+    </div>
+    <input type="hidden" name="urgency" id="urgency" required>
+  </div>
+
+
+
+  <!-- Recipient -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-user"></i> Recipient
+    </h2>
+
+    <div class="form-group">
+      <label class="form-label" for="recipient_name">Full Name</label>
+      <input type="text" name="recipient_name" id="recipient_name" class="form-control" placeholder="Recipient name" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="recipient_phone">Phone Number</label>
+      <input type="tel" name="recipient_phone" id="recipient_phone" class="form-control" placeholder="0244123456" required>
+    </div>
+  </div>
+
+  <!-- Pickup -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-map-marker-alt" style="color: #10b981;"></i> Pickup Location
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div class="form-group">
+        <label class="form-label" for="pickup_region">Pickup Region</label>
+        <select name="pickup_region" id="pickup_region" class="form-control" required>
+          <option value="">Select Region</option>
+          {% for region in regions %}
+            <option value="{{ region.id }}">{{ region.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pickup_area">Pickup Area</label>
+        <select name="pickup_area" id="pickup_area" class="form-control" required>
+          <option value="">Select Area</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="pickup_address">Address</label>
+      <textarea name="pickup_address" id="pickup_address" class="form-control" rows="2" placeholder="Complete pickup address" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="pickup_landmark">Landmark (Optional)</label>
+      <input type="text" name="pickup_landmark" id="pickup_landmark" class="form-control" placeholder="e.g., Near Accra Mall">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="pickup_instructions">Special Instructions (Optional)</label>
+      <textarea name="pickup_instructions" id="pickup_instructions" class="form-control" rows="2" placeholder="Any special notes"></textarea>
+    </div>
+  </div>
+
+  <!-- Delivery -->
+  <div class="section-card">
+    <h2 class="section-title">
+      <i class="fas fa-flag-checkered" style="color: #1d4ed8;"></i> Delivery Location
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div class="form-group">
+        <label class="form-label" for="delivery_region">Delivery Region</label>
+        <select name="delivery_region" id="delivery_region" class="form-control" required>
+          <option value="">Select Region</option>
+          {% for region in regions %}
+            <option value="{{ region.id }}">{{ region.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="delivery_area">Delivery Area</label>
+        <select name="delivery_area" id="delivery_area" class="form-control" required>
+          <option value="">Select Area</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="delivery_address">Address</label>
+      <textarea name="delivery_address" id="delivery_address" class="form-control" rows="2" placeholder="Complete delivery address" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="delivery_landmark">Landmark (Optional)</label>
+      <input type="text" name="delivery_landmark" id="delivery_landmark" class="form-control" placeholder="e.g., Blue gate house">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="delivery_instructions">Special Instructions (Optional)</label>
+      <textarea name="delivery_instructions" id="delivery_instructions" class="form-control" rows="2" placeholder="Any special notes"></textarea>
+    </div>
+  </div>
+
+  <!-- Cost Estimate -->
+  <div class="cost-estimate-card" id="costEstimate" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Estimated Cost</div>
+        <div id="estimatedCost" style="font-size: 1.5rem; color: #eab308; font-weight: 800;">GHS 0.00</div>
+      </div>
+      <i class="fas fa-money-bill-wave" style="font-size: 2rem; color: #10b981;"></i>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="send-btn">
+    <i class="fas fa-paper-plane"></i> Send Package Request
+  </button>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:delivery_requests' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:order_tracking' %}" class="bottom-nav-item">
+    <i class="fas fa-shipping-fast"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Package type selection
+  document.querySelectorAll('.package-type-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.package-type-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      document.getElementById('package_type').value = this.dataset.type;
+      calculateEstimate();
+    });
+  });
+
+  // Urgency selection
+  document.querySelectorAll('.urgency-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.urgency-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      document.getElementById('urgency').value = this.dataset.urgency;
+      calculateEstimate();
+    });
+  });
+
+  // Calculate estimate on weight change
+  document.getElementById('weight').addEventListener('input', calculateEstimate);
+
+  // Region change handlers - load areas dynamically
+  document.getElementById('pickup_region').addEventListener('change', function() {
+    loadAreas(this.value, 'pickup_area');
+    calculateEstimate();
+  });
+
+  document.getElementById('delivery_region').addEventListener('change', function() {
+    loadAreas(this.value, 'delivery_area');
+    calculateEstimate();
+  });
+
+  // Area selection handler
+  document.getElementById('pickup_area').addEventListener('change', calculateEstimate);
+  document.getElementById('delivery_area').addEventListener('change', calculateEstimate);
+
+  function loadAreas(regionId, targetSelectId) {
+    const areaSelect = document.getElementById(targetSelectId);
+    
+    // Clear current options
+    areaSelect.innerHTML = '<option value="">Select Area</option>';
+    
+    if (!regionId) return;
+
+    fetch('{% url "express_pwa:get_areas_by_region" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: `region_id=${regionId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        data.areas.forEach(area => {
+          const option = document.createElement('option');
+          option.value = area.id;
+          option.textContent = area.name;
+          areaSelect.appendChild(option);
+        });
+      }
+    })
+    .catch(error => console.error('Error loading areas:', error));
+  }
+
+  function calculateEstimate() {
+    const weight = parseFloat(document.getElementById('weight').value);
+    const urgency = document.getElementById('urgency').value;
+    const pickupRegion = document.getElementById('pickup_region').value;
+    const deliveryRegion = document.getElementById('delivery_region').value;
+
+    if (weight && urgency && pickupRegion && deliveryRegion) {
+      fetch('{% url "express_pwa:delivery_estimate" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: `weight=${weight}&urgency=${urgency}&pickup_region=${pickupRegion}&delivery_region=${deliveryRegion}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('estimatedCost').textContent = `${data.currency} ${data.estimated_cost.toFixed(2)}`;
+          document.getElementById('costEstimate').style.display = 'block';
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+  }
+
+  // Form validation
+  const sendPackageForm = document.getElementById('sendPackageForm');
+  if (sendPackageForm) {
+    sendPackageForm.addEventListener('submit', function(e) {
+      const packageType = document.getElementById('package_type');
+      const urgency = document.getElementById('urgency');
+      const pickupRegion = document.getElementById('pickup_region');
+      const pickupArea = document.getElementById('pickup_area');
+      const deliveryRegion = document.getElementById('delivery_region');
+      const deliveryArea = document.getElementById('delivery_area');
+
+      if (!packageType || !packageType.value) {
+        e.preventDefault();
+        alert('Please select a package type');
+        return;
+      }
+
+      if (!urgency || !urgency.value) {
+        e.preventDefault();
+        alert('Please select delivery urgency');
+        return;
+      }
+
+      if (!pickupRegion || !pickupRegion.value) {
+        e.preventDefault();
+        alert('Please select pickup region');
+        return;
+      }
+
+      if (!pickupArea || !pickupArea.value) {
+        e.preventDefault();
+        alert('Please select pickup area');
+        return;
+      }
+
+      if (!deliveryRegion || !deliveryRegion.value) {
+        e.preventDefault();
+        alert('Please select delivery region');
+        return;
+      }
+
+      if (!deliveryArea || !deliveryArea.value) {
+        e.preventDefault();
+        alert('Please select delivery area');
+        return;
+      }
+    });
+  }
+
+  // Slider functionality
+  const slider = document.querySelector('.riders-slider');
+  const slides = document.querySelectorAll('.rider-slide');
+  const prevBtn = document.getElementById('prevRider');
+  const nextBtn = document.getElementById('nextRider');
+  const sliderDotsContainer = document.getElementById('sliderDots');
+  let currentSlide = 0;
+
+  // Debug logging
+  console.log('Slider elements found:', {
+    slider: !!slider,
+    slides: slides.length,
+    prevBtn: !!prevBtn,
+    nextBtn: !!nextBtn,
+    dotsContainer: !!sliderDotsContainer
+  });
+
+  // Calculate slides to show based on screen width
+  function getSlidesToShow() {
+    return window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3;
+  }
+
+  // Create dots dynamically based on number of slides
+  function createDots() {
+    if (!sliderDotsContainer || !slides.length) return;
+    
+    const slidesToShow = getSlidesToShow();
+    const numDots = Math.ceil(slides.length / slidesToShow);
+    
+    sliderDotsContainer.innerHTML = '';
+    
+    for (let i = 0; i < numDots; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'slider-dot';
+      if (i === 0) dot.classList.add('active');
+      
+      dot.addEventListener('click', () => {
+        currentSlide = Math.min(i * slidesToShow, Math.max(0, slides.length - slidesToShow));
+        updateSlider();
+      });
+      
+      sliderDotsContainer.appendChild(dot);
+    }
+  }
+
+  // Update slider position
+  function updateSlider() {
+    const slidesToShow = getSlidesToShow();
+    const slideWidth = slides[0].offsetWidth + 16; // Including gap
+    const maxSlide = Math.max(0, slides.length - slidesToShow);
+    
+    // Adjust current slide if needed
+    if (currentSlide > maxSlide) {
+      currentSlide = maxSlide;
+    }
+    
+    const translateX = currentSlide * slideWidth;
+    slider.style.transform = `translateX(-${translateX}px)`;
+    
+    console.log('UpdateSlider:', {
+      currentSlide,
+      slidesToShow,
+      slideWidth,
+      maxSlide,
+      translateX,
+      totalSlides: slides.length
+    });
+    
+    // Update navigation buttons
+    if (prevBtn) {
+      prevBtn.disabled = currentSlide === 0;
+    }
+    if (nextBtn) {
+      nextBtn.disabled = currentSlide >= maxSlide;
+    }
+    
+    // Update dots
+    const dots = document.querySelectorAll('.slider-dot');
+    const activeDotIndex = Math.floor(currentSlide / slidesToShow);
+    
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === activeDotIndex);
+    });
+  }
+
+  if (slider && slides.length > 0) {
+    // Previous button
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        console.log('Previous button clicked, currentSlide:', currentSlide);
+        if (currentSlide > 0) {
+          currentSlide--;
+          updateSlider();
+        }
+      });
+    }
+
+    // Next button  
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        console.log('Next button clicked, currentSlide:', currentSlide);
+        const slidesToShow = getSlidesToShow();
+        const maxSlide = Math.max(0, slides.length - slidesToShow);
+        if (currentSlide < maxSlide) {
+          currentSlide++;
+          updateSlider();
+        }
+      });
+    }
+
+    // Touch/swipe support
+    let startX = 0;
+    let isDragging = false;
+
+    slider.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    });
+
+    slider.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+    });
+
+    slider.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      const endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+      
+      if (Math.abs(diff) > 50) { // Minimum swipe distance
+        const slidesToShow = getSlidesToShow();
+        const maxSlide = Math.max(0, slides.length - slidesToShow);
+        
+        if (diff > 0 && currentSlide < maxSlide) {
+          currentSlide++;
+        } else if (diff < 0 && currentSlide > 0) {
+          currentSlide--;
+        }
+        updateSlider();
+      }
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && currentSlide > 0) {
+        currentSlide--;
+        updateSlider();
+      } else if (e.key === 'ArrowRight') {
+        const slidesToShow = getSlidesToShow();
+        const maxSlide = Math.max(0, slides.length - slidesToShow);
+        if (currentSlide < maxSlide) {
+          currentSlide++;
+          updateSlider();
+        }
+      }
+    });
+
+    // Responsive handling
+    window.addEventListener('resize', () => {
+      setTimeout(() => {
+        createDots();
+        updateSlider();
+      }, 100);
+    });
+
+    // Initial setup
+    createDots();
+    updateSlider();
+  }
+
+  // Rider selection
+  document.querySelectorAll('.rider-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.rider-card').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      const selectedRiderInput = document.getElementById('selectedRider');
+      if (selectedRiderInput) {
+        selectedRiderInput.value = this.dataset.rider;
+      }
+    });
+  });
+
+  // Pre-select auto-assign option
+  const autoAssignCard = document.querySelector('.rider-card.auto-assign');
+  if (autoAssignCard) {
+    autoAssignCard.classList.add('selected');
+  }
+
+  // Phone formatting
+  const phoneInput = document.getElementById('recipient_phone');
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 10) value = value.substring(0, 10);
+      e.target.value = value;
+    });
+  }
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'express_pwa:create_order' %}" class="bottom-nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Send</span>
+  </a>
+  <a href="{% url 'express_pwa:order_tracking' %}" class="bottom-nav-item">
+    <i class="fas fa-map-marker-alt"></i>
+    <span>Track</span>
+  </a>
+  <a href="{% url 'express_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

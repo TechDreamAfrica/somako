@@ -1,0 +1,174 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Payment Failed - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-red-50 py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Failed Card -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Failed Header -->
+            <div class="bg-red-500 text-white p-8 text-center">
+                <div class="mb-4">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto">
+                        <i class="fas fa-times text-4xl text-red-500"></i>
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Payment Failed</h1>
+                <p class="text-red-100 text-lg">We couldn't process your payment</p>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="p-8">
+                <!-- Error Message -->
+                {% if payment.gateway_response %}
+                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3 mt-0.5"></i>
+                        <div class="flex-1">
+                            <h3 class="text-red-800 font-semibold mb-1">Error Details</h3>
+                            <p class="text-red-700 text-sm">{{ payment.gateway_response }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="mb-8">
+                    <div class="text-center mb-6">
+                        <div class="text-gray-600 text-sm mb-1">Attempted Amount</div>
+                        <div class="text-4xl font-bold text-gray-900">
+                            GH₵ {{ payment.amount }}
+                        </div>
+                    </div>
+
+                    <div class="border-t border-b border-gray-200 py-4 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Payment ID</span>
+                            <span class="font-mono text-sm text-gray-900">{{ payment.payment_id }}</span>
+                        </div>
+                        {% if payment.paystack_reference %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Reference</span>
+                            <span class="font-mono text-sm text-gray-900">{{ payment.paystack_reference }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Order Number</span>
+                            <span class="font-semibold text-gray-900">{{ payment.order_id }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Date</span>
+                            <span class="text-gray-900">{{ payment.created_at|date:"M d, Y - h:i A" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Status</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-times-circle mr-1"></i> Failed
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Reasons -->
+                <div class="bg-yellow-50 rounded-xl p-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                        <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                        Common Reasons for Payment Failure
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-chevron-right text-yellow-600 mr-2 mt-1"></i>
+                            <span>Insufficient funds in your account</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-chevron-right text-yellow-600 mr-2 mt-1"></i>
+                            <span>Incorrect card details or expired card</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-chevron-right text-yellow-600 mr-2 mt-1"></i>
+                            <span>Payment declined by your bank</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-chevron-right text-yellow-600 mr-2 mt-1"></i>
+                            <span>Network connection issues</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-chevron-right text-yellow-600 mr-2 mt-1"></i>
+                            <span>Daily transaction limit exceeded</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button onclick="retryPayment()" 
+                            class="block w-full bg-blue-500 text-white text-center py-3 px-6 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-200 shadow-lg">
+                        <i class="fas fa-redo mr-2"></i> Try Again
+                    </button>
+                    
+                    {% if payment.source_app == 'food' %}
+                    <a href="{% url 'food_pwa:checkout' %}" 
+                       class="block w-full bg-gray-100 text-gray-700 text-center py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200">
+                        <i class="fas fa-shopping-cart mr-2"></i> Back to Checkout
+                    </a>
+                    <a href="{% url 'food_pwa:restaurant_list' %}" 
+                       class="block w-full bg-white border-2 border-gray-200 text-gray-700 text-center py-3 px-6 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200">
+                        <i class="fas fa-home mr-2"></i> Back to Home
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accounts:dashboard' %}" 
+                       class="block w-full bg-gray-100 text-gray-700 text-center py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-200">
+                        <i class="fas fa-home mr-2"></i> Go to Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Help Text -->
+                <div class="mt-6 text-center space-y-2">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-shield-alt text-green-600 mr-1"></i>
+                        Your payment information is secure and encrypted
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Need help? <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Contact Support</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function retryPayment() {
+    // Store payment details for retry
+    const paymentData = {
+        amount: '{{ payment.amount }}',
+        source_app: '{{ payment.source_app }}',
+        order_id: '{{ payment.order_id }}',
+        description: '{{ payment.description }}'
+    };
+    
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "payment:initiate" %}';
+    
+    // Add CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    form.innerHTML = `
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+        <input type="hidden" name="amount" value="${paymentData.amount}">
+        <input type="hidden" name="source_app" value="${paymentData.source_app}">
+        <input type="hidden" name="order_id" value="${paymentData.order_id}">
+        <input type="hidden" name="description" value="${paymentData.description}">
+        <input type="hidden" name="payment_method" value="paystack">
+    `;
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+
+{% csrf_token %}
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}My Orders - Food Delivery{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<section style="position: relative; background: #f97316; padding: 4rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2; text-align: center; color: white;">
+    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 0.5rem 1.25rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.625rem; margin-bottom: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+      <i class="fas fa-history"></i>
+      <span style="font-weight: 700; font-size: 0.875rem;">Order History</span>
+    </div>
+    <h1 style="font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">
+      My Food Orders
+    </h1>
+    <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95); max-width: 600px; margin: 0 auto;">Track your restaurant orders and deliveries</p>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #f97316;">
+  <div class="container">
+
+      <!-- Orders List -->
+      {% for order in orders %}
+    <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 30px rgba(245, 158, 11, 0.15)'; this.style.borderColor='#fef3c7'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#f3f4f6'">
+      <div class="row align-items-center g-4">
+        <div class="col-md-8">
+          <div style="display: flex; gap: 1.5rem; align-items: start;">
+            <div style="width: 60px; height: 60px; background: #fef3c7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-hamburger" style="color: #f97316; font-size: 1.75rem;"></i>
+            </div>
+            <div style="flex: 1;">
+              <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 0.75rem;">
+                Order #{{ order.order_number }}
+              </h5>
+              <p style="color: #6b7280; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">
+                <i class="fas fa-calendar" style="color: #f97316; margin-right: 0.375rem;"></i>
+                {{ order.created_at|date:"F d, Y h:i A" }}
+                {% if order.restaurant %}
+                <span style="margin-left: 1rem;">
+                  <i class="fas fa-store" style="color: #f97316; margin-right: 0.375rem;"></i>
+                  {{ order.restaurant.name }}
+                </span>
+                {% endif %}
+              </p>
+
+              {% if order.status == 'delivered' %}
+              <span style="background: #d1fae5; color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #6ee7b7; display: inline-block;">
+                <i class="fas fa-check-circle"></i> {{ order.get_status_display }}
+              </span>
+              {% elif order.status == 'cancelled' %}
+              <span style="background: #fee2e2; color: #991b1b; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fca5a5; display: inline-block;">
+                <i class="fas fa-times-circle"></i> {{ order.get_status_display }}
+              </span>
+              {% elif order.status == 'pending' or order.status == 'preparing' %}
+              <span style="background: #fef3c7; color: #92400e; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fcd34d; display: inline-block;">
+                <i class="fas fa-clock"></i> {{ order.get_status_display }}
+              </span>
+              {% elif order.status == 'out_for_delivery' %}
+              <span style="background: #dbeafe; color: #1e40af; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #93c5fd; display: inline-block;">
+                <i class="fas fa-motorcycle"></i> {{ order.get_status_display }}
+              </span>
+              {% else %}
+              <span style="background: #dbeafe; color: #1e40af; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #93c5fd; display: inline-block;">
+                <i class="fas fa-info-circle"></i> {{ order.get_status_display }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div style="display: flex; flex-direction: column; align-items: end; gap: 1rem;">
+            <h4 style="font-size: 2rem; font-weight: 900; color: #f97316; margin: 0;">GHS {{ order.total_amount|default:"0.00" }}</h4>
+            <a href="{% url 'food:order_detail' order.id %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1.5rem; background: #f97316; color: white; border-radius: 0.75rem; font-weight: 700; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <i class="fas fa-eye"></i>View Details
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 5rem 2rem; background: white; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+      <div style="width: 120px; height: 120px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-hamburger" style="font-size: 4rem; color: #f97316; opacity: 0.5;"></i>
+      </div>
+      <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Orders Yet</h4>
+      <p style="color: #6b7280; font-size: 1rem; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">Browse restaurants and place your first food order!</p>
+      <a href="{% url 'food:restaurant_list' %}" style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1.125rem 2.5rem; background: #f97316; color: white; border-radius: 1rem; font-weight: 700; font-size: 1.0625rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <i class="fas fa-plus-circle"></i>Browse Restaurants
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

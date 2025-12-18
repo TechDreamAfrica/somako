@@ -1,0 +1,341 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Login - Soma Ko{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+
+{# Hide the auth banner on login page #}
+{% block auth_banner %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: #6366f1;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .login-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-logo i {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #6366f1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-subtitle {
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 0.9375rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: #f9fafb;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: {{ app_color|default:"#059669" }};
+    background: white;
+  }
+
+  .error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    border-left: 4px solid #dc2626;
+  }
+
+  .error-message ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 1rem;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  }
+
+  .login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+  }
+
+  .login-button:active {
+    transform: translateY(0);
+  }
+
+  .login-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .forgot-password a {
+    color: {{ app_color|default:"#059669" }};
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .signup-link {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 0.9375rem;
+  }
+
+  .signup-link a {
+    color: {{ app_color|default:"#059669" }};
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .input-icon {
+    position: relative;
+  }
+
+  .input-icon i.fa-user,
+  .input-icon i.fa-lock {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+  }
+
+  .input-icon .form-control {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 1.125rem;
+    z-index: 10;
+    transition: color 0.2s;
+  }
+
+  .password-toggle:hover {
+    color: #4b5563;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="{% block app_icon %}fas fa-store{% endblock %}"></i>
+      <h1 class="login-title">{% block app_name %}Soma Ko{% endblock %}</h1>
+      <p class="login-subtitle">Sign in to continue</p>
+    </div>
+
+    {% if form.errors or error %}
+    <div class="error-message">
+      {% if error %}
+        {{ error }}
+      {% else %}
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_username" class="form-label">Email or Username</label>
+        <div class="input-icon">
+          <i class="fas fa-user"></i>
+          <input type="text"
+                 name="username"
+                 id="id_username"
+                 class="form-control"
+                 placeholder="Enter your email or username"
+                 required
+                 autofocus>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_password" class="form-label">Password</label>
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password"
+                 name="password"
+                 id="id_password"
+                 class="form-control"
+                 placeholder="Enter your password"
+                 required>
+          <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <input type="hidden" name="next" value="{{ next|default:pwa_home_url }}">
+
+      <button type="submit" class="login-button">
+        Sign In
+      </button>
+
+      <div class="forgot-password">
+        <a href="{% url 'accounts:pwa_password_reset' %}">Forgot Password?</a>
+      </div>
+    </form>
+
+    <div class="signup-link">
+      Don't have an account? <a href="{% url 'accounts:pwa_signup' %}?app={{ request.GET.app|default:'food' }}&next={% if request.GET.app == 'express' %}/pwa/express/{% else %}{{ next|default:pwa_home_url|default:'/pwa/food/' }}{% endif %}">Sign Up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<!-- No bottom nav on login page -->
+{% endblock %}
+
+{% block fab_button %}
+<!-- No floating action button on login page -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Toggle password visibility
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('id_password');
+
+  togglePassword.addEventListener('click', function() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    this.classList.toggle('fa-eye');
+    this.classList.toggle('fa-eye-slash');
+  });
+
+  // Auto-fill detection
+  document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('animationstart', function(e) {
+      if (e.animationName === 'onAutoFillStart') {
+        this.classList.add('autofilled');
+      }
+    });
+  });
+</script>
+
+<!-- Raise error message alert if there are validation errors or error messages -->
+{% if form.errors or error or messages %}
+<script>
+  (function() {
+    var errs = [];
+    // Inline error variable
+    {% if error %}
+    errs.push("{{ error|escapejs }}");
+    {% endif %}
+    // Form field errors
+    {% if form %}
+      {% for field in form %}
+        {% for err in field.errors %}
+          errs.push("{{ field.label|default:field.name }}: {{ err|escapejs }}");
+        {% endfor %}
+      {% endfor %}
+      {% for err in form.non_field_errors %}
+        errs.push("{{ err|escapejs }}");
+      {% endfor %}
+    {% endif %}
+    // Django messages (only errors)
+    {% if messages %}
+      {% for m in messages %}
+        {% if 'error' in m.tags %}
+          errs.push("{{ m|escapejs }}");
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    if (errs.length) {
+      alert(errs.join('\n'));
+    }
+  })();
+</script>
+{% endif %}
+{% endblock %}

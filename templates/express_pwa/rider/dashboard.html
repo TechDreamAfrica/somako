@@ -1,0 +1,712 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Driver Dashboard - Express{% endblock %}
+{% block theme_color %}#06b6d4{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+{% block login_banner_color_1 %}#06b6d4{% endblock %}
+{% block login_banner_color_2 %}#0891b2{% endblock %}
+{% block fab_color_1 %}#06b6d4{% endblock %}
+{% block fab_color_2 %}#0891b2{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin: 1rem 1rem 1.5rem 1rem;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="30" cy="30" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="60" r="1.5" fill="white" opacity="0.15"/><circle cx="150" cy="40" r="2.5" fill="white" opacity="0.1"/><circle cx="170" cy="90" r="1" fill="white" opacity="0.2"/><path d="M20,20 Q50,10 80,30 T140,25" stroke="white" stroke-width="1" fill="none" opacity="0.1"/><path d="M160,160 Q130,150 100,170 T40,165" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 6px solid white;
+    box-shadow: 0 12px 32px rgba(6, 182, 212, 0.4);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-icon-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Status Badges */
+  .status-online {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    color: #10b981;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  }
+
+  .status-offline {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(107, 114, 128, 0.05));
+    color: #6b7280;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid rgba(107, 114, 128, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(107, 114, 128, 0.1);
+  }
+
+  .status-on-delivery {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    color: #06b6d4;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.2);
+  }
+
+
+  /* Hero Statistics */
+  .hero-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .hero-stat {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hero-stat-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 0.25rem;
+    color: #06b6d4;
+  }
+
+  .hero-stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  /* Cards */
+  .info-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 0 1rem 1.5rem 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-left: 6px solid #06b6d4;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+    transform: translate(50%, -50%);
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Delivery Card */
+  .delivery-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 2px solid rgba(6, 182, 212, 0.1);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .delivery-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(6, 182, 212, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .delivery-card:hover {
+    border-color: #06b6d4;
+    box-shadow: 0 12px 32px rgba(6, 182, 212, 0.25);
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .delivery-card:hover::before {
+    opacity: 1;
+  }
+
+  .delivery-tracking {
+    font-weight: 800;
+    color: #06b6d4;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .delivery-route {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .route-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05));
+    color: #06b6d4;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .route-text {
+    font-size: 0.875rem;
+    color: #1f2937;
+    line-height: 1.4;
+  }
+
+  /* Action Button */
+  .action-btn {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .action-btn:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+    color: white;
+    box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(6, 182, 212, 0.5);
+  }
+
+  .btn-outline {
+    background: rgba(255, 255, 255, 0.9);
+    color: #06b6d4;
+    border: 2px solid #06b6d4;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-outline:hover {
+    background: #06b6d4;
+    color: white;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-secondary {
+    background: #6b7280;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Pending Approval */
+  .pending-approval {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .pending-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #f59e0b;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  }
+
+  .rating-stars {
+    color: #fbbf24;
+    font-size: 1.25rem;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-delivered {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-in-transit {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if pending_approval %}
+<!-- Pending Approval View -->
+<div class="hero-header">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      <i class="fas fa-clock"></i>
+      Rider Application
+    </h1>
+    <p class="hero-subtitle">Your application is under review</p>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <div class="pending-approval">
+    <div class="pending-icon">
+      <i class="fas fa-clock"></i>
+    </div>
+    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+      Application {{ driver_profile.get_status_display }}
+    </h2>
+    <p style="color: #6b7280; margin-bottom: 1.5rem; line-height: 1.6;">
+      {% if driver_profile.status == 'PENDING' %}
+        Thank you for applying to become a delivery rider! Our team is reviewing your application and documents. You'll be notified once approved.
+      {% elif driver_profile.status == 'REJECTED' %}
+        Unfortunately, your application was not approved. Please contact support for more information.
+      {% elif driver_profile.status == 'SUSPENDED' %}
+        Your account has been suspended. Please contact support for assistance.
+      {% endif %}
+    </p>
+
+    {% if driver_profile.status == 'PENDING' %}
+    <div class="info-card" style="text-align: left;">
+      <h3 style="font-weight: 700; margin-bottom: 1rem;">Application Details</h3>
+      <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6;">
+        <span style="color: #6b7280;">License Number</span>
+        <span style="font-weight: 600;">{{ driver_profile.driver_license_number }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6;">
+        <span style="color: #6b7280;">Applied On</span>
+        <span style="font-weight: 600;">{{ driver_profile.created_at|date:"M d, Y" }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+        <span style="color: #6b7280;">Status</span>
+        <span style="font-weight: 600; color: #f59e0b;">{{ driver_profile.get_status_display }}</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <button onclick="window.location.href='{% url 'express_pwa:dashboard' %}'" class="action-btn btn-outline">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+  </div>
+</div>
+
+{% else %}
+<!-- Approved Rider Dashboard -->
+<div class="hero-header">
+  <div class="banner-container">
+  </div>
+  
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-motorcycle" style="color: white; font-size: 3rem;"></i>
+    </div>
+    
+    <h1 class="hero-title">Rider Dashboard</h1>
+    <p class="hero-subtitle">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+    
+    <form method="post" action="{% url 'express_pwa:toggle_availability' %}" style="margin: 0;">
+      {% csrf_token %}
+      <button type="submit" class="{% if stats.is_online %}status-online{% else %}status-offline{% endif %}" style="border: none; cursor: pointer;">
+        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+        {{ driver_profile.get_availability_display }}
+      </button>
+    </form>
+
+    <!-- Hero Statistics -->
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-number">{{ stats.available_count|default:0 }}</div>
+        <div class="hero-stat-label">Available</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">{{ stats.active_count|default:0 }}</div>
+        <div class="hero-stat-label">Active</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">{{ stats.today_completed|default:0 }}</div>
+        <div class="hero-stat-label">Completed Today</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number">GH₵{{ stats.today_earnings|default:0|floatformat:0 }}</div>
+        <div class="hero-stat-label">Today Earned</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 6rem;">
+  <!-- Active Delivery -->
+  {% if active_delivery %}
+  <div class="info-card">
+    <h2 class="card-title">
+      <i class="fas fa-shipping-fast" style="color: #1d4ed8;"></i>
+      Active Delivery
+    </h2>
+
+    <div class="delivery-card" onclick="window.location.href='{% url 'express_pwa:delivery_detail_rider' active_delivery.id %}'">
+      <div class="delivery-tracking">
+        <i class="fas fa-barcode"></i> {{ active_delivery.tracking_number }}
+      </div>
+
+      <div class="delivery-route">
+        <div class="route-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="route-text">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">PICKUP</div>
+          <div style="font-weight: 600;">{{ active_delivery.pickup_address|truncatewords:8 }}</div>
+        </div>
+      </div>
+
+      <div class="delivery-route">
+        <div class="route-icon"><i class="fas fa-flag-checkered"></i></div>
+        <div class="route-text">
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">DELIVERY</div>
+          <div style="font-weight: 600;">{{ active_delivery.delivery_address|truncatewords:8 }}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+        <span style="background: #3b82f6; color: white; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+          {{ active_delivery.get_status_display }}
+        </span>
+        <span style="font-weight: 700; color: #10b981;">GH₵{{ active_delivery.estimated_cost|floatformat:2 }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Active Order -->
+  {% if active_order %}
+  <div class="info-card">
+    <h2 class="card-title">
+      <i class="fas fa-boxes" style="color: #7c3aed;"></i>
+      Active Order
+    </h2>
+
+    <div class="delivery-card" onclick="window.location.href='{% url 'express_pwa:order_detail_rider' active_order.id %}'">
+      <div class="delivery-tracking">
+        <i class="fas fa-receipt"></i> {{ active_order.order_number }}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.75rem 0;">
+        <div>
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">ITEMS</div>
+          <div style="font-weight: 600;">{{ active_order.items.count }} item{{ active_order.items.count|pluralize }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">TOTAL VALUE</div>
+          <div style="font-weight: 600;">GH₵{{ active_order.total_estimated_cost|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+        <span style="background: #7c3aed; color: white; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+          {{ active_order.get_status_display }}
+        </span>
+        <span style="font-size: 0.75rem; color: #6b7280;">
+          Assigned {{ active_order.assigned_at|timesince }} ago
+        </span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Pending Orders -->
+  {% if pending_orders %}
+  <div class="info-card">
+    <h2 class="card-title">
+      <i class="fas fa-clock" style="color: #f59e0b;"></i>
+      Assigned Orders ({{ pending_orders|length }})
+    </h2>
+
+    {% for order in pending_orders %}
+    <div class="delivery-card" onclick="window.location.href='{% url 'express_pwa:order_detail_rider' order.id %}'">
+      <div class="delivery-tracking">
+        <i class="fas fa-receipt"></i> {{ order.order_number }}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.75rem 0;">
+        <div>
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">ITEMS</div>
+          <div style="font-weight: 600;">{{ order.items.count }} item{{ order.items.count|pluralize }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">TOTAL VALUE</div>
+          <div style="font-weight: 600;">GH₵{{ order.total_estimated_cost|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+        <span style="background: #f59e0b; color: white; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+          {{ order.get_status_display }}
+        </span>
+        <span style="font-size: 0.75rem; color: #6b7280;">
+          Assigned {{ order.assigned_at|timesince }} ago
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Quick Actions -->
+  <div style="padding: 0 1rem;">
+    {% if not active_delivery and stats.is_online %}
+    <button onclick="window.location.href='{% url 'express_pwa:rider_available_deliveries' %}'" class="action-btn btn-primary">
+      <i class="fas fa-search"></i> Find Available Deliveries
+    </button>
+    {% endif %}
+
+    <button onclick="window.location.href='{% url 'express_pwa:rider_my_deliveries' %}'" class="action-btn btn-outline">
+      <i class="fas fa-history"></i> My Deliveries
+    </button>
+
+    <button onclick="window.location.href='{% url 'express_pwa:rider_earnings' %}'" class="action-btn btn-outline">
+      <i class="fas fa-wallet"></i> Earnings & Payments
+    </button>
+  </div>
+
+  <!-- Recent Completed -->
+  {% if recent_completed %}
+  <div class="info-card">
+    <h2 class="card-title">
+      <i class="fas fa-check-circle" style="color: #10b981;"></i>
+      Recent Completed
+    </h2>
+
+    {% for delivery in recent_completed %}
+    <div class="delivery-card" onclick="window.location.href='{% url 'express_pwa:delivery_detail_rider' delivery.id %}'">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+        <span class="delivery-tracking">{{ delivery.tracking_number }}</span>
+        <span style="font-size: 0.75rem; color: #6b7280;">{{ delivery.delivery_time|date:"M d" }}</span>
+      </div>
+      <div style="font-size: 0.875rem; color: #6b7280;">
+        {{ delivery.pickup_address|truncatewords:10 }}
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+        <span style="background: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+          Delivered
+        </span>
+        <span style="font-weight: 700; color: #1f2937;">GH₵{{ delivery.final_cost|floatformat:2 }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-tachometer-alt"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Available</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_my_deliveries' %}" class="bottom-nav-item">
+    <i class="fas fa-box"></i>
+    <span>Deliveries</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item">
+    <i class="fas fa-wallet"></i>
+    <span>Earnings</span>
+  </a>
+  <a href="{% url 'express_pwa:rider_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

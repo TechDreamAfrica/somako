@@ -1,0 +1,387 @@
+{% extends "pwa_base.html" %}
+{% load static %}
+
+{% block title %}Capture Signature - {{ delivery.tracking_number }}{% endblock %}
+{% block theme_color %}#1d4ed8{% endblock %}
+{% block pwa_app_name %}express{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: #1d4ed8;
+    padding: 2.5rem 1rem;
+    margin-bottom: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L30,30 L20,40 M50,30 L60,40 L50,50 M80,10 L90,20 L80,30" stroke="white" stroke-width="1" fill="none" opacity="0.1"/></svg>');
+    pointer-events: none;
+  }
+
+  .page-title {
+    font-size: 2.25rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .signature-container {
+    margin: 1rem;
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .delivery-info {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .signature-canvas {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    width: 100%;
+    height: 200px;
+    margin: 1rem 0;
+    background: #fafafa;
+    cursor: crosshair;
+    transition: all 0.3s;
+    display: block;
+    touch-action: none;
+    user-select: none;
+  }
+  
+  .signature-canvas.active {
+    border-color: #1d4ed8;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background: white;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
+  }
+  
+  .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  
+  .btn {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-clear {
+    background: #f8fafc;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+  }
+  
+  .btn-clear:hover {
+    background: #f1f5f9;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-complete {
+    background: #1d4ed8;
+    color: white;
+    border: 2px solid #1d4ed8;
+  }
+  
+  .btn-complete:hover {
+    background: #1e40af;
+    border-color: #1e40af;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  }
+  
+  .btn-complete:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .signature-required {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">
+    <i class="fas fa-pen-nib"></i>
+    Capture Signature
+  </h1>
+  <p class="page-subtitle">{{ delivery.tracking_number }}</p>
+</div>
+
+<div class="signature-container">
+  <div class="delivery-info">
+    <div style="color: #6b7280; margin-bottom: 1rem;">
+      Delivery: <strong>{{ delivery.tracking_number }}</strong>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+      <span><strong>From:</strong> {{ delivery.pickup_area.name }}</span>
+      <span><strong>To:</strong> {{ delivery.delivery_area.name }}</span>
+    </div>
+    <div style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+      <strong>Package:</strong> {{ delivery.package_description|default:"Package delivery" }}
+    </div>
+  </div>
+
+  <form method="post" id="signatureForm">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="recipient_name">Recipient Name</label>
+      <input type="text" id="recipient_name" name="recipient_name" class="form-control" 
+             placeholder="Enter recipient's full name" required>
+    </div>
+
+    <div class="form-group">
+      <label>Recipient Signature <span style="color: #dc2626;">*</span></label>
+      <canvas id="signatureCanvas" class="signature-canvas" width="400" height="200"></canvas>
+      <div class="signature-required" id="signatureError" style="display: none;">
+        Signature is required to complete the delivery
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Additional Notes (Optional)</label>
+      <textarea id="notes" name="notes" class="form-control" rows="3" 
+                placeholder="Any additional delivery notes..."></textarea>
+    </div>
+
+    <input type="hidden" id="signature_data" name="signature_data">
+
+    <div class="btn-group">
+      <button type="button" class="btn btn-clear" onclick="clearSignature()">
+        <i class="fas fa-eraser"></i> Clear Signature
+      </button>
+      <button type="submit" class="btn btn-complete" id="completeBtn" disabled>
+        <i class="fas fa-check-circle"></i> Complete Delivery
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('signatureCanvas');
+  const ctx = canvas.getContext('2d');
+  const signatureData = document.getElementById('signature_data');
+  const completeBtn = document.getElementById('completeBtn');
+  const signatureError = document.getElementById('signatureError');
+  
+  let isDrawing = false;
+  let hasSignature = false;
+  
+  // Set up canvas with proper sizing
+  function setupCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1f2937';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+  }
+  
+  setupCanvas();
+  
+  // Resize handler
+  window.addEventListener('resize', function() {
+    if (hasSignature) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      setupCanvas();
+      ctx.putImageData(imageData, 0, 0);
+    } else {
+      setupCanvas();
+    }
+  });
+  
+  // Mouse events
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseout', stopDrawing);
+  
+  // Touch events for mobile
+  canvas.addEventListener('touchstart', handleTouchStart);
+  canvas.addEventListener('touchmove', handleTouchMove);
+  canvas.addEventListener('touchend', stopDrawing);
+  canvas.addEventListener('touchcancel', stopDrawing);
+  
+  function startDrawing(e) {
+    e.preventDefault();
+    isDrawing = true;
+    canvas.classList.add('active');
+    const pos = getEventPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+  
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    
+    const pos = getEventPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    
+    hasSignature = true;
+    updateSignatureState();
+  }
+  
+  function stopDrawing(e) {
+    if (isDrawing) {
+      e.preventDefault();
+      isDrawing = false;
+      canvas.classList.remove('active');
+      updateSignatureData();
+    }
+  }
+  
+  function handleTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: function() {}
+    };
+    startDrawing(mouseEvent);
+  }
+  
+  function handleTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: function() {}
+    };
+    draw(mouseEvent);
+  }
+  
+  function getEventPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    return {
+      x: (e.clientX - rect.left) * scaleX / Math.max(window.devicePixelRatio || 1, 1),
+      y: (e.clientY - rect.top) * scaleY / Math.max(window.devicePixelRatio || 1, 1)
+    };
+  }
+  
+  function updateSignatureData() {
+    if (hasSignature) {
+      signatureData.value = canvas.toDataURL('image/png', 0.8);
+    }
+  }
+  
+  function updateSignatureState() {
+    completeBtn.disabled = !hasSignature;
+    signatureError.style.display = 'none';
+  }
+  
+  // Global function for clear button
+  window.clearSignature = function() {
+    setupCanvas();
+    hasSignature = false;
+    signatureData.value = '';
+    updateSignatureState();
+  };
+  
+  // Form submission validation
+  document.getElementById('signatureForm').addEventListener('submit', function(e) {
+    if (!hasSignature) {
+      e.preventDefault();
+      signatureError.style.display = 'block';
+      canvas.scrollIntoView({ behavior: 'smooth' });
+      return false;
+    }
+    
+    // Ensure signature data is captured
+    updateSignatureData();
+    return true;
+  });
+});
+</script>
+{% endblock %}

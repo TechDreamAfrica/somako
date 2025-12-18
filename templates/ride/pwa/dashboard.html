@@ -1,0 +1,503 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Ride - Soma Ko{% endblock %}
+{% block theme_color %}#eab308{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+{% block login_banner_color_1 %}#eab308{% endblock %}
+{% block login_banner_color_2 %}#ffffff{% endblock %}
+{% block fab_color_1 %}#eab308{% endblock %}
+{% block fab_color_2 %}#ffffff{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .active-ride-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    border-left: 4px solid #eab308;
+  }
+
+  .quick-action-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s;
+  }
+
+  .quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .action-icon {
+    width: 64px;
+    height: 64px;
+    background: #eab308;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    font-size: 1.75rem;
+    color: #ffffff;
+  }
+
+  .action-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .action-subtitle {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .vehicle-category-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .vehicle-category-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-icon {
+    width: 56px;
+    height: 56px;
+    background: #eab308;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .recent-ride-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .ride-status {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-completed { background: #d1fae5; color: #065f46; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+  .status-in-progress { background: #dbeafe; color: #1e40af; }
+  .status-requested { background: #fef3c7; color: #92400e; }
+
+  .section-header {
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .content-padding {
+    padding: 0 1rem;
+    margin-bottom: 6rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <i class="fas fa-car" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+  </div>
+
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-car" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <h1 class="hero-title">Ride with Soma Ko</h1>
+    <p class="hero-subtitle">Get to your destination safely and quickly</p>
+  </div>
+</div>
+
+<!-- GPS Location Prompt -->
+<div id="gpsPrompt" style="display: none; margin: 0 1rem 1rem 1rem; background: linear-gradient(135deg, #10b981, #059669); border-radius: 16px; padding: 1.5rem; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+    <div style="background: rgba(255, 255, 255, 0.2); padding: 1rem; border-radius: 12px; flex-shrink: 0;">
+      <i class="fas fa-map-marker-alt" style="font-size: 1.5rem;"></i>
+    </div>
+    <div style="flex: 1;">
+      <h3 style="font-weight: 700; margin: 0 0 0.5rem 0; font-size: 1.125rem;">Enable Location for Best Experience</h3>
+      <p style="margin: 0; opacity: 0.9; font-size: 0.875rem;">We'll show you nearby drivers and accurate pickup times</p>
+    </div>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <button id="enableGPSBtn" style="flex: 1; background: white; color: #10b981; border: none; padding: 0.875rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+      <i class="fas fa-location-arrow"></i> Enable GPS
+    </button>
+    <button id="skipGPSBtn" style="background: rgba(255, 255, 255, 0.2); color: white; border: none; padding: 0.875rem 1rem; border-radius: 8px; cursor: pointer;">
+      Skip
+    </button>
+  </div>
+</div>
+
+<!-- GPS Status Display -->
+<div id="gpsStatus" style="display: none; margin: 0 1rem 1rem 1rem; background: white; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); border-left: 4px solid #10b981;">
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.25rem;"></i>
+    <span style="font-weight: 600; color: #1f2937;">Location enabled - Finding nearby drivers</span>
+  </div>
+</div>
+
+<!-- Active Ride -->
+{% if active_ride %}
+<div class="active-ride-card">
+  <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fas fa-car-side" style="color: #eab308;"></i>
+    Active Ride
+  </h3>
+  <div style="margin-bottom: 0.75rem;">
+    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">From</div>
+    <div style="font-weight: 600; color: #1f2937;">{{ active_ride.pickup_address }}</div>
+  </div>
+  <div style="margin-bottom: 1rem;">
+    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">To</div>
+    <div style="font-weight: 600; color: #1f2937;">{{ active_ride.dropoff_address }}</div>
+  </div>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span class="ride-status status-{{ active_ride.status|lower|cut:' '|cut:'_' }}">
+      {{ active_ride.get_status_display }}
+    </span>
+    <a href="{% url 'ride_pwa:track_ride' active_ride.id %}" style="padding: 0.75rem 1.5rem; background: #eab308; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);">
+      Track Ride <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="section-header">
+  <h2 class="section-title">
+    <i class="fas fa-bolt"></i> Quick Actions
+  </h2>
+</div>
+
+<a href="{% url 'ride_pwa:book_ride' %}" class="quick-action-card">
+  <div class="action-icon">
+    <i class="fas fa-plus-circle"></i>
+  </div>
+  <div class="action-title">Book a Ride</div>
+  <div class="action-subtitle">Get a ride to your destination</div>
+</a>
+
+<!-- Vehicle Categories -->
+{% if vehicle_categories %}
+<div class="section-header">
+  <h2 class="section-title">
+    <i class="fas fa-car-side"></i> Available Vehicles
+  </h2>
+</div>
+
+<div class="content-padding">
+  {% for category in vehicle_categories %}
+  <a href="{% url 'ride_pwa:book_ride' %}?category={{ category.id }}" class="vehicle-category-card">
+    <div class="category-icon">
+      <i class="fas fa-car"></i>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">{{ category.name }}</div>
+      <div style="font-size: 0.875rem; color: #6b7280;">{{ category.description }}</div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-weight: 700; color: #eab308; font-size: 1.125rem;">GHS {{ category.base_fare }}</div>
+      <div style="font-size: 0.75rem; color: #6b7280;">Base fare</div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Recent Rides -->
+{% if recent_rides %}
+<div class="section-header">
+  <h2 class="section-title">
+    <i class="fas fa-history"></i> Recent Rides
+  </h2>
+</div>
+
+<div class="content-padding">
+  {% for ride in recent_rides %}
+  <a href="{% url 'ride_pwa:ride_detail' ride.id %}" class="recent-ride-card" style="text-decoration: none; display: block;">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+      <div>
+        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+          <i class="fas fa-map-marker-alt" style="color: #10b981;"></i>
+          {{ ride.pickup_address|truncatewords:5 }}
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280;">
+          <i class="fas fa-flag-checkered" style="color: #ef4444;"></i>
+          {{ ride.dropoff_address|truncatewords:5 }}
+        </div>
+      </div>
+      <span class="ride-status status-{{ ride.status|lower|cut:' '|cut:'_' }}">
+        {{ ride.get_status_display }}
+      </span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: #6b7280;">
+      <span>
+        <i class="far fa-calendar"></i>
+        {{ ride.requested_at|date:"M d, Y" }}
+      </span>
+      <span style="font-weight: 700; color: #eab308; font-size: 1rem;">
+        GHS {{ ride.total_fare|floatformat:2 }}
+      </span>
+    </div>
+  </a>
+  {% endfor %}
+
+  <a href="{% url 'ride_pwa:ride_list' %}" style="display: block; text-align: center; padding: 1rem; color: #eab308; font-weight: 600; text-decoration: none; margin-top: 1rem;">
+    View All Rides <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-car-side"></i>
+  <p style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">No Recent Rides</p>
+  <p style="font-size: 0.875rem;">Book your first ride to get started!</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:dashboard' %}" class="bottom-nav-item active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'ride_pwa:book_ride' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Book</span>
+  </a>
+  <a href="{% url 'ride_pwa:ride_list' %}" class="bottom-nav-item">
+    <i class="fas fa-list"></i>
+    <span>Rides</span>
+  </a>
+  <a href="{% url 'ride_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if GPS is already enabled or user previously declined
+  const gpsEnabled = localStorage.getItem('gpsEnabled');
+  const gpsDeclined = localStorage.getItem('gpsDeclined');
+  
+  if (!gpsEnabled && !gpsDeclined) {
+    // Show GPS prompt
+    document.getElementById('gpsPrompt').style.display = 'block';
+  } else if (gpsEnabled === 'true') {
+    // Show GPS status and get location
+    document.getElementById('gpsStatus').style.display = 'block';
+    getCurrentLocationSilently();
+  }
+
+  // Handle Enable GPS button
+  document.getElementById('enableGPSBtn').addEventListener('click', function() {
+    const btn = this;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
+    btn.disabled = true;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          // Success - store location and preference
+          localStorage.setItem('gpsEnabled', 'true');
+          localStorage.setItem('userLatitude', position.coords.latitude);
+          localStorage.setItem('userLongitude', position.coords.longitude);
+          localStorage.setItem('lastLocationUpdate', Date.now());
+          
+          // Store in session for server-side use
+          fetch('/pwa/ride/update-location/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          }).catch(console.error);
+
+          // Hide prompt, show status
+          document.getElementById('gpsPrompt').style.display = 'none';
+          document.getElementById('gpsStatus').style.display = 'block';
+        },
+        function(error) {
+          // Error - show helpful message
+          btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Enable GPS';
+          btn.disabled = false;
+          
+          let errorMsg = 'Please enable location services in your browser settings.';
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMsg = 'Location access denied. You can enable it in browser settings.';
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            errorMsg = 'Location unavailable. Please check your GPS settings.';
+          }
+          
+          alert(errorMsg);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
+        }
+      );
+    } else {
+      alert('GPS not supported by this browser');
+      btn.innerHTML = '<i class="fas fa-location-arrow"></i> Enable GPS';
+      btn.disabled = false;
+    }
+  });
+
+  // Handle Skip GPS button
+  document.getElementById('skipGPSBtn').addEventListener('click', function() {
+    localStorage.setItem('gpsDeclined', 'true');
+    document.getElementById('gpsPrompt').style.display = 'none';
+  });
+
+  // Function to get location silently for returning users
+  function getCurrentLocationSilently() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          localStorage.setItem('userLatitude', position.coords.latitude);
+          localStorage.setItem('userLongitude', position.coords.longitude);
+          localStorage.setItem('lastLocationUpdate', Date.now());
+          
+          // Update server session
+          fetch('/pwa/ride/update-location/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            },
+            body: JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          }).catch(console.error);
+        },
+        function(error) {
+          console.log('Silent location update failed:', error);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 600000 // 10 minutes
+        }
+      );
+    }
+  }
+});
+</script>
+{% endblock %}

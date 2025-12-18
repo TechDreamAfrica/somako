@@ -1,0 +1,129 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Shop PWA{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block shop_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .checkout-header {
+    background: #8b5cf6;
+    color: white;
+    padding: 1.5rem 1rem 1.25rem;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    position: relative;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-header">
+  <h1 style="font-size: 1.75rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.025em;">
+    <i class="fas fa-check-circle"></i> Checkout
+  </h1>
+  <p style="opacity: 0.95; margin: 0; font-size: 0.875rem;">Complete your order</p>
+</div>
+
+<div style="padding: 1rem; margin-bottom: 6rem;">
+  <form method="POST" action="{% url 'shop_pwa:confirm_order' %}">
+    {% csrf_token %}
+
+    <!-- Delivery Details -->
+    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+      <h3 style="font-weight: 700; margin-bottom: 1rem;">Delivery Information</h3>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Shipping Address *</label>
+        <textarea name="shipping_address" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;" rows="3"></textarea>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Phone Number *</label>
+        <input type="tel" name="shipping_phone" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px;">
+      </div>
+
+      <div>
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Notes (Optional)</label>
+        <textarea name="notes" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;" rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+      <h3 style="font-weight: 700; margin-bottom: 1rem;">Payment Method</h3>
+
+      <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem;">
+        <input type="radio" name="payment_method" value="cash" checked style="margin-right: 0.75rem;">
+        <span style="font-weight: 600;">Cash on Delivery</span>
+      </label>
+
+      <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px;">
+        <input type="radio" name="payment_method" value="card" style="margin-right: 0.75rem;">
+        <span style="font-weight: 600;">Card Payment</span>
+      </label>
+    </div>
+
+    <!-- Order Summary -->
+    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+      <h3 style="font-weight: 700; margin-bottom: 1rem;">Order Summary</h3>
+
+      {% for item in cart_items %}
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span>{{ item.variant.product.name }} (x{{ item.quantity }})</span>
+        <span style="font-weight: 600;">GHS {{ item.total_price|floatformat:2 }}</span>
+      </div>
+      {% endfor %}
+
+      <div style="border-top: 2px solid #e5e7eb; margin: 1rem 0; padding-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>Subtotal</span>
+          <span>GHS {{ subtotal|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>Shipping</span>
+          <span>GHS {{ shipping_fee|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span>Tax</span>
+          <span>GHS {{ tax|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.125rem; color: #8b5cf6;">
+          <span>Total</span>
+          <span>GHS {{ total|floatformat:2 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Place Order Button -->
+    <button type="submit" style="width: 100%; background: #8b5cf6; color: white; border: none; border-radius: 12px; padding: 1rem; font-size: 1rem; font-weight: 700;">
+      Place Order • GHS {{ total|floatformat:2 }}
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'shop_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'shop_pwa:product_list' %}" class="bottom-nav-item">
+    <i class="fas fa-th"></i>
+    <span>Products</span>
+  </a>
+  <a href="{% url 'shop_pwa:cart' %}" class="bottom-nav-item active">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Cart</span>
+  </a>
+  <a href="{% url 'shop_pwa:order_list' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

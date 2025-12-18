@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block content_class %}app-rent{% endblock %}
+{% block title %}Booking #{{ booking.id }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #14b8a6; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">
+          {% if booking.transaction_type == 'purchase' %}Purchase Details{% else %}Booking Details{% endif %}
+        </h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">
+          <i class="fas fa-receipt"></i> {% if booking.transaction_type == 'purchase' %}Purchase{% else %}Booking{% endif %} #{{ booking.id }}
+        </p>
+      </div>
+      <a href="{% url 'rent:booking_list' %}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; font-weight: 700; text-decoration: none; backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i> Back to {% if booking.transaction_type == 'purchase' %}Purchases{% else %}Bookings{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 3rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left - Booking Details -->
+      <div class="col-lg-8">
+        <!-- Status Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-info-circle" style="color: {% if booking.transaction_type == 'purchase' %}#14b8a6{% else %}#059669{% endif %};"></i> {% if booking.transaction_type == 'purchase' %}Purchase Status{% else %}Booking Status{% endif %}
+          </h3>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            {% if booking.status == 'confirmed' %}
+            <div style="background: #14b8a6; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #6ee7b7; flex: 1;">
+              <div style="font-weight: 800; color: #065f46; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-check-circle"></i> Confirmed
+              </div>
+              <div style="color: #047857; font-size: 0.875rem;">Your {% if booking.transaction_type == 'purchase' %}purchase{% else %}booking{% endif %} has been confirmed</div>
+            </div>
+            {% elif booking.status == 'cancelled' %}
+            <div style="background: #14b8a6; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #fca5a5; flex: 1;">
+              <div style="font-weight: 800; color: #991b1b; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-times-circle"></i> Cancelled
+              </div>
+              <div style="color: #ffffff; font-size: 0.875rem;">This {% if booking.transaction_type == 'purchase' %}purchase{% else %}booking{% endif %} has been cancelled</div>
+            </div>
+            {% elif booking.status == 'pending' %}
+            <div style="background: #14b8a6; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #fcd34d; flex: 1;">
+              <div style="font-weight: 800; color: #92400e; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-clock"></i> Pending
+              </div>
+              <div style="color: #b45309; font-size: 0.875rem;">Your {% if booking.transaction_type == 'purchase' %}purchase{% else %}booking{% endif %} is being processed</div>
+            </div>
+            {% elif booking.status == 'completed' %}
+            <div style="background: #14b8a6; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #5eead4; flex: 1;">
+              <div style="font-weight: 800; color: #115e59; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-flag-checkered"></i> Completed
+              </div>
+              <div style="color: #1d4ed8; font-size: 0.875rem;">This {% if booking.transaction_type == 'purchase' %}purchase{% else %}booking{% endif %} has been completed</div>
+            </div>
+            {% else %}
+            <div style="background: #14b8a6; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #9ca3af; flex: 1;">
+              <div style="font-weight: 800; color: #374151; font-size: 1.125rem; margin-bottom: 0.25rem;">
+                <i class="fas fa-info-circle"></i> {{ booking.status|title }}
+              </div>
+              <div style="color: #6b7280; font-size: 0.875rem;">Status information</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Item Details Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            {% if booking.property %}
+            <i class="fas fa-home" style="color: #059669;"></i> Property Details
+            {% else %}
+            <i class="fas fa-tools" style="color: #059669;"></i> Equipment Details
+            {% endif %}
+          </h3>
+
+          <div style="display: flex; gap: 1.5rem; padding: 1.5rem; border-radius: 0.875rem; background: #14b8a6; border: 2px solid #e5e7eb;">
+            <div style="width: 100px; height: 100px; background: #14b8a6; border-radius: 0.875rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid #6ee7b7;">
+              {% if booking.property %}
+              <i class="fas fa-building" style="font-size: 2.5rem; color: #059669;"></i>
+              {% else %}
+              <i class="fas fa-wrench" style="font-size: 2.5rem; color: #059669;"></i>
+              {% endif %}
+            </div>
+
+            <div style="flex: 1;">
+              <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; font-size: 1.25rem;">
+                {% if booking.property %}{{ booking.property.title }}{% else %}{{ booking.equipment.name }}{% endif %}
+              </h4>
+              {% if booking.property %}
+              <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 0.5rem;">
+                <i class="fas fa-map-marker-alt" style="color: #059669;"></i> {{ booking.property.city }}, {{ booking.property.state }}
+              </p>
+              {% if booking.property.bedrooms or booking.property.bathrooms %}
+              <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
+                {% if booking.property.bedrooms %}
+                <span style="background: #ecfdf5; color: #047857; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600; border: 2px solid #a7f3d0;">
+                  <i class="fas fa-bed"></i> {{ booking.property.bedrooms }} Bed{{ booking.property.bedrooms|pluralize }}
+                </span>
+                {% endif %}
+                {% if booking.property.bathrooms %}
+                <span style="background: #ecfdf5; color: #047857; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600; border: 2px solid #a7f3d0;">
+                  <i class="fas fa-bath"></i> {{ booking.property.bathrooms }} Bath{{ booking.property.bathrooms|pluralize }}
+                </span>
+                {% endif %}
+              </div>
+              {% endif %}
+              {% else %}
+              <p style="color: #6b7280; font-size: 0.9375rem; margin-bottom: 0.5rem;">
+                {% if booking.equipment.brand %}
+                  <i class="fas fa-tag" style="color: #059669;"></i> {{ booking.equipment.brand }}
+                {% endif %}
+              </p>
+              {% if booking.quantity > 1 %}
+              <div style="margin-top: 0.75rem;">
+                <span style="background: #ecfdf5; color: #047857; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 600; border: 2px solid #a7f3d0;">
+                  <i class="fas fa-boxes"></i> Quantity: {{ booking.quantity }}
+                </span>
+              </div>
+              {% endif %}
+              {% endif %}
+            </div>
+          </div>
+
+          {% if booking.notes %}
+          <div style="margin-top: 1.5rem; padding: 1.25rem; background: #fef3c7; border-radius: 0.75rem; border: 2px solid #fcd34d;">
+            <h4 style="font-weight: 700; color: #92400e; margin-bottom: 0.5rem; font-size: 0.9375rem;">
+              <i class="fas fa-sticky-note"></i> Notes
+            </h4>
+            <p style="color: #78350f; margin: 0; font-size: 0.9375rem;">{{ booking.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Rental Period Card (Hidden for Purchases) -->
+        {% if booking.transaction_type != 'purchase' %}
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-calendar-alt" style="color: #059669;"></i> Rental Period
+          </h3>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div style="background: #14b8a6; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #a7f3d0; text-align: center;">
+                <div style="font-weight: 700; color: #047857; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <i class="fas fa-calendar-check"></i> Start Date
+                </div>
+                <div style="font-weight: 900; color: #059669; font-size: 1.5rem; margin-bottom: 0.25rem;">{{ booking.start_date|date:"M d, Y" }}</div>
+                <div style="color: #065f46; font-size: 0.8125rem; font-weight: 600;">{{ booking.start_date|date:"l" }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div style="background: #14b8a6; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #fcd34d; text-align: center;">
+                <div style="font-weight: 700; color: #b45309; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <i class="fas fa-calendar-times"></i> End Date
+                </div>
+                <div style="font-weight: 900; color: #ffffff; font-size: 1.5rem; margin-bottom: 0.25rem;">{{ booking.end_date|date:"M d, Y" }}</div>
+                <div style="color: #92400e; font-size: 0.8125rem; font-weight: 600;">{{ booking.end_date|date:"l" }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <!-- Purchase Date Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-calendar-check" style="color: #14b8a6;"></i> Purchase Date
+          </h3>
+
+          <div style="background: #14b8a6; border-radius: 0.875rem; padding: 1.5rem; border: 2px solid #5eead4; text-align: center;">
+            <div style="font-weight: 700; color: #115e59; margin-bottom: 0.5rem; font-size: 0.875rem;">
+              <i class="fas fa-shopping-cart"></i> Purchased On
+            </div>
+            <div style="font-weight: 900; color: #14b8a6; font-size: 1.5rem; margin-bottom: 0.25rem;">{{ booking.created_at|date:"M d, Y" }}</div>
+            <div style="color: #2563eb; font-size: 0.8125rem; font-weight: 600;">{{ booking.created_at|date:"l, h:i A" }}</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right - Summary & Actions -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <!-- Price Summary Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); margin-bottom: 2rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+              <i class="fas fa-receipt" style="color: #059669;"></i> Price Summary
+            </h3>
+
+            <div style="border-bottom: 2px solid #f3f4f6; padding-bottom: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Subtotal</span>
+                <span style="font-weight: 700; color: #1f2937;">GHS {{ booking.total_amount }}</span>
+              </div>
+
+              {% if booking.security_deposit_paid %}
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: #6b7280; font-weight: 600;">Security Deposit</span>
+                <span style="font-weight: 700; color: #1f2937;">GHS {{ booking.security_deposit_paid }}</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid #059669;">
+              <span style="font-weight: 700; font-size: 1.125rem; color: #1f2937;">Total Amount</span>
+              <span style="font-weight: 900; font-size: 1.5rem; color: #059669;">GHS {{ booking.total_amount }}</span>
+            </div>
+
+            <!-- Status Actions -->
+            {% if booking.status == 'pending' %}
+            <form method="post" action="{% url 'rent:booking_cancel' booking.pk %}" style="margin-top: 1.5rem;" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+              {% csrf_token %}
+              <button type="submit" style="width: 100%; padding: 1.125rem; background: #14b8a6; color: #991b1b; border: 2px solid #fca5a5; border-radius: 0.875rem; font-weight: 700; font-size: 1.0625rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#ffffff'; this.style.color='white'; this.style.borderColor='#ffffff'" onmouseout="this.style.background='#fee2e2'; this.style.color='#991b1b'; this.style.borderColor='#fca5a5'">
+                <i class="fas fa-times-circle"></i> Cancel Booking
+              </button>
+            </form>
+            {% elif booking.status == 'confirmed' %}
+            <div style="margin-top: 1.5rem; background: #14b8a6; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #6ee7b7;">
+              <div style="display: flex; gap: 0.75rem; align-items: start;">
+                <i class="fas fa-check-circle" style="color: #065f46; font-size: 1.5rem;"></i>
+                <div>
+                  <div style="font-weight: 700; color: #065f46; margin-bottom: 0.25rem;">Booking Confirmed</div>
+                  <div style="color: #047857; font-size: 0.875rem;">Your reservation is confirmed</div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Booking Info Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+              <i class="fas fa-info-circle" style="color: #059669;"></i> Booking Information
+            </h3>
+
+            <div style="color: #374151; line-height: 1.8;">
+              <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.625rem;">
+                <i class="fas fa-plus-circle" style="color: #059669; width: 20px;"></i>
+                <span style="font-size: 0.875rem;"><strong>Created:</strong> {{ booking.created_at|date:"M d, Y h:i A" }}</span>
+              </p>
+              <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.625rem;">
+                <i class="fas fa-sync-alt" style="color: #059669; width: 20px;"></i>
+                <span style="font-size: 0.875rem;"><strong>Updated:</strong> {{ booking.updated_at|date:"M d, Y h:i A" }}</span>
+              </p>
+              <p style="margin-bottom: 0; display: flex; align-items: center; gap: 0.625rem;">
+                <i class="fas fa-hashtag" style="color: #059669; width: 20px;"></i>
+                <span style="font-size: 0.875rem;"><strong>Booking ID:</strong> #{{ booking.id }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

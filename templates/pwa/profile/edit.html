@@ -1,0 +1,367 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - {{ service_name|default:"Soma Ko" }}{% endblock %}
+{% block theme_color %}{{ app_color|default:"#059669" }}{% endblock %}
+{% block pwa_app_name %}profile{% endblock %}
+
+{% block auth_banner %}
+  <!-- Hide auth banner on profile pages -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #f9fafb;
+  }
+
+  /* Header */
+  .edit-header {
+    background: #6366f1;
+    padding: 1.5rem 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  /* Form Container */
+  .form-container {
+    padding: 1rem;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Profile Picture Section */
+  .profile-pic-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .current-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: #6366f1;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border: 4px solid #f3f4f6;
+    overflow: hidden;
+  }
+
+  .current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: {{ app_color|default:"#059669" }};
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .upload-btn:hover {
+    background: {{ app_color_dark|default:"#047857" }};
+    transform: translateY(-2px);
+  }
+
+  #profile_picture {
+    display: none;
+  }
+
+  /* Form Groups */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-label .required {
+    color: #dc2626;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: {{ app_color|default:"#059669" }};
+    box-shadow: 0 0 0 3px {{ app_color|default:"#059669" }}20;
+  }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  .form-help {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+  }
+
+  /* Messages */
+  .message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .message.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  /* Submit Button */
+  .submit-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px {{ app_color|default:"#059669" }}40;
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Bottom spacing */
+  .content-spacer {
+    height: 80px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="edit-header">
+  <button onclick="history.back()" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+  <div class="header-title">Edit Profile</div>
+</div>
+
+<!-- Form -->
+<div class="form-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">
+        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Profile Picture -->
+      <div class="profile-pic-section">
+        <div class="current-avatar" id="avatarPreview">
+          {% if user.profile_picture %}
+            <img src="{{ user.profile_picture }}" alt="Profile">
+          {% else %}
+            <i class="fas fa-user"></i>
+          {% endif %}
+        </div>
+        <label for="profile_picture" class="upload-btn">
+          <i class="fas fa-link"></i>
+          Image URL
+        </label>
+        <input type="url" id="profile_picture" name="profile_picture" placeholder="https://example.com/image.jpg" value="{{ user.profile_picture|default:'' }}">
+        <p class="form-help">Enter direct image URL from GitHub, Imgur, etc.</p>
+      </div>
+
+      <!-- Basic Information -->
+      <div class="form-group">
+        <label class="form-label">
+          First Name <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          name="first_name" 
+          class="form-input" 
+          value="{{ user.first_name }}"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Last Name <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          name="last_name" 
+          class="form-input" 
+          value="{{ user.last_name }}"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Email <span class="required">*</span>
+        </label>
+        <input 
+          type="email" 
+          name="email" 
+          class="form-input" 
+          value="{{ user.email }}"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Phone Number
+        </label>
+        <input 
+          type="tel" 
+          name="phone_number" 
+          class="form-input" 
+          value="{{ user.phone_number|default:'' }}"
+          placeholder="+234 800 000 0000"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Location
+        </label>
+        <input 
+          type="text" 
+          name="location" 
+          class="form-input" 
+          value="{{ user.location|default:'' }}"
+          placeholder="City, State"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Bio
+        </label>
+        <textarea 
+          name="bio" 
+          class="form-input"
+          placeholder="Tell us a bit about yourself..."
+        >{{ user.bio|default:'' }}</textarea>
+        <p class="form-help">Brief description for your profile (optional)</p>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-section">
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-save"></i>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="content-spacer"></div>
+
+<script>
+// Profile picture preview
+document.getElementById('profile_picture').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('avatarPreview').innerHTML = 
+        '<img src="' + e.target.result + '" alt="Preview">';
+    }
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+{% endblock %}

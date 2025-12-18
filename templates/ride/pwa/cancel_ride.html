@@ -1,0 +1,401 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Cancel Ride - Soma Ko Ride{% endblock %}
+{% block pwa_app_name %}ride{% endblock %}
+{% block login_banner_color_1 %}#eab308{% endblock %}
+{% block login_banner_color_2 %}#ffffff{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero Banner Styles */
+  .hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 1rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .hero-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    background: #eab308;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cancel-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0 1rem 1rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .warning-banner {
+    background: #eab308;
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .warning-icon {
+    font-size: 1.5rem;
+    color: #eab308;
+    flex-shrink: 0;
+  }
+
+  .warning-text {
+    color: #92400e;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .ride-summary {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .summary-row:last-child {
+    border-bottom: none;
+  }
+
+  .summary-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .summary-value {
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  .reason-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .reason-label {
+    display: block;
+    color: #374151;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .reason-option {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .reason-option:hover {
+    border-color: #eab308;
+    background: #fff7ed;
+  }
+
+  .reason-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #eab308;
+    cursor: pointer;
+  }
+
+  .reason-option label {
+    flex: 1;
+    cursor: pointer;
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .custom-reason {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 100px;
+    transition: all 0.2s;
+  }
+
+  .custom-reason:focus {
+    outline: none;
+    border-color: #eab308;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+  }
+
+  .btn-cancel-ride {
+    width: 100%;
+    background: #eab308;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .btn-cancel-ride:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  .btn-go-back {
+    width: 100%;
+    background: white;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 6rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .btn-go-back:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-header">
+  <div class="banner-container">
+    <!-- Banner background image can be added here -->
+  </div>
+  <div class="hero-profile">
+    <div class="hero-icon-container">
+      <i class="fas fa-times-circle" style="color: white; font-size: 3rem;"></i>
+    </div>
+    <h1 class="hero-title">Cancel Ride</h1>
+    <p class="hero-subtitle">Are you sure you want to cancel this ride?</p>
+  </div>
+</div>
+
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+
+<div class="cancel-card">
+  <!-- Warning Banner -->
+  <div class="warning-banner">
+    <i class="fas fa-exclamation-triangle warning-icon"></i>
+    <div class="warning-text">
+      <strong>Important:</strong> Frequent cancellations may affect your account standing and future ride requests.
+    </div>
+  </div>
+
+  <!-- Ride Summary -->
+  <div class="ride-summary">
+    <h3 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">
+      <i class="fas fa-info-circle" style="color: #eab308;"></i> Ride Details
+    </h3>
+    <div class="summary-row">
+      <span class="summary-label"><i class="fas fa-hashtag"></i> Ride ID</span>
+      <span class="summary-value">#{{ ride.ride_id }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label"><i class="fas fa-map-marker-alt"></i> Pickup</span>
+      <span class="summary-value">{{ ride.pickup_address|truncatewords:5 }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label"><i class="fas fa-flag-checkered"></i> Dropoff</span>
+      <span class="summary-value">{{ ride.dropoff_address|truncatewords:5 }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label"><i class="fas fa-money-bill-wave"></i> Fare</span>
+      <span class="summary-value">GHS {{ ride.total_fare|floatformat:2 }}</span>
+    </div>
+    {% if ride.driver %}
+    <div class="summary-row">
+      <span class="summary-label"><i class="fas fa-user-tie"></i> Driver</span>
+      <span class="summary-value">{{ ride.driver.user.get_full_name }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Cancellation Form -->
+  <form method="POST" action="{% url 'ride_pwa:cancel_ride' ride.id %}">
+    {% csrf_token %}
+
+    <div class="reason-group">
+      <label class="reason-label">
+        <i class="fas fa-comment-alt"></i> Why are you cancelling?
+      </label>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason1" value="Changed my plans" required>
+        <label for="reason1">Changed my plans</label>
+      </div>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason2" value="Taking too long to find driver">
+        <label for="reason2">Taking too long to find driver</label>
+      </div>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason3" value="Found alternative transportation">
+        <label for="reason3">Found alternative transportation</label>
+      </div>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason4" value="Wrong pickup location">
+        <label for="reason4">Wrong pickup location</label>
+      </div>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason5" value="Price is too high">
+        <label for="reason5">Price is too high</label>
+      </div>
+
+      <div class="reason-option">
+        <input type="radio" name="reason" id="reason_other" value="other">
+        <label for="reason_other">Other (please specify)</label>
+      </div>
+
+      <div id="customReasonContainer" style="display: none; margin-top: 0.75rem;">
+        <textarea name="custom_reason" id="customReason" class="custom-reason" placeholder="Please tell us why you're cancelling..."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-cancel-ride">
+      <i class="fas fa-times-circle"></i> Confirm Cancellation
+    </button>
+  </form>
+
+  <button onclick="window.history.back()" class="btn-go-back">
+    <i class="fas fa-arrow-left"></i> Go Back
+  </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Show/hide custom reason textarea
+  const reasonOther = document.getElementById('reason_other');
+  const customReasonContainer = document.getElementById('customReasonContainer');
+  const customReasonTextarea = document.getElementById('customReason');
+
+  document.querySelectorAll('input[name="reason"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.id === 'reason_other') {
+        customReasonContainer.style.display = 'block';
+        customReasonTextarea.required = true;
+      } else {
+        customReasonContainer.style.display = 'none';
+        customReasonTextarea.required = false;
+      }
+    });
+  });
+
+  // Form validation
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const reasonOtherChecked = document.getElementById('reason_other').checked;
+    const customReason = document.getElementById('customReason').value.trim();
+
+    if (reasonOtherChecked && !customReason) {
+      e.preventDefault();
+      alert('Please specify your reason for cancellation');
+      return false;
+    }
+
+    // Confirm cancellation
+    if (!confirm('Are you sure you want to cancel this ride? This action cannot be undone.')) {
+      e.preventDefault();
+      return false;
+    }
+
+    return true;
+  });
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'ride_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'ride_pwa:book_ride' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Book</span>
+  </a>
+  <a href="{% url 'ride_pwa:ride_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-list"></i>
+    <span>Rides</span>
+  </a>
+  <a href="{% url 'ride_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

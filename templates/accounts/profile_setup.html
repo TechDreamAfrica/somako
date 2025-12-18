@@ -1,0 +1,515 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Complete Your
+Profile - Soma Ko{% endblock %} {% block extra_css %}
+
+
+
+
+{% endblock %} {% block content %}
+<!-- Setup Header -->
+<div>
+  <div>
+    <div>
+      <div>
+        <div>
+          <div>
+            <div>
+              <i></i>
+            </div>
+          </div>
+          <h1>Welcome to Soma Ko!</h1>
+          <p>Let's set up your profile to get you started</p>
+
+          <!-- Progress Bar -->
+          <div>
+            <div></div>
+          </div>
+          <small>Step 1 of 4: Basic Information</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div>
+    <div>
+      <!-- User Type Info -->
+      <div>
+        <h6>
+          <i
+          ></i>
+          Account Type: {{ user.get_user_type_display }}
+        </h6>
+        <p>
+          {% if user.user_type == 'worker' %} As a professional, you can
+          showcase your skills, build a portfolio, and find exciting projects.
+          {% else %} As a client, you can post projects, browse professionals,
+          and find the right talent for your needs. {% endif %}
+        </p>
+      </div>
+
+      <!-- Setup Form -->
+      <div>
+        <div>
+          <h3>Complete Your Profile</h3>
+          <p>
+            This information helps others find and connect with you
+          </p>
+        </div>
+
+        <div>
+          {% if messages %} {% for message in messages %}
+          <div
+            role="alert"
+          >
+            <i
+            ></i>
+            {{ message }}
+            <button
+              type="button"
+              data-bs-dismiss="alert"
+            ></button>
+          </div>
+          {% endfor %} {% endif %}
+
+          <form method="post" enctype="multipart/form-data" id="setupForm">
+            {% csrf_token %}
+
+            <!-- Basic Information Section -->
+            <div>
+              <div>
+                <div>
+                  <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    value="{{ user.first_name }}"
+                    placeholder="First Name"
+                    required
+                  />
+                  <label for="first_name">First Name *</label>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    value="{{ user.last_name }}"
+                    placeholder="Last Name"
+                    required
+                  />
+                  <label for="last_name">Last Name *</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div>
+                <div>
+                  <input
+                    type="tel"
+                    id="phone_number"
+                    name="phone_number"
+                    value="{{ user.phone_number|default:'' }}"
+                    placeholder="Phone Number"
+                  />
+                  <label for="phone_number">Phone Number</label>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value="{{ user.location|default:'' }}"
+                    placeholder="Location"
+                  />
+                  <label for="location">Location (City, Region)</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <textarea
+                id="bio"
+                name="bio"
+                placeholder="Tell us about yourself..."
+              >
+{{ user.bio|default:'' }}</textarea
+              >
+              <label for="bio">About You</label>
+            </div>
+
+            <!-- Profile Picture Upload -->
+            <div>
+              <label>Profile Picture</label>
+              <div
+                onclick="document.getElementById('profile_picture').click()"
+              >
+                <i></i>
+                <p>Click to upload or drag & drop</p>
+                <small>JPG, PNG, GIF up to 5MB</small>
+                <div id="imagePreview"></div>
+              </div>
+              <input
+                type="file"
+                id="profile_picture"
+                name="profile_picture"
+                accept="image/*"
+              />
+            </div>
+
+            {% if user.user_type == 'worker' %}
+            <!-- Worker-Specific Fields -->
+            <hr />
+            <h5>
+              <i></i>Professional Information
+            </h5>
+
+            <div>
+              <div>
+                <div>
+                  <input
+                    type="text"
+                    id="profession"
+                    name="profession"
+                    placeholder="Profession"
+                  />
+                  <label for="profession"
+                    >Profession (e.g., Electrician, Plumber)</label
+                  >
+                </div>
+              </div>
+              <div>
+                <div>
+                  <input
+                    type="number"
+                    id="experience_years"
+                    name="experience_years"
+                    min="0"
+                    max="50"
+                    placeholder="Experience Years"
+                  />
+                  <label for="experience_years">Years of Experience</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div>
+                <div>
+                  <input
+                    type="number"
+                    id="hourly_rate"
+                    name="hourly_rate"
+                    min="5"
+                    max="1000"
+                    step="0.01"
+                    placeholder="Hourly Rate"
+                  />
+                  <label for="hourly_rate">Hourly Rate (GHS)</label>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <input
+                    type="url"
+                    id="portfolio"
+                    name="portfolio"
+                    placeholder="Portfolio URL"
+                  />
+                  <label for="portfolio">Portfolio Website (Optional)</label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <textarea
+                id="education"
+                name="education"
+                placeholder="Educational Background"
+              ></textarea>
+              <label for="education">Educational Background</label>
+            </div>
+
+            <div>
+              <textarea
+                id="certifications"
+                name="certifications"
+                placeholder="Certifications and Qualifications"
+              ></textarea>
+              <label for="certifications"
+                >Certifications & Qualifications</label
+              >
+            </div>
+
+            <!-- Skills Selection -->
+            <div>
+              <label>Select Your Skills</label>
+              <div>
+                {% regroup all_skills by category as skills_by_category %}
+                {% for category_group in skills_by_category %}
+                <div>
+                  <h6>
+                    <i></i>{{ category_group.grouper.name }}
+                  </h6>
+                  {% for skill in category_group.list %}
+                  <div>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="skills"
+                        value="{{ skill.id }}"
+                      />
+                      {{ skill.name }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% empty %}
+                <p>
+                  No skills available. Please contact administrator.
+                </p>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Availability -->
+            <div>
+              <div>
+                <input
+                  type="checkbox"
+                  id="availability"
+                  name="availability"
+                  checked
+                />
+                <label for="availability">
+                  <strong>I'm available for new projects</strong><br />
+                  <small
+                    >You can change this anytime from your profile</small
+                  >
+                </label>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Completion Tips -->
+            <div>
+              <h6>
+                <i></i>Tips for a Great Profile
+              </h6>
+              <ul>
+                <li>Add a professional profile picture</li>
+                <li>Write a compelling bio that highlights your strengths</li>
+                {% if user.user_type == 'worker' %}
+                <li>Select relevant skills to help clients find you</li>
+                <li>Include your experience and certifications</li>
+                {% endif %}
+                <li>Keep your contact information up to date</li>
+              </ul>
+            </div>
+
+            <!-- Form Actions -->
+            <div>
+              <a href="{% url 'accounts:dashboard' %}">
+                Skip for now
+              </a>
+              <div>
+                <button type="submit">
+                  <i></i>Complete Profile
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Profile picture upload preview
+    const profilePictureInput = document.getElementById("profile_picture");
+    const imagePreview = document.getElementById("imagePreview");
+
+    if (profilePictureInput) {
+      profilePictureInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file size (5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert("File size must be less than 5MB");
+            this.value = "";
+            return;
+          }
+
+          // Validate file type
+          if (!file.type.startsWith("image/")) {
+            alert("Please select an image file");
+            this.value = "";
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <p><strong>Selected:</strong> ${file.name}</p>
+                    `;
+
+            // Update progress bar
+            updateProgressBar();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Drag and drop functionality
+    const uploadArea = document.querySelector(".upload-area");
+    if (uploadArea) {
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, highlight, false);
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+      });
+
+      function highlight(e) {
+        uploadArea.classList.add("dragover");
+      }
+
+      function unhighlight(e) {
+        uploadArea.classList.remove("dragover");
+      }
+
+      uploadArea.addEventListener("drop", handleDrop, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+          profilePictureInput.files = files;
+          profilePictureInput.dispatchEvent(new Event("change"));
+        }
+      }
+    }
+
+    // Progress bar update based on form completion
+    function updateProgressBar() {
+      const requiredFields = ["first_name", "last_name"];
+      const optionalFields = [
+        "phone_number",
+        "location",
+        "bio",
+        "profile_picture",
+      ];
+
+      let completedRequired = 0;
+      let completedOptional = 0;
+
+      requiredFields.forEach((fieldName) => {
+        const field = document.getElementById(fieldName);
+        if (field && field.value.trim()) {
+          completedRequired++;
+        }
+      });
+
+      optionalFields.forEach((fieldName) => {
+        const field = document.getElementById(fieldName);
+        if (field && (field.value.trim() || field.files.length > 0)) {
+          completedOptional++;
+        }
+      });
+
+      // Check skills for workers
+      if (document.querySelector('input[name="skills"]')) {
+        const selectedSkills = document.querySelectorAll(
+          'input[name="skills"]:checked'
+        );
+        if (selectedSkills.length > 0) {
+          completedOptional++;
+        }
+      }
+
+      const totalRequired = requiredFields.length;
+      const totalOptional =
+        optionalFields.length +
+        (document.querySelector('input[name="skills"]') ? 1 : 0);
+
+      const progress =
+        (completedRequired / totalRequired) * 70 +
+        (completedOptional / totalOptional) * 30;
+      const progressBar = document.querySelector(".progress-bar");
+
+      if (progressBar) {
+        progressBar.style.width = Math.min(progress, 100) + "%";
+      }
+    }
+
+    // Update progress on field changes
+    document.querySelectorAll("input, textarea, select").forEach((field) => {
+      field.addEventListener("input", updateProgressBar);
+      field.addEventListener("change", updateProgressBar);
+    });
+
+    // Initial progress calculation
+    updateProgressBar();
+
+    // Form validation
+    const setupForm = document.getElementById("setupForm");
+    if (setupForm) {
+      setupForm.addEventListener("submit", function (e) {
+        const firstName = document.getElementById("first_name").value.trim();
+        const lastName = document.getElementById("last_name").value.trim();
+
+        if (!firstName || !lastName) {
+          e.preventDefault();
+          alert("First name and last name are required.");
+          return;
+        }
+
+        // Check if worker has selected skills
+        const skillInputs = document.querySelectorAll('input[name="skills"]');
+        if (skillInputs.length > 0) {
+          const selectedSkills = document.querySelectorAll(
+            'input[name="skills"]:checked'
+          );
+          if (selectedSkills.length === 0) {
+            const confirmSkip = confirm(
+              "You haven't selected any skills. Skills help clients find you. Are you sure you want to continue?"
+            );
+            if (!confirmSkip) {
+              e.preventDefault();
+              return;
+            }
+          }
+        }
+      });
+    }
+
+    // Auto-resize textareas
+    document.querySelectorAll("textarea").forEach((textarea) => {
+      textarea.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+    });
+  });
+</script>
+{% endblock %}

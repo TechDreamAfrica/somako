@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}Order Success{% endblock %}
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<div>
+  <div>
+    <i></i>
+    <h1>Order Placed Successfully!</h1>
+    <p>Order #{{ order.order_number }}</p>
+    <a href="{% url 'pharmacy:order_detail' order.id %}">View Order</a>
+  </div>
+</div>
+{% endblock %}

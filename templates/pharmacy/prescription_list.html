@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}My Prescriptions{% endblock %}
+{% block extra_css %}
+
+
+
+{% endblock %}
+
+{% block content %}
+<div>
+  <h1>My Prescriptions</h1>
+  <a href="{% url 'pharmacy:prescription_upload' %}">Upload New</a>
+  <div>
+    {% for prescription in prescriptions %}
+    <div>
+      <div>
+        <div>
+          <h5>{{ prescription.prescription_number }}</h5>
+          <span>{{ prescription.get_status_display }}</span>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div><h4>No Prescriptions</h4></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

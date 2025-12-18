@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Subscription Plans - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #6366f1; padding: 5rem 0 4rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div class="text-center" style="max-width: 700px; margin: 0 auto;">
+      <span style="display: inline-flex; align-items: center; gap: 0.625rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.625rem 1.5rem; border-radius: 50px; font-size: 0.9375rem; font-weight: 600; color: white; margin-bottom: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+        <i class="fas {{ service_context.icon }}"></i>{% if service_name %}{{ service_context.heading|truncatewords:2 }}{% else %}Provider Plans{% endif %}
+      </span>
+      <h1 style="font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 900; color: white; margin-bottom: 1.25rem; letter-spacing: -1.5px; text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">{{ service_context.heading|default:'Choose Your Plan' }}</h1>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.95); line-height: 1.7;">{{ service_context.subheading|default:'Select the perfect subscription plan for your business needs' }}</p>
+      {% if not is_provider %}
+      <div style="background: rgba(245, 158, 11, 0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 1rem; margin-top: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.4); max-width: 600px; margin-left: auto; margin-right: auto;">
+        <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Subscriptions are only available for service providers (Drivers, Restaurants, Shops, Pharmacies, Landlords)
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Cards -->
+<section style="padding: 5rem 0; background: #6366f1; margin-top: -3rem;">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      {% for plan in plans %}
+      <div class="col-md-6 col-lg-4">
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, {% if plan.is_popular %}0.15{% else %}0.08{% endif %}); border: 2px solid {% if plan.is_popular %}#059669{% else %}#f3f4f6{% endif %}; position: relative; transition: all 0.4s ease; height: 100%;" {% if plan.is_popular %}onmouseover="this.style.transform='translateY(-15px) scale(1.02)'" onmouseout="this.style.transform='translateY(0) scale(1)'"{% else %}onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'"{% endif %}>
+
+          {% if plan.is_popular %}
+          <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);">
+            <i class="fas fa-star"></i> MOST POPULAR
+          </div>
+          {% endif %}
+
+          <!-- Plan Icon -->
+          <div style="width: 80px; height: 80px; background: #6366f1; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);">
+            <i class="fas {% if plan.name == 'basic' %}fa-rocket{% elif plan.name == 'standard' %}fa-star{% else %}fa-crown{% endif %}" style="font-size: 2.5rem; color: {% if plan.name == 'basic' %}#3b82f6{% elif plan.name == 'standard' %}#059669{% else %}#f59e0b{% endif %};"></i>
+          </div>
+
+          <!-- Plan Name -->
+          <h3 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">{{ plan.display_name }}</h3>
+
+          <!-- Price -->
+          <div style="margin-bottom: 1.5rem;">
+            <span style="font-size: 3.5rem; font-weight: 900; color: {% if plan.name == 'basic' %}#3b82f6{% elif plan.name == 'standard' %}#059669{% else %}#f59e0b{% endif %}; line-height: 1;">GHS {{ plan.price }}</span>
+            <span style="color: #6b7280; font-size: 1.125rem; font-weight: 600;">/month</span>
+          </div>
+
+          <!-- Description -->
+          <p style="color: #6b7280; font-size: 0.9375rem; line-height: 1.7; margin-bottom: 2rem; min-height: 60px;">{{ plan.description }}</p>
+
+          <!-- Features -->
+          <ul style="list-style: none; padding: 0; margin: 0 0 2rem 0; space-y: 0.75rem;">
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>{% if plan.max_listings == -1 %}Unlimited{% else %}{{ plan.max_listings }}{% endif %} Active Listings</span>
+            </li>
+            {% if plan.featured_listings > 0 %}
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>{{ plan.featured_listings }} Featured Listing{% if plan.featured_listings > 1 %}s{% endif %}</span>
+            </li>
+            {% endif %}
+            {% if plan.priority_support %}
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>Priority Support</span>
+            </li>
+            {% endif %}
+            {% if plan.analytics_access %}
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>Analytics Dashboard</span>
+            </li>
+            {% endif %}
+            {% if plan.verification_badge %}
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>Verification Badge</span>
+            </li>
+            {% endif %}
+            <li style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563; font-size: 0.9375rem; margin-bottom: 0.875rem;">
+              <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
+              <span>{{ plan.commission_rate }}% Commission Rate</span>
+            </li>
+          </ul>
+
+          <!-- CTA Button -->
+          {% if not is_provider %}
+          <button disabled style="width: 100%; padding: 1rem; background: #e5e7eb; color: #9ca3af; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 0.625rem;">
+            <i class="fas fa-lock"></i>Providers Only
+          </button>
+          {% elif user_subscription and user_subscription.plan.id == plan.id and user_subscription.is_active %}
+          <button disabled style="width: 100%; padding: 1rem; background: #e5e7eb; color: #9ca3af; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 0.625rem;">
+            <i class="fas fa-check"></i>Current Plan
+          </button>
+          {% else %}
+          <a href="{% url 'accounts:subscribe' plan.id %}" style="width: 100%; padding: 1rem; background: #6366f1; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.625rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'">
+            <i class="fas fa-bolt"></i>{% if user_subscription %}Upgrade{% else %}Subscribe Now{% endif %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Features Comparison -->
+    <div style="margin-top: 5rem; text-align: center;">
+      <p style="color: #6b7280; font-size: 1rem;">All plans include <strong style="color: #059669;">24/7 customer support</strong> and <strong style="color: #059669;">secure payment processing</strong></p>
+    </div>
+  </div>
+</section>
+{% endblock %}
