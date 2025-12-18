@@ -73,7 +73,7 @@
         <div class="col-md-4">
           <div style="display: flex; flex-direction: column; align-items: end; gap: 1rem;">
             <h4 style="font-size: 2rem; font-weight: 900; color: #f97316; margin: 0;">GHS {{ order.total_amount|default:"0.00" }}</h4>
-            <a href="{% url 'food:order_detail' order.id %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1.5rem; background: #f97316; color: white; border-radius: 0.75rem; font-weight: 700; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <a href="{% url 'food:order_detail' order.order_number %}" style="display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1.5rem; background: #f97316; color: white; border-radius: 0.75rem; font-weight: 700; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
               <i class="fas fa-eye"></i>View Details
             </a>
           </div>

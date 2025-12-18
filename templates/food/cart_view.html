@@ -379,7 +379,7 @@ document.addEventListener('click', function(e) {
     <i class="fas fa-compass" style="font-size: 20px; margin-bottom: 4px;"></i>
     <span>Explore</span>
   </a>
-  <a href="{% url 'food:cart' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #f97316; font-size: 12px; font-weight: 600; padding: 8px; position: relative; transition: all 0.2s ease;">
+  <a href="{% url 'food:cart_view' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #f97316; font-size: 12px; font-weight: 600; padding: 8px; position: relative; transition: all 0.2s ease;">
     <i class="fas fa-shopping-cart" style="font-size: 20px; margin-bottom: 4px;"></i>
     <span>Cart</span>
     {% if cart_items %}
@@ -388,7 +388,7 @@ document.addEventListener('click', function(e) {
     </div>
     {% endif %}
   </a>
-  <a href="{% url 'food:orders' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
+  <a href="{% url 'food:order_list' %}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px; transition: all 0.2s ease;">
     <i class="fas fa-receipt" style="font-size: 20px; margin-bottom: 4px;"></i>
     <span>Orders</span>
   </a>
