@@ -924,30 +924,39 @@
     <div class="action-subtitle">View your income</div>
   </a>
 
-  <a href="{% url 'express_pwa:delivery_history' %}" class="quick-action-card">
-    <div class="action-icon">
-      <i class="fas fa-history"></i>
-    </div>
-    <div class="action-title">History</div>
-    <div class="action-subtitle">Past deliveries</div>
-  </a>
+    <a href="{% url 'express_pwa:delivery_history' %}" class="group bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-emerald-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+      <div class="flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <i class="fas fa-history text-white text-xl"></i>
+        </div>
+        <div class="text-gray-800 font-black text-lg mb-2">History</div>
+        <div class="text-gray-600 text-sm font-medium">Past deliveries</div>
+      </div>
+    </a>
+  </div>
   {% else %}
-  <!-- Customer Actions -->
-  <a href="{% url 'express_pwa:create_order' %}" class="quick-action-card">
-    <div class="action-icon">
-      <i class="fas fa-plus-circle"></i>
-    </div>
-    <div class="action-title">Create Order</div>
-    <div class="action-subtitle">Start a new delivery</div>
-  </a>
+  <!-- Customer Actions Grid -->
+  <div class="grid grid-cols-2 gap-4 mb-4">
+    <a href="{% url 'express_pwa:create_order' %}" class="group bg-gradient-to-br from-emerald-500 to-green-500 rounded-3xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+      <div class="flex flex-col items-center text-center text-white">
+        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 border border-white/30">
+          <i class="fas fa-plus-circle text-2xl"></i>
+        </div>
+        <div class="font-black text-lg mb-2">Create Order</div>
+        <div class="text-emerald-100 text-sm font-medium">Start a new delivery</div>
+      </div>
+    </a>
 
-  <a href="{% url 'express_pwa:order_tracking' %}" class="quick-action-card">
-    <div class="action-icon">
-      <i class="fas fa-map-marker-alt"></i>
-    </div>
-    <div class="action-title">Track Orders</div>
-    <div class="action-subtitle">View & track all orders</div>
-  </a>
+    <a href="{% url 'express_pwa:order_tracking' %}" class="group bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-emerald-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+      <div class="flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+          <i class="fas fa-search text-white text-xl"></i>
+        </div>
+        <div class="text-gray-800 font-black text-lg mb-2">Track Orders</div>
+        <div class="text-gray-600 text-sm font-medium">View & track all orders</div>
+      </div>
+    </a>
+  </div>
 
   <a href="{% url 'express_pwa:create_order' %}" class="quick-action-card">
     <div class="action-icon">

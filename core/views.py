@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Avg
+from django.http import HttpResponse
 from accounts.models import User
 
 # Import models from service apps
@@ -110,3 +111,13 @@ def home(request):
         'unique_cities': unique_cities,
     }
     return render(request, 'core/home.html', context)
+
+
+def downloads(request):
+    """Downloads page for Soma Ko mobile app"""
+    context = {
+        'ios_url': 'http://www.somako.org/pwa/express',
+        'android_url': 'http://www.somako.org/pwa/express',
+        'apk_filename': 'soma-ko-app.apk'  # Adjust this to match your actual APK filename
+    }
+    return render(request, 'core/downloads.html', context)
