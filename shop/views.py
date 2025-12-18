@@ -654,28 +654,56 @@ def order_detail(request, order_number):
     """
     Display detailed order information.
     """
-    order = get_object_or_404(
-        Order.objects.prefetch_related(
-            Prefetch(
-                'items',
-                queryset=OrderItem.objects.select_related(
-                    'variant__product'
-                ).prefetch_related('variant__product__images')
+    # Try to determine if order_number is actually an ID (numeric)
+    try:
+        order_id = int(order_number)
+        # If it's numeric, search by ID
+        order = get_object_or_404(
+            Order.objects.prefetch_related(
+                Prefetch(
+                    'items',
+                    queryset=OrderItem.objects.select_related(
+                        'variant__product'
+                    ).prefetch_related('variant__product__images')
+                ),
+                Prefetch(
+                    'payments',
+                    queryset=Payment.objects.order_by('-created_at')
+                ),
+                Prefetch(
+                    'status_history',
+                    queryset=OrderStatusHistory.objects.select_related(
+                        'changed_by'
+                    ).order_by('-created_at')
+                )
             ),
-            Prefetch(
-                'payments',
-                queryset=Payment.objects.order_by('-created_at')
+            id=order_id,
+            user=request.user
+        )
+    except ValueError:
+        # If it's not numeric, search by order_number
+        order = get_object_or_404(
+            Order.objects.prefetch_related(
+                Prefetch(
+                    'items',
+                    queryset=OrderItem.objects.select_related(
+                        'variant__product'
+                    ).prefetch_related('variant__product__images')
+                ),
+                Prefetch(
+                    'payments',
+                    queryset=Payment.objects.order_by('-created_at')
+                ),
+                Prefetch(
+                    'status_history',
+                    queryset=OrderStatusHistory.objects.select_related(
+                        'changed_by'
+                    ).order_by('-created_at')
+                )
             ),
-            Prefetch(
-                'status_history',
-                queryset=OrderStatusHistory.objects.select_related(
-                    'changed_by'
-                ).order_by('-created_at')
-            )
-        ),
-        order_number=order_number,
-        user=request.user
-    )
+            order_number=order_number,
+            user=request.user
+        )
 
     context = {
         'order': order,
