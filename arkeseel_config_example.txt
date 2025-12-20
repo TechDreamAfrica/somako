@@ -1,0 +1,15 @@
+# Arkesel SMS API Configuration (matches existing utils/sms_utils.py)
+# Add these to your .env file:
+
+# ARKESEL_API_KEY=your_arkesel_api_key_here
+# ARKESEL_SENDER_ID=Soma Ko
+
+# Example usage in your .env file:
+# ARKESEL_API_KEY=ak_test_1234567890abcdef
+# ARKESEL_SENDER_ID=Soma Ko
+
+# Note: This matches the naming convention used in utils/sms_utils.py
+# The system now uses the existing comprehensive SMS utilities
+
+# Make sure to get your actual API key from Arkesel dashboard
+# Visit: https://sms.arkesel.com to create an account and get your API key

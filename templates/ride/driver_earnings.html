@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content_class %}app-ride{% endblock %}
+{% block title %}Driver Earnings - Soma Ko Rides{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #10b981; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Earnings Report</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">
+          <i class="fas fa-chart-line"></i> Track your earnings and performance
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'ride:driver_dashboard' %}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.2); color: white; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.3);">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Earnings Summary -->
+<section style="padding: 2rem 0">
+  <div class="container">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.5rem; border: 2px solid #6ee7b7; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <div style="color: #047857; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Today's Earnings</div>
+          <div style="color: #065f46; font-size: 2rem; font-weight: 900;">GHS {{ today_earnings|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.5rem; border: 2px solid #93c5fd; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <div style="color: #1e40af; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">This Week</div>
+          <div style="color: #1e3a8a; font-size: 2rem; font-weight: 900;">GHS {{ week_earnings|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.5rem; border: 2px solid #fcd34d; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <div style="color: #92400e; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">This Month</div>
+          <div style="color: #78350f; font-size: 2rem; font-weight: 900;">GHS {{ month_earnings|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.5rem; border: 2px solid #a78bfa; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <div style="color: #7c3aed; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Total Earnings</div>
+          <div style="color: #6d28d9; font-size: 2rem; font-weight: 900;">GHS {{ total_earnings|floatformat:2 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Rides -->
+    <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-history" style="color: #10b981;"></i> Recent Completed Rides ({{ total_rides }} total)
+      </h3>
+
+      {% if recent_rides %}
+      <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+              <th style="padding: 1rem; text-align: left; font-weight: 700; color: #374151;">Date</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 700; color: #374151;">Passenger</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 700; color: #374151;">Route</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 700; color: #374151;">Distance</th>
+              <th style="padding: 1rem; text-align: left; font-weight: 700; color: #374151;">Fare</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ride in recent_rides %}
+            <tr style="border-bottom: 1px solid #f3f4f6;">
+              <td style="padding: 1rem;">
+                <div style="color: #1f2937; font-size: 0.875rem;">{{ ride.completed_at|date:"M d, Y" }}</div>
+                <div style="color: #9ca3af; font-size: 0.75rem;">{{ ride.completed_at|time:"h:i A" }}</div>
+              </td>
+              <td style="padding: 1rem;">
+                <div style="font-weight: 600; color: #1f2937;">{{ ride.passenger.get_full_name|default:ride.passenger.username }}</div>
+              </td>
+              <td style="padding: 1rem;">
+                <div style="color: #6b7280; font-size: 0.875rem;">
+                  <div><i class="fas fa-map-marker-alt" style="color: #10b981;"></i> {{ ride.pickup_address|truncatewords:3 }}</div>
+                  <div style="margin-top: 0.25rem;"><i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> {{ ride.dropoff_address|truncatewords:3 }}</div>
+                </div>
+              </td>
+              <td style="padding: 1rem;">
+                <span style="color: #6b7280; font-weight: 600;">{{ ride.estimated_distance_km }} km</span>
+              </td>
+              <td style="padding: 1rem;">
+                <span style="color: #10b981; font-weight: 700; font-size: 1.125rem;">GHS {{ ride.total_fare|floatformat:2 }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 3rem; color: #9ca3af;">
+        <i class="fas fa-chart-line" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+        <p style="font-size: 1.125rem; font-weight: 600;">No completed rides yet</p>
+        <p>Complete rides to see your earnings here</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

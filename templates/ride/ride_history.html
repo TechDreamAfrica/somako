@@ -26,7 +26,7 @@
       <div class="row align-items-center g-4">
         <div class="col-md-8">
           <div style="display: flex; gap: 1.5rem; align-items: start;">
-            <div style="width: 60px; height: 60px; background: #2563eb; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <i class="fas fa-car" style="color: #2563eb; font-size: 1.75rem;"></i>
             </div>
             <div style="flex: 1;">
@@ -38,19 +38,19 @@
                 {{ ride.requested_at|date:"F d, Y h:i A" }}
               </p>
               {% if ride.status == 'COMPLETED' %}
-              <span style="background: #2563eb; color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #6ee7b7; display: inline-block;">
+              <span style="color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #6ee7b7; display: inline-block;">
                 <i class="fas fa-check-circle"></i> {{ ride.get_status_display }}
               </span>
               {% elif ride.status == 'CANCELLED' %}
-              <span style="background: #2563eb; color: #991b1b; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fca5a5; display: inline-block;">
+              <span style="color: #991b1b; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fca5a5; display: inline-block;">
                 <i class="fas fa-times-circle"></i> {{ ride.get_status_display }}
               </span>
               {% elif ride.status == 'REQUESTED' or ride.status == 'ACCEPTED' %}
-              <span style="background: #2563eb; color: #92400e; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fcd34d; display: inline-block;">
+              <span style="color: #92400e; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fcd34d; display: inline-block;">
                 <i class="fas fa-clock"></i> {{ ride.get_status_display }}
               </span>
               {% else %}
-              <span style="background: #2563eb; color: #1e40af; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #93c5fd; display: inline-block;">
+              <span style="color: #1e40af; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #93c5fd; display: inline-block;">
                 <i class="fas fa-info-circle"></i> {{ ride.get_status_display }}
               </span>
               {% endif %}

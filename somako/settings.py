@@ -23,6 +23,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+# Site framework configuration
+SITE_ID = 1
+
 
 # Application definition
 
@@ -34,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for site domain URLs in notifications
     'core',
     'accounts',
     'messaging',  # Cross-app messaging system
@@ -518,6 +522,12 @@ JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": True
 }
+
+# ============================================
+# ARKESEL SMS API CONFIGURATION (matches utils/sms_utils.py)
+# ============================================
+ARKESEL_API_KEY = os.environ.get('ARKESEL_API_KEY', '')
+ARKESEL_SENDER_ID = os.environ.get('ARKESEL_SENDER_ID', 'Soma Ko')
 
 # ============================================
 # PAYSTACK PAYMENT CONFIGURATION

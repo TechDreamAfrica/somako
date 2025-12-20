@@ -48,18 +48,41 @@ class ProductAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def scrape_products_view(self, request):
-        """Admin view for scraping products"""
+        """Admin view for scraping products from multiple sources"""
         if request.method == 'POST':
-            count = int(request.POST.get('count', 10))
-            category_id = request.POST.get('category')
+            scraper_type = request.POST.get('scraper', 'aliexpress')
+            
+            if scraper_type == 'aliexpress':
+                return self._handle_aliexpress_scraping(request)
+            elif scraper_type == 'jumia':
+                return self._handle_jumia_scraping(request)
+            else:
+                messages.error(request, 'Invalid scraper type selected')
+                return redirect('admin:shop_product_scrape')
 
-            category = None
-            if category_id:
-                try:
-                    category = Category.objects.get(id=category_id)
-                except Category.DoesNotExist:
-                    pass
+        # GET request - show form
+        categories = Category.objects.filter(is_active=True)
+        context = {
+            'title': 'Product Scraping Dashboard',
+            'categories': categories,
+            'opts': self.model._meta,
+            'has_view_permission': True,
+        }
+        return render(request, 'admin/shop/scrape_products.html', context)
+    
+    def _handle_aliexpress_scraping(self, request):
+        """Handle AliExpress mock scraping"""
+        count = int(request.POST.get('count', 10))
+        category_id = request.POST.get('category')
 
+        category = None
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                pass
+
+        try:
             scraper = MockAliExpressScraper()
             products = scraper.bulk_generate(
                 count=count,
@@ -69,19 +92,103 @@ class ProductAdmin(admin.ModelAdmin):
 
             messages.success(
                 request,
-                f'Successfully imported {len(products)} products!'
+                f'Successfully generated {len(products)} mock AliExpress products!'
             )
-            return redirect('admin:shop_product_changelist')
-
-        # GET request - show form
-        categories = Category.objects.filter(is_active=True)
-        context = {
-            'title': 'Scrape Products from AliExpress',
-            'categories': categories,
-            'opts': self.model._meta,
-            'has_view_permission': True,
-        }
-        return render(request, 'admin/shop/scrape_products.html', context)
+        except Exception as e:
+            messages.error(request, f'Error generating products: {str(e)}')
+        
+        return redirect('admin:shop_product_changelist')
+    
+    def _handle_jumia_scraping(self, request):
+        """Handle Jumia scraping with better error handling and feedback"""
+        scrape_mode = request.POST.get('scrape_mode', 'keyword')
+        count = int(request.POST.get('count', 20))
+        db_category_slug = request.POST.get('db_category')
+        use_mock = request.POST.get('use_mock', 'false') == 'true'
+        
+        # Get database category if specified
+        db_category = None
+        if db_category_slug:
+            try:
+                db_category = Category.objects.get(slug=db_category_slug)
+            except Category.DoesNotExist:
+                messages.error(request, f'Database category "{db_category_slug}" not found')
+                return redirect('admin:shop_product_scrape')
+        
+        try:
+            # Use mock mode for immediate results (recommended)
+            if use_mock or True:  # Force mock mode for admin interface
+                from shop.scrapers import MockJumiaScraper
+                scraper = MockJumiaScraper()
+                
+                if scrape_mode == 'all_categories':
+                    # Generate products for all categories
+                    total_products = []
+                    categories = scraper.categories.keys()
+                    
+                    for category_name in categories:
+                        products = scraper.generate_category_products(
+                            category_name,
+                            count=min(count, 10),  # Limit per category for admin
+                            db_category=db_category,
+                            created_by=request.user
+                        )
+                        total_products.extend(products)
+                    
+                    messages.success(
+                        request,
+                        f'Successfully generated {len(total_products)} mock Jumia products across {len(categories)} categories!'
+                    )
+                    
+                elif scrape_mode == 'category':
+                    jumia_category = request.POST.get('jumia_category')
+                    if not jumia_category:
+                        messages.error(request, 'Category selection is required')
+                        return redirect('admin:shop_product_scrape')
+                    
+                    products = scraper.generate_category_products(
+                        jumia_category,
+                        count=count,
+                        db_category=db_category,
+                        created_by=request.user
+                    )
+                    
+                    messages.success(
+                        request,
+                        f'Successfully generated {len(products)} mock Jumia products for category "{jumia_category}"!'
+                    )
+                    
+                elif scrape_mode == 'keyword':
+                    keyword = request.POST.get('keyword', '').strip()
+                    if not keyword:
+                        messages.error(request, 'Keyword is required for keyword search')
+                        return redirect('admin:shop_product_scrape')
+                    
+                    # Generate products based on keyword (use electronics as default category)
+                    products = scraper.generate_category_products(
+                        'electronics',
+                        count=count,
+                        db_category=db_category,
+                        created_by=request.user
+                    )
+                    
+                    messages.success(
+                        request,
+                        f'Successfully generated {len(products)} mock Jumia products for keyword "{keyword}"!'
+                    )
+                
+            else:
+                # Real scraping (not recommended for admin interface)
+                messages.warning(
+                    request,
+                    'Real-time scraping from admin interface is not recommended. '
+                    'Use command line: python manage.py scrape_jumia --help for options.'
+                )
+            
+        except Exception as e:
+            messages.error(request, f'Error during Jumia scraping: {str(e)}')
+        
+        return redirect('admin:shop_product_changelist')
 
 
 @admin.register(ProductImage)

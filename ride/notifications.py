@@ -25,6 +25,7 @@ def notify_ride_requested(ride):
             f'View & Accept: {ride_url}'
         )
 
+        # Send via notification service
         send_notification(
             user=ride.driver.user,
             notification_type='ride_requested',
@@ -42,46 +43,93 @@ def notify_ride_requested(ride):
             }
         )
 
+        # Also send via existing SMS utils for consistency
+        try:
+            from utils.sms_utils import send_driver_ride_notification
+            send_driver_ride_notification(ride.driver, ride)
+        except ImportError:
+            pass  # SMS utils not available
+
 
 def notify_ride_accepted(ride):
-    """Notify rider when driver accepts the ride"""
+    """Notify passenger when driver accepts the ride"""
+    # Get driver's primary vehicle
+    primary_vehicle = ride.vehicle or ride.driver.vehicles.filter(is_active=True, is_primary=True).first()
+    
+    vehicle_info = f"{primary_vehicle.make} {primary_vehicle.model}" if primary_vehicle else "Vehicle"
+    plate_info = primary_vehicle.license_plate if primary_vehicle else "N/A"
+    
+    message = (
+        f"Your ride has been accepted!"
+        f"\nDriver: {ride.driver.user.get_full_name() or ride.driver.user.username}"
+        f"\nVehicle: {vehicle_info}"
+        f"\nPlate: {plate_info}"
+        f"\nPhone: {ride.driver.user.phone_number or 'N/A'}"
+    )
+    
+    # Send via notification service
     send_notification(
-        user=ride.rider,
+        user=ride.passenger,
         notification_type='ride_accepted',
         title='Ride Accepted!',
-        message=f'Your ride has been accepted by {ride.driver.user.get_full_name() or ride.driver.user.username}. Vehicle: {ride.driver.vehicle_model}. Plate: {ride.driver.vehicle_plate}',
-        channels=['in_app', 'sms', 'whatsapp'],
+        message=message,
+        channels=['in_app', 'sms'],
         reference_id=str(ride.ride_id),
         reference_type='Ride',
         data={
             'ride_id': str(ride.ride_id),
             'driver_name': ride.driver.user.get_full_name() or ride.driver.user.username,
-            'driver_phone': ride.driver.user.phone_number,
-            'vehicle': f"{ride.driver.vehicle_model} - {ride.driver.vehicle_plate}"
+            'driver_phone': ride.driver.user.phone_number or '',
+            'vehicle': vehicle_info,
+            'plate': plate_info
         }
     )
 
+    # Also send via existing SMS utils
+    try:
+        from utils.sms_utils import send_passenger_driver_accepted
+        send_passenger_driver_accepted(ride.passenger, ride)
+    except ImportError:
+        pass  # SMS utils not available
+
 
 def notify_driver_arrived(ride):
-    """Notify rider when driver arrives at pickup"""
+    """Notify passenger when driver arrives at pickup"""
+    primary_vehicle = ride.vehicle or ride.driver.vehicles.filter(is_active=True, is_primary=True).first()
+    vehicle_info = f"{primary_vehicle.make} {primary_vehicle.model} ({primary_vehicle.license_plate})" if primary_vehicle else "Your driver"
+    
+    message = (
+        f"Your driver has arrived at the pickup location!"
+        f"\nVehicle: {vehicle_info}"
+        f"\nDriver: {ride.driver.user.get_full_name() or ride.driver.user.username}"
+        f"\nPhone: {ride.driver.user.phone_number or 'N/A'}"
+    )
+    
     send_notification(
-        user=ride.rider,
+        user=ride.passenger,
         notification_type='ride_arrived',
         title='Driver Arrived',
-        message=f'Your driver has arrived at the pickup location. Vehicle: {ride.driver.vehicle_model} ({ride.driver.vehicle_plate})',
-        channels=['in_app', 'sms', 'whatsapp'],
+        message=message,
+        channels=['in_app', 'sms'],
         reference_id=str(ride.ride_id),
         reference_type='Ride'
     )
 
 
 def notify_ride_started(ride):
-    """Notify rider when ride starts"""
+    """Notify passenger when ride starts"""
+    message = (
+        f"Your ride has started!"
+        f"\nDestination: {ride.dropoff_address[:50]}..."
+        f"\nEstimated fare: GHS {ride.total_fare:.2f}"
+        f"\nDriver: {ride.driver.user.get_full_name() or ride.driver.user.username}"
+    )
+    
     send_notification(
-        user=ride.rider,
+        user=ride.passenger,
         notification_type='ride_started',
         title='Ride Started',
-        message=f'Your ride has started. Destination: {ride.dropoff_address}. Estimated fare: GHS {ride.total_fare}',
+        message=message,
         channels=['in_app', 'sms'],
         reference_id=str(ride.ride_id),
         reference_type='Ride'
@@ -89,55 +137,88 @@ def notify_ride_started(ride):
 
 
 def notify_ride_completed(ride):
-    """Notify both rider and driver when ride is completed"""
-    # Notify rider
-    send_notification(
-        user=ride.rider,
-        notification_type='ride_completed',
-        title='Ride Completed',
-        message=f'Your ride has been completed. Total fare: GHS {ride.total_fare}. Thank you for riding with Soma Ko!',
-        channels=['in_app', 'sms', 'whatsapp'],
-        reference_id=str(ride.ride_id),
-        reference_type='Ride',
-        data={'fare': str(ride.total_fare)}
+    """Notify both passenger and driver when ride is completed"""
+    # Notify passenger
+    passenger_message = (
+        f"Your ride has been completed!"
+        f"\nTotal fare: GHS {ride.total_fare:.2f}"
+        f"\nThank you for riding with Soma Ko!"
+        f"\nPlease rate your experience."
     )
-
-    # Notify driver
+    
     send_notification(
-        user=ride.driver.user,
+        user=ride.passenger,
         notification_type='ride_completed',
         title='Ride Completed',
-        message=f'Ride completed successfully. Fare earned: GHS {ride.total_fare}',
+        message=passenger_message,
         channels=['in_app', 'sms'],
         reference_id=str(ride.ride_id),
         reference_type='Ride',
         data={'fare': str(ride.total_fare)}
     )
 
+    # Notify driver
+    driver_message = (
+        f"Ride completed successfully!"
+        f"\nFare collected: GHS {ride.total_fare:.2f}"
+        f"\nPassenger: {ride.passenger.get_full_name() or ride.passenger.username}"
+        f"\nThank you for driving with Soma Ko!"
+    )
+    
+    send_notification(
+        user=ride.driver.user,
+        notification_type='ride_completed',
+        title='Ride Completed',
+        message=driver_message,
+        channels=['in_app', 'sms'],
+        reference_id=str(ride.ride_id),
+        reference_type='Ride',
+        data={'fare': str(ride.total_fare)}
+    )
+
+    # Also send via existing SMS utils
+    try:
+        from utils.sms_utils import send_passenger_ride_completed
+        send_passenger_ride_completed(ride.passenger, ride)
+    except ImportError:
+        pass  # SMS utils not available
+
 
 def notify_ride_cancelled(ride, cancelled_by):
     """Notify when ride is cancelled"""
     # Determine who to notify
-    if cancelled_by == ride.rider:
+    if cancelled_by == ride.passenger:
         # Notify driver
         if ride.driver:
+            message = (
+                f"Ride has been cancelled by passenger."
+                f"\nPickup: {ride.pickup_address[:50]}..."
+                f"\nRide ID: {ride.ride_id}"
+                f"\nYou are now available for new rides."
+            )
             send_notification(
                 user=ride.driver.user,
                 notification_type='ride_cancelled',
                 title='Ride Cancelled',
-                message=f'The rider has cancelled the ride from {ride.pickup_address}.',
-                channels=['in_app', 'sms', 'whatsapp'],
+                message=message,
+                channels=['in_app', 'sms'],
                 reference_id=str(ride.ride_id),
                 reference_type='Ride'
             )
     elif ride.driver and cancelled_by == ride.driver.user:
-        # Notify rider
+        # Notify passenger
+        message = (
+            f"Your ride has been cancelled by the driver."
+            f"\nRide ID: {ride.ride_id}"
+            f"\nPlease book a new ride."
+            f"\nSorry for the inconvenience."
+        )
         send_notification(
-            user=ride.rider,
+            user=ride.passenger,
             notification_type='ride_cancelled',
             title='Ride Cancelled',
-            message=f'Your ride has been cancelled by the driver. Please request a new ride.',
-            channels=['in_app', 'sms', 'whatsapp'],
+            message=message,
+            channels=['in_app', 'sms'],
             reference_id=str(ride.ride_id),
             reference_type='Ride'
         )

@@ -135,7 +135,7 @@ class NotificationPreference(models.Model):
 
     # Channel preferences
     enable_in_app = models.BooleanField(default=True)
-    enable_sms = models.BooleanField(default=False)
+    enable_sms = models.BooleanField(default=True)
     enable_whatsapp = models.BooleanField(default=True)
     enable_email = models.BooleanField(default=True)
 

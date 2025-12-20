@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.db.models import Q, Count, Sum, Avg
 from datetime import date
 
-from rent.models import Property, Equipment, PropertyCategory, EquipmentCategory, RentalBooking, SavedProperty
+from rent.models import Equipment, EquipmentCategory, RentalBooking, SavedEquipment
 
 
 # ============================================
@@ -26,7 +26,7 @@ def pwa_dashboard(request):
     user = request.user
     # Check if user has landlord or equipment_owner role
     is_owner = user.has_role('landlord') or user.has_role('equipment_owner')
-    has_properties = Property.objects.filter(owner=user).exists() or Equipment.objects.filter(owner=user).exists()
+    has_equipment = Equipment.objects.filter(owner=user).exists()
 
     if is_owner and has_properties:
         return redirect('rent_pwa:owner_dashboard')
@@ -37,8 +37,8 @@ def pwa_dashboard(request):
     ).order_by('-created_at')
 
     context = {
-        'featured_propertys': featured_props[:6],
-        'recent_propertys': featured_props[6:12] if featured_props.count() > 6 else featured_props[:6],
+        'featured_equipment': featured_equipment[:6],
+        'recent_equipment': featured_equipment[6:12] if len(featured_equipment) > 6 else featured_equipment[:6],
         'featured_equipment': Equipment.objects.filter(
             is_available=True
         ).order_by('-created_at')[:4],

@@ -143,7 +143,11 @@
 <!-- Profile Header -->
 <div class="profile-header">
   <div class="profile-avatar">
-    <i class="fas fa-user"></i>
+    {% if user.profile_picture and user.profile_picture.strip and 'http' in user.profile_picture %}
+      <img src="{{ user.profile_picture }}" alt="Profile Picture" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+    {% else %}
+      <i class="fas fa-user"></i>
+    {% endif %}
   </div>
   <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
   <div class="profile-email">{{ user.email }}</div>

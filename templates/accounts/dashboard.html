@@ -10,7 +10,7 @@
       <div class="row align-items-center">
         <div class="col-md-8">
           <div style="display: flex; align-items: center; gap: 1.5rem;">
-            {% if user.profile_picture %}
+            {% if user.profile_picture and user.profile_picture.strip %}
             <img src="{{ user.profile_picture }}" alt="{{ user.username }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #059669; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
             {% else %}
             <div style="width: 80px; height: 80px; border-radius: 50%; background: #059669; display: flex; align-items: center; justify-content: center; border: 4px solid #ecfdf5; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">
@@ -796,7 +796,7 @@
             {% else %}
               <!-- General User - Show all available apps -->
               <div class="col-sm-6 col-md-4">
-                <a href="/rent/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'rent:property_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #10b981; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-home" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -805,7 +805,7 @@
               </div>
 
               <div class="col-sm-6 col-md-4">
-                <a href="/ride/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #e9d5ff; border-radius: 1rem; text-decoration: none; border: 2px solid #a855f7; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #e9d5ff; border-radius: 1rem; text-decoration: none; border: 2px solid #a855f7; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #a855f7; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-car" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -814,7 +814,7 @@
               </div>
 
               <div class="col-sm-6 col-md-4">
-                <a href="/food/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-utensils" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -823,7 +823,7 @@
               </div>
 
               <div class="col-sm-6 col-md-4">
-                <a href="/shop/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'shop:product_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-shopping-cart" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -832,7 +832,7 @@
               </div>
 
               <div class="col-sm-6 col-md-4">
-                <a href="/pharmacy/" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fef3c7; border-radius: 1rem; text-decoration: none; border: 2px solid #f59e0b; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'pharmacy:medicine_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fef3c7; border-radius: 1rem; text-decoration: none; border: 2px solid #f59e0b; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #f59e0b; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-pills" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -908,7 +908,7 @@
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
               <span style="font-size: 0.875rem; color: #4b5563;">Profile Picture</span>
-              {% if user.profile_picture %}
+              {% if user.profile_picture and user.profile_picture.strip and 'http' in user.profile_picture %}
                 <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
               {% else %}
                 <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.125rem;"></i>

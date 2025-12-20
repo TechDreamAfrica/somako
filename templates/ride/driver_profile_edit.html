@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content_class %}app-ride{% endblock %}
+{% block title %}Driver Profile - Soma Ko Rides{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: #6b7280; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Driver Profile</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">
+          <i class="fas fa-user-cog"></i> Manage your driver settings
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'ride:driver_dashboard' %}" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.2); color: white; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.3);">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Profile Form -->
+<section style="padding: 2rem 0; background: #f9fafb;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+          <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+            <i class="fas fa-user" style="color: #6b7280;"></i> Profile Information
+          </h3>
+
+          <!-- Driver Info Display -->
+          <div style="margin-bottom: 2rem; padding: 1.5rem; background: #f9fafb; border-radius: 1rem;">
+            <div class="row">
+              <div class="col-md-6">
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">Driver Name</label>
+                  <div style="color: #1f2937;">{{ driver_profile.user.get_full_name|default:driver_profile.user.username }}</div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">Phone</label>
+                  <div style="color: #1f2937;">{{ driver_profile.user.phone_number|default:"Not provided" }}</div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">Status</label>
+                  <span style="background: {% if driver_profile.status == 'APPROVED' %}#d1fae5{% else %}#fef3c7{% endif %}; color: {% if driver_profile.status == 'APPROVED' %}#065f46{% else %}#92400e{% endif %}; padding: 0.375rem 0.75rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700;">
+                    {{ driver_profile.get_status_display }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">Email</label>
+                  <div style="color: #1f2937;">{{ driver_profile.user.email|default:"Not provided" }}</div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">License Number</label>
+                  <div style="color: #1f2937;">{{ driver_profile.license_number|default:"Not provided" }}</div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                  <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.5rem;">Current Availability</label>
+                  <span style="background: {% if driver_profile.availability == 'ONLINE' %}#d1fae5{% else %}#f3f4f6{% endif %}; color: {% if driver_profile.availability == 'ONLINE' %}#065f46{% else %}#6b7280{% endif %}; padding: 0.375rem 0.75rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700;">
+                    {{ driver_profile.get_availability_display }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability Toggle Form -->
+          <form method="post" style="margin-bottom: 2rem;">
+            {% csrf_token %}
+            <h4 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+              <i class="fas fa-toggle-on" style="color: #6b7280;"></i> Update Availability
+            </h4>
+            
+            <div style="margin-bottom: 1.5rem;">
+              <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.75rem;">Availability Status</label>
+              <div style="display: flex; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.style.borderColor='#10b981'; this.style.background='#f0fdf4'">
+                  <input type="radio" name="availability" value="ONLINE" {% if driver_profile.availability == 'ONLINE' %}checked{% endif %} style="accent-color: #10b981;">
+                  <div>
+                    <div style="font-weight: 600; color: #10b981;"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online</div>
+                    <div style="font-size: 0.875rem; color: #6b7280;">Receive ride requests</div>
+                  </div>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease;" onclick="this.style.borderColor='#6b7280'; this.style.background='#f9fafb'">
+                  <input type="radio" name="availability" value="OFFLINE" {% if driver_profile.availability == 'OFFLINE' %}checked{% endif %} style="accent-color: #6b7280;">
+                  <div>
+                    <div style="font-weight: 600; color: #6b7280;"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Offline</div>
+                    <div style="font-size: 0.875rem; color: #6b7280;">Stop receiving requests</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" style="padding: 0.75rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </form>
+
+          <!-- Additional Info -->
+          <div style="padding: 1.5rem; background: #f0f9ff; border-radius: 1rem; border: 2px solid #bfdbfe;">
+            <h4 style="color: #1e40af; font-weight: 700; margin-bottom: 0.75rem;">
+              <i class="fas fa-info-circle"></i> Profile Management
+            </h4>
+            <ul style="color: #1e3a8a; margin: 0; padding-left: 1.25rem;">
+              <li>To update personal information, contact support</li>
+              <li>Vehicle information can be managed separately</li>
+              <li>Profile status changes require admin approval</li>
+              <li>Keep your availability status updated for better ride matching</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

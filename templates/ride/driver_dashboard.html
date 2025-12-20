@@ -33,11 +33,11 @@
 </section>
 
 <!-- Statistics Cards -->
-<section style="padding: 2rem 0; background: #f9fafb;">
+<section style="padding: 2rem 0;">
   <div class="container">
     <!-- Driver Status Info -->
     {% if driver_profile.status != 'APPROVED' %}
-    <div style="background: #2563eb; border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #fcd34d;">
+    <div style="border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #fcd34d;">
       <div style="display: flex; gap: 1rem; align-items: start;">
         <i class="fas fa-exclamation-triangle" style="color: #2563eb; font-size: 2rem;"></i>
         <div style="flex: 1;">
@@ -52,7 +52,7 @@
 
     <div class="row g-3 mb-4">
       <div class="col-md-3">
-        <div style="background: #2563eb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #93c5fd;">
+        <div style="border-radius: 1rem; padding: 1.5rem; border: 2px solid #93c5fd;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
             <div style="width: 50px; height: 50px; background: white; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
               <i class="fas fa-road" style="color: #2563eb; font-size: 1.5rem;"></i>
@@ -64,7 +64,7 @@
       </div>
 
       <div class="col-md-3">
-        <div style="background: #2563eb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #fcd34d;">
+        <div style="border-radius: 1rem; padding: 1.5rem; border: 2px solid #fcd34d;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
             <div style="width: 50px; height: 50px; background: white; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
               <i class="fas fa-star" style="color: #2563eb; font-size: 1.5rem;"></i>
@@ -76,7 +76,7 @@
       </div>
 
       <div class="col-md-3">
-        <div style="background: #2563eb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #6ee7b7;">
+        <div style="border-radius: 1rem; padding: 1.5rem; border: 2px solid #6ee7b7;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
             <div style="width: 50px; height: 50px; background: white; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
               <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.5rem;"></i>
@@ -88,7 +88,7 @@
       </div>
 
       <div class="col-md-3">
-        <div style="background: #2563eb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #6ee7b7;">
+        <div style="border-radius: 1rem; padding: 1.5rem; border: 2px solid #6ee7b7;">
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
             <div style="width: 50px; height: 50px; background: white; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
               <i class="fas fa-money-bill-wave" style="color: #10b981; font-size: 1.5rem;"></i>
@@ -96,6 +96,100 @@
           </div>
           <div style="color: #047857; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Today's Earnings</div>
           <div style="color: #065f46; font-size: 2rem; font-weight: 900;">GHS {{ today_earnings|default:"0.00"|floatformat:2 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
+        <i class="fas fa-bolt" style="color: #f59e0b;"></i> Quick Actions
+      </h3>
+      
+      <div class="row g-3">
+        <!-- Availability Toggle -->
+        <div class="col-md-4">
+          {% if driver_profile.availability == 'ONLINE' %}
+          <form method="post" action="{% url 'ride:toggle_availability' %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" style="width: 100%; padding: 1rem; background: #dc2626; color: white; border: none; border-radius: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(220, 38, 38, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(220, 38, 38, 0.3)'">
+              <i class="fas fa-pause-circle" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+              <div>Go Offline</div>
+              <small style="opacity: 0.8;">Stop receiving ride requests</small>
+            </button>
+          </form>
+          {% else %}
+          <form method="post" action="{% url 'ride:toggle_availability' %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" style="width: 100%; padding: 1rem; background: #10b981; color: white; border: none; border-radius: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'">
+              <i class="fas fa-play-circle" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+              <div>Go Online</div>
+              <small style="opacity: 0.8;">Start receiving ride requests</small>
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+        <!-- View Pending Requests -->
+        <div class="col-md-4">
+          <a href="#pending-requests" style="display: block; width: 100%; padding: 1rem; background: #2563eb; color: white; border-radius: 1rem; font-weight: 700; text-decoration: none; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(37, 99, 235, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37, 99, 235, 0.3)'">
+            <i class="fas fa-bell" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>View Requests</div>
+            <small style="opacity: 0.8;">
+              {% if pending_requests.count > 0 %}
+                {{ pending_requests.count }} pending request{{ pending_requests.count|pluralize }}
+              {% else %}
+                No pending requests
+              {% endif %}
+            </small>
+          </a>
+        </div>
+
+        <!-- Active Ride -->
+        <div class="col-md-4">
+          {% if active_ride %}
+          <a href="{% url 'ride:ride_detail' active_ride.ride_id %}" style="display: block; width: 100%; padding: 1rem; background: #f59e0b; color: white; border-radius: 1rem; font-weight: 700; text-decoration: none; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(245, 158, 11, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'">
+            <i class="fas fa-route" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>Active Ride</div>
+            <small style="opacity: 0.8;">{{ active_ride.get_status_display }}</small>
+          </a>
+          {% else %}
+          <div style="display: block; width: 100%; padding: 1rem; background: #6b7280; color: white; border-radius: 1rem; font-weight: 700; text-align: center; opacity: 0.6;">
+            <i class="fas fa-car-side" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>No Active Ride</div>
+            <small style="opacity: 0.8;">Accept a ride to get started</small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Second Row of Actions -->
+      <div class="row g-3 mt-2">
+        <!-- View All Rides -->
+        <div class="col-md-4">
+          <a href="{% url 'ride:driver_rides' %}" style="display: block; width: 100%; padding: 1rem; background: #8b5cf6; color: white; border-radius: 1rem; font-weight: 700; text-decoration: none; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(139, 92, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)'">
+            <i class="fas fa-history" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>Ride History</div>
+            <small style="opacity: 0.8;">View all completed rides</small>
+          </a>
+        </div>
+
+        <!-- Earnings Summary -->
+        <div class="col-md-4">
+          <a href="{% url 'ride:driver_earnings' %}" style="display: block; width: 100%; padding: 1rem; background: #10b981; color: white; border-radius: 1rem; font-weight: 700; text-decoration: none; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(16, 185, 129, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'">
+            <i class="fas fa-chart-line" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>Earnings</div>
+            <small style="opacity: 0.8;">View earnings report</small>
+          </a>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="col-md-4">
+          <a href="{% url 'ride:driver_profile_edit' %}" style="display: block; width: 100%; padding: 1rem; background: #6b7280; color: white; border-radius: 1rem; font-weight: 700; text-decoration: none; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(107, 114, 128, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(107, 114, 128, 0.3)'">
+            <i class="fas fa-user-cog" style="font-size: 1.25rem; margin-bottom: 0.5rem;"></i>
+            <div>Profile</div>
+            <small style="opacity: 0.8;">Edit driver profile</small>
+          </a>
         </div>
       </div>
     </div>
@@ -120,7 +214,7 @@
 
     <!-- Pending Ride Requests -->
     {% if pending_requests %}
-    <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+    <div id="pending-requests" style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
       <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem;">
         <i class="fas fa-bell" style="color: #2563eb;"></i> Pending Ride Requests ({{ pending_requests.count }})
       </h3>

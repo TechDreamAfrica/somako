@@ -35,7 +35,7 @@
       <!-- Status Card -->
       <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
         <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 40px; height: 40px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-info-circle" style="color: #2563eb;"></i>
           </div>
           Ride Status
@@ -43,7 +43,7 @@
 
         <div class="row g-3" style="margin-bottom: 2rem;">
           <div class="col-md-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd;">
               <div style="color: #1e40af; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Current Status</div>
               <div style="color: #1f2937; font-size: 1.25rem; font-weight: 900;">
                 {{ ride.get_status_display }}
@@ -51,7 +51,7 @@
             </div>
           </div>
           <div class="col-md-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d;">
               <div style="color: #92400e; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Payment Status</div>
               <div style="color: #1f2937; font-size: 1.25rem; font-weight: 900;">
                 {{ ride.get_payment_status_display }}
@@ -69,7 +69,7 @@
               <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
                 <i class="fas fa-paper-plane" style="color: #2563eb;"></i>
               </div>
-              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+              <div style="padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
                 <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Ride Requested</div>
                 <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.requested_at|date:"M d, Y g:i A" }}</div>
               </div>
@@ -81,7 +81,7 @@
               <div style="position: absolute; left: -2rem; width: 40px; height: 40px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
                 <i class="fas fa-check" style="color: #10b981;"></i>
               </div>
-              <div style="background: #f9fafb; padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
+              <div style="padding: 1rem 1.5rem; border-radius: 0.875rem; border: 2px solid #e5e7eb;">
                 <div style="font-weight: 800; color: #1f2937; margin-bottom: 0.25rem;">Driver Accepted</div>
                 <div style="color: #6b7280; font-size: 0.875rem; font-weight: 600;">{{ ride.accepted_at|date:"M d, Y g:i A" }}</div>
               </div>
@@ -145,16 +145,16 @@
       <!-- Route Card -->
       <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
         <h2 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 40px; height: 40px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-route" style="color: #2563eb;"></i>
           </div>
           Route Details
         </h2>
 
         <!-- Pickup -->
-        <div style="background: #2563eb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #6ee7b7; margin-bottom: 1.5rem;">
+        <div style="padding: 1.5rem; border-radius: 1rem; border: 2px solid #6ee7b7; margin-bottom: 1.5rem;">
           <div style="display: flex; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="width: 50px; height: 50px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <i class="fas fa-map-marker-alt" style="color: white; font-size: 1.5rem;"></i>
             </div>
             <div style="flex: 1;">
@@ -168,9 +168,9 @@
         </div>
 
         <!-- Dropoff -->
-        <div style="background: #2563eb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fca5a5; margin-bottom: 1.5rem;">
+        <div style="padding: 1.5rem; border-radius: 1rem; border: 2px solid #fca5a5; margin-bottom: 1.5rem;">
           <div style="display: flex; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="width: 50px; height: 50px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <i class="fas fa-map-marker-alt" style="color: white; font-size: 1.5rem;"></i>
             </div>
             <div style="flex: 1;">
@@ -186,7 +186,7 @@
         <!-- Distance & Duration -->
         <div class="row g-3">
           <div class="col-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd; text-align: center;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd; text-align: center;">
               <div style="color: #1e40af; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Distance</div>
               <div style="color: #1f2937; font-size: 1.75rem; font-weight: 900;">
                 {{ ride.actual_distance_km|default:ride.estimated_distance_km }} km
@@ -194,7 +194,7 @@
             </div>
           </div>
           <div class="col-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d; text-align: center;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d; text-align: center;">
               <div style="color: #92400e; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.5rem;">Duration</div>
               <div style="color: #1f2937; font-size: 1.75rem; font-weight: 900;">
                 {{ ride.actual_duration_minutes|default:ride.estimated_duration_minutes }} min
@@ -233,7 +233,7 @@
             <span style="color: #dc2626; font-weight: 800; font-size: 0.875rem;">Applied</span>
           </div>
           {% endif %}
-          <div style="height: 2px; background: #2563eb; margin: 0.5rem 0;"></div>
+          <div style="height: 2px; margin: 0.5rem 0;"></div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="color: #1f2937; font-size: 1rem; font-weight: 800;">Total</span>
             <span style="color: #2563eb; font-weight: 900; font-size: 1.75rem;">GHS {{ ride.total_fare|default:"0.00" }}</span>
@@ -274,7 +274,7 @@
           {% if ride.driver.user.profile_picture %}
           <img src="{{ ride.driver.user.profile_picture.url }}" alt="{{ ride.driver.user.get_full_name }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #ede9fe;">
           {% else %}
-          <div style="width: 60px; height: 60px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: #2563eb; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+          <div style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: #2563eb; border: 3px solid white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
             {{ ride.driver.user.first_name|first }}
           </div>
           {% endif %}
@@ -285,7 +285,7 @@
         </div>
 
         {% if ride.vehicle %}
-        <div style="background: #2563eb; padding: 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+        <div style="padding: 1rem; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
           <div style="color: #6b7280; font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.5rem;">Vehicle</div>
           <div style="font-weight: 800; color: #1f2937; font-size: 1rem; margin-bottom: 0.25rem;">{{ ride.vehicle }}</div>
           <div style="color: #2563eb; font-size: 0.875rem; font-weight: 700;">{{ ride.vehicle_category.name }}</div>
@@ -307,7 +307,7 @@
 
       <!-- Payment Action -->
       {% if ride.payment_status == 'PENDING' %}
-      <div style="background: #2563eb; border-radius: 1.5rem; padding: 2rem; border: 2px solid #fcd34d; margin-bottom: 1.5rem;">
+      <div style="border-radius: 1.5rem; padding: 2rem; border: 2px solid #fcd34d; margin-bottom: 1.5rem;">
         <div style="margin-bottom: 1.5rem;">
           <h3 style="font-size: 1.25rem; font-weight: 800; color: #92400e; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.625rem;">
             <i class="fas fa-exclamation-circle"></i>
@@ -344,10 +344,27 @@
 
       <!-- Actions -->
       <div>
-        <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: white; color: #2563eb; border: 2px solid #2563eb; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='white'">
-          <i class="fas fa-plus-circle"></i>
-          Book Another Ride
-        </a>
+        {% if user.driver_profile %}
+          <!-- Driver Actions -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="{% url 'ride:driver_dashboard' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex: 1; min-width: 200px; padding: 1rem; background: #2563eb; color: white; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+              <i class="fas fa-tachometer-alt"></i>
+              Go to Dashboard
+            </a>
+            {% if ride.status == 'REQUESTED' %}
+            <a href="#pending-requests" onclick="window.location.href='{% url 'ride:driver_dashboard' %}#pending-requests'" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex: 1; min-width: 200px; padding: 1rem; background: white; color: #2563eb; border: 2px solid #2563eb; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='white'">
+              <i class="fas fa-bell"></i>
+              View Requests
+            </a>
+            {% endif %}
+          </div>
+        {% else %}
+          <!-- Passenger Actions -->
+          <a href="{% url 'ride:book_ride' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: white; color: #2563eb; border: 2px solid #2563eb; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='white'">
+            <i class="fas fa-plus-circle"></i>
+            Book Another Ride
+          </a>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -567,16 +567,17 @@ def driver_dashboard(request):
 
 # Driver Rides View
 @login_required
+@login_required
 def driver_rides(request):
     """
     View all rides for the driver with filters and pagination
     """
     # Check if user is a driver
-    if not hasattr(request.user, 'driver_profile'):
+    try:
+        driver_profile = request.user.driver_profile
+    except DriverProfile.DoesNotExist:
         messages.error(request, 'You need a driver profile to access this page.')
-        return redirect('ride:ride_home')
-
-    driver_profile = request.user.driver_profile
+        return redirect('ride:home')
 
     # Base query
     rides = Ride.objects.filter(
@@ -615,13 +616,10 @@ def driver_rides(request):
     # Calculate statistics
     total_rides_count = rides.count()
     completed_rides_count = rides.filter(status='COMPLETED').count()
-    total_earnings = sum(
-        payment.driver_payout for payment in Payment.objects.filter(
-            ride__driver=driver_profile,
-            ride__in=rides.filter(status='COMPLETED'),
-            status='COMPLETED'
-        )
-    )
+    
+    # Calculate total earnings from completed rides
+    completed_rides = rides.filter(status='COMPLETED')
+    total_earnings = sum(ride.total_fare or 0 for ride in completed_rides)
 
     # Pagination
     page = request.GET.get('page', 1)
@@ -716,9 +714,17 @@ def accept_ride(request, ride_id):
     ride.accepted_at = timezone.now()
     ride.save()
 
+    # Send SMS notifications
+    from ride.notifications import notify_ride_accepted
+    notify_ride_accepted(ride)
+
     # Update driver availability
     driver_profile.availability = 'ON_RIDE'
     driver_profile.save()
+
+    # Send SMS notification to passenger
+    from ride.notifications import notify_ride_accepted
+    notify_ride_accepted(ride)
 
     messages.success(request, f'Ride {ride.ride_id} accepted successfully!')
     return redirect('ride:ride_detail', ride_id=ride.ride_id)
@@ -798,6 +804,10 @@ def complete_ride(request, ride_id):
     payment.calculate_driver_payout()
     payment.save()
 
+    # Send SMS notification to both passenger and driver
+    from ride.notifications import notify_ride_completed
+    notify_ride_completed(ride)
+
     messages.success(
         request,
         f'Ride completed successfully! Fare: GHS {ride.total_fare:.2f}, Your payout: GHS {payment.driver_payout:.2f}'
@@ -844,6 +854,10 @@ def cancel_ride(request, ride_id):
     ride.cancellation_reason = cancellation_reason
     ride.save()
 
+    # Send SMS notification
+    from ride.notifications import notify_ride_cancelled
+    notify_ride_cancelled(ride, cancelled_by=request.user)
+
     messages.info(request, 'Ride cancelled successfully.')
     return redirect('ride:ride_detail', ride_id=ride.ride_id)
 
@@ -877,6 +891,10 @@ def start_ride(request, ride_id):
     ride.started_at = timezone.now()
     ride.save()
 
+    # Send SMS notification to passenger
+    from ride.notifications import notify_ride_started
+    notify_ride_started(ride)
+
     messages.success(request, 'Ride started! Drive safely.')
     return redirect('ride:track_ride', ride_id=ride.ride_id)
 
@@ -909,6 +927,10 @@ def driver_arrived(request, ride_id):
     ride.status = 'DRIVER_ARRIVED'
     ride.driver_arrived_at = timezone.now()
     ride.save()
+
+    # Send SMS notification to passenger
+    from ride.notifications import notify_driver_arrived
+    notify_driver_arrived(ride)
 
     messages.success(request, 'Arrival confirmed. Waiting for passenger.')
     return redirect('ride:ride_detail', ride_id=ride.ride_id)
@@ -1262,3 +1284,117 @@ def verify_payment(request, ride_id):
     except Exception as e:
         messages.error(request, f'Error verifying payment: {str(e)}')
         return redirect('ride:ride_detail', ride_id=ride.ride_id)
+
+
+@login_required
+def toggle_driver_availability(request):
+    """Toggle driver availability between ONLINE and OFFLINE"""
+    try:
+        from ride.models import DriverProfile
+        driver_profile = DriverProfile.objects.get(user=request.user)
+        
+        # Toggle availability
+        if driver_profile.availability == 'ONLINE':
+            driver_profile.availability = 'OFFLINE'
+            messages.success(request, 'You are now offline and will not receive ride requests.')
+        else:
+            driver_profile.availability = 'ONLINE'
+            messages.success(request, 'You are now online and will receive ride requests.')
+        
+        driver_profile.save()
+        
+    except DriverProfile.DoesNotExist:
+        messages.error(request, 'Driver profile not found.')
+    except Exception as e:
+        messages.error(request, f'Error updating availability: {str(e)}')
+    
+    return redirect('ride:driver_dashboard')
+
+
+@login_required
+def driver_earnings(request):
+    """Driver earnings report"""
+    try:
+        from ride.models import DriverProfile, Ride
+        from django.db.models import Sum, Count, Q
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        driver_profile = DriverProfile.objects.get(user=request.user)
+        
+        # Get completed rides
+        completed_rides = Ride.objects.filter(
+            driver=driver_profile,
+            status='COMPLETED'
+        )
+        
+        # Calculate earnings
+        total_earnings = completed_rides.aggregate(Sum('total_fare'))['total_fare__sum'] or 0
+        total_rides = completed_rides.count()
+        
+        # Today's earnings
+        today = timezone.now().date()
+        today_earnings = completed_rides.filter(
+            completed_at__date=today
+        ).aggregate(Sum('total_fare'))['total_fare__sum'] or 0
+        
+        # This week's earnings
+        week_start = today - timedelta(days=today.weekday())
+        week_earnings = completed_rides.filter(
+            completed_at__date__gte=week_start
+        ).aggregate(Sum('total_fare'))['total_fare__sum'] or 0
+        
+        # This month's earnings
+        month_earnings = completed_rides.filter(
+            completed_at__month=today.month,
+            completed_at__year=today.year
+        ).aggregate(Sum('total_fare'))['total_fare__sum'] or 0
+        
+        context = {
+            'driver_profile': driver_profile,
+            'total_earnings': total_earnings,
+            'total_rides': total_rides,
+            'today_earnings': today_earnings,
+            'week_earnings': week_earnings,
+            'month_earnings': month_earnings,
+            'recent_rides': completed_rides.order_by('-completed_at')[:10],
+        }
+        
+        return render(request, 'ride/driver_earnings.html', context)
+        
+    except DriverProfile.DoesNotExist:
+        messages.error(request, 'Driver profile not found.')
+        return redirect('ride:driver_dashboard')
+    except Exception as e:
+        messages.error(request, f'Error loading earnings: {str(e)}')
+        return redirect('ride:driver_dashboard')
+
+
+@login_required
+def driver_profile_edit(request):
+    """Edit driver profile"""
+    try:
+        from ride.models import DriverProfile
+        driver_profile = DriverProfile.objects.get(user=request.user)
+        
+        if request.method == 'POST':
+            # Handle basic profile updates
+            availability = request.POST.get('availability')
+            if availability in ['ONLINE', 'OFFLINE']:
+                driver_profile.availability = availability
+                driver_profile.save()
+                messages.success(request, 'Profile updated successfully.')
+                return redirect('ride:driver_dashboard')
+        
+        context = {
+            'driver_profile': driver_profile,
+        }
+        
+        return render(request, 'ride/driver_profile_edit.html', context)
+        
+    except DriverProfile.DoesNotExist:
+        messages.error(request, 'Driver profile not found.')
+        return redirect('ride:driver_dashboard')
+    except Exception as e:
+        messages.error(request, f'Error loading profile: {str(e)}')
+        return redirect('ride:driver_dashboard')

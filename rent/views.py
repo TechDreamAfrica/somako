@@ -5,97 +5,9 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from decimal import Decimal
 from .models import (
-    Property, Equipment, PropertyCategory, EquipmentCategory,
+    Equipment, EquipmentCategory,
     RentalBooking
 )
-
-
-def property_list(request):
-    """List all available properties with search and filters"""
-    properties = Property.objects.filter(is_available=True).select_related('owner', 'category')
-
-    # Search
-    search_query = request.GET.get('search', '')
-    if search_query:
-        properties = properties.filter(
-            Q(title__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(city__icontains=search_query) |
-            Q(address__icontains=search_query)
-        )
-
-    # Filters
-    property_type = request.GET.get('type', '')
-    if property_type:
-        properties = properties.filter(property_type=property_type)
-
-    city = request.GET.get('city', '')
-    if city:
-        properties = properties.filter(city__icontains=city)
-
-    category_id = request.GET.get('category', '')
-    if category_id:
-        properties = properties.filter(category_id=category_id)
-
-    rental_period = request.GET.get('period', '')
-    if rental_period:
-        properties = properties.filter(rental_period=rental_period)
-
-    # Sorting
-    sort_by = request.GET.get('sort', '-created_at')
-    properties = properties.order_by(sort_by)
-
-    # Pagination
-    paginator = Paginator(properties, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    # Get categories for filter
-    categories = PropertyCategory.objects.all()
-
-    context = {
-        'properties': page_obj,
-        'page_obj': page_obj,
-        'categories': categories,
-        'search_query': search_query,
-        'selected_type': property_type,
-        'selected_city': city,
-        'selected_category': category_id,
-        'selected_period': rental_period,
-    }
-    return render(request, 'rent/property_list.html', context)
-
-
-def property_detail(request, pk):
-    """Display property details"""
-    from .models import SavedProperty
-
-    property_obj = get_object_or_404(
-        Property.objects.select_related('owner', 'category').prefetch_related('images', 'reviews'),
-        pk=pk
-    )
-
-    # Increment views
-    property_obj.views_count += 1
-    property_obj.save(update_fields=['views_count'])
-
-    # Check if user has saved this property
-    is_saved = False
-    if request.user.is_authenticated:
-        is_saved = SavedProperty.objects.filter(user=request.user, property=property_obj).exists()
-
-    # Get related properties
-    related_properties = Property.objects.filter(
-        category=property_obj.category,
-        is_available=True
-    ).exclude(pk=pk)[:4]
-
-    context = {
-        'property': property_obj,
-        'related_properties': related_properties,
-        'is_saved': is_saved,
-    }
-    return render(request, 'rent/property_detail.html', context)
 
 
 def equipment_list(request):
@@ -382,20 +294,14 @@ def booking_create(request):
 def booking_detail(request, pk):
     """Display booking details"""
     booking = get_object_or_404(
-        RentalBooking.objects.select_related('property', 'equipment', 'renter'),
+        RentalBooking.objects.select_related('equipment', 'renter'),
         pk=pk
     )
 
-    # Check if user is the renter or the owner
-    if booking.renter != request.user:
-        if booking.booking_type == 'property' and booking.property:
-            if booking.property.owner != request.user:
-                messages.error(request, 'You do not have permission to view this booking.')
-                return redirect('rent:booking_list')
-        elif booking.booking_type == 'equipment' and booking.equipment:
-            if booking.equipment.owner != request.user:
-                messages.error(request, 'You do not have permission to view this booking.')
-                return redirect('rent:booking_list')
+    # Check if user is the renter or the equipment owner
+    if booking.renter != request.user and booking.equipment.owner != request.user:
+        messages.error(request, 'You do not have permission to view this booking.')
+        return redirect('rent:booking_list')
 
     context = {
         'booking': booking,
@@ -419,21 +325,6 @@ def booking_cancel(request, pk):
 
 
 @login_required
-def my_properties(request):
-    """List properties owned by the user"""
-    properties = Property.objects.filter(owner=request.user).order_by('-created_at')
-
-    paginator = Paginator(properties, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-    }
-    return render(request, 'rent/my_properties.html', context)
-
-
-@login_required
 def my_equipment(request):
     """List equipment owned by the user"""
     equipment_items = Equipment.objects.filter(owner=request.user).order_by('-created_at')
@@ -451,15 +342,15 @@ def my_equipment(request):
 @login_required
 def dashboard_pwa(request):
     """PWA Dashboard for Rent app"""
-    properties = Property.objects.filter(owner=request.user)
+    equipment = Equipment.objects.filter(owner=request.user)
     bookings = RentalBooking.objects.filter(
-        Q(renter=request.user) | Q(property__owner=request.user)
+        Q(renter=request.user) | Q(equipment__owner=request.user)
     )
 
     context = {
-        'properties_count': properties.count(),
-        'tenants_count': bookings.filter(status='confirmed').count(),
+        'equipment_count': equipment.count(),
+        'renters_count': bookings.filter(status='confirmed').count(),
         'revenue': sum([b.total_amount for b in bookings.filter(status='completed')]),
-        'views': sum([p.views_count for p in properties]),
+        'views': sum([e.views_count for e in equipment]),
     }
     return render(request, 'rent/dashboard_pwa.html', context)

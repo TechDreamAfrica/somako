@@ -6,59 +6,189 @@
 {% block content %}
 <div id="content-main">
   <div>
-    <h1>Scrape Products from AliExpress</h1>
+    <h1>Product Scraping Dashboard</h1>
 
-    <div>
-      <strong>Note:</strong> This feature uses a mock scraper to generate sample products for testing. In production, this would scrape actual products from AliExpress.
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+      
+      <!-- AliExpress Scraper -->
+      <div style="border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
+        <h2>AliExpress Scraper</h2>
+        <div style="background-color: #fffbcc; padding: 10px; margin-bottom: 15px; border-radius: 3px;">
+          <strong>Note:</strong> This feature uses a mock scraper to generate sample products for testing. In production, this would scrape actual products from AliExpress.
+        </div>
+
+<form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="scraper" value="aliexpress">
+
+          <div style="margin-bottom: 15px;">
+            <label for="id_ali_count">Number of Products to Generate:</label>
+            <input type="number" name="count" id="id_ali_count" value="10" min="1" max="50" required>
+            <small>Generate between 1 and 50 sample products</small>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label for="id_ali_category">Category (Optional):</label>
+            <select name="category" id="id_ali_category">
+              <option value="">--- Default (Imported Products) ---</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+            <small>Select a category to assign imported products to</small>
+          </div>
+
+          <div>
+            <input type="submit" value="Generate Mock Products" style="background-color: #007cba; color: white; padding: 8px 16px; border: none; border-radius: 3px;">
+          </div>
+        </form>
+      </div>
+
+      <!-- Jumia Scraper -->
+      <div style="border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
+        <h2>Jumia Ghana Scraper</h2>
+        <div style="background-color: #e8f5e8; padding: 10px; margin-bottom: 15px; border-radius: 3px;">
+          <strong>Admin Mode:</strong> This interface uses mock mode for immediate results and better performance. For real scraping, use the command line interface.
+        </div>
+
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="scraper" value="jumia">
+          <input type="hidden" name="use_mock" value="true">
+
+          <div style="margin-bottom: 15px;">
+            <label>Scraping Mode:</label>
+            <div>
+              <input type="radio" name="scrape_mode" value="keyword" id="jumia_keyword" checked>
+              <label for="jumia_keyword">By Keyword</label>
+              
+              <input type="radio" name="scrape_mode" value="category" id="jumia_category" style="margin-left: 15px;">
+              <label for="jumia_category">By Category</label>
+              
+              <input type="radio" name="scrape_mode" value="all_categories" id="jumia_all" style="margin-left: 15px;">
+              <label for="jumia_all">All Categories</label>
+            </div>
+          </div>
+
+          <div id="keyword_input" style="margin-bottom: 15px;">
+            <label for="id_keyword">Search Keyword:</label>
+            <input type="text" name="keyword" id="id_keyword" placeholder="e.g., smartphones, laptops, shoes">
+            <small>Enter search term for products (mock products will be generated)</small>
+          </div>
+
+          <div id="category_input" style="margin-bottom: 15px; display: none;">
+            <label for="id_jumia_category_select">Jumia Category:</label>
+            <select name="jumia_category" id="id_jumia_category_select">
+              <option value="electronics">Electronics</option>
+              <option value="phones-tablets">Phones & Tablets</option>
+              <option value="fashion">Fashion</option>
+              <option value="home-office">Home & Office</option>
+              <option value="beauty-health">Beauty & Health</option>
+              <option value="kids-babies">Kids & Babies</option>
+              <option value="sports-fitness">Sports & Fitness</option>
+              <option value="automobile">Automobile</option>
+              <option value="books-games">Books & Games</option>
+              <option value="garden-outdoor">Garden & Outdoor</option>
+              <option value="food-drinks">Food & Drinks</option>
+              <option value="services">Services</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label for="id_jumia_count">Products per Category:</label>
+            <input type="number" name="count" id="id_jumia_count" value="20" min="5" max="50" required>
+            <small>Number of products to generate (5-50, limited in admin for performance)</small>
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label for="id_jumia_db_category">Database Category (Optional):</label>
+            <select name="db_category" id="id_jumia_db_category">
+              <option value="">--- Auto-create/assign ---</option>
+              {% for category in categories %}
+              <option value="{{ category.slug }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+            <small>Will auto-create categories if not specified</small>
+          </div>
+
+          <div>
+            <input type="submit" value="Generate Jumia Products" style="background-color: #ff6900; color: white; padding: 8px 16px; border: none; border-radius: 3px;">
+          </div>
+        </form>
+      </div>
     </div>
 
-    <form method="post">
-      {% csrf_token %}
-
-      <div>
+    <!-- Command Line Instructions -->
+    <div style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px;">
+      <h3>Command Line Usage:</h3>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
-          <label for="id_count">Number of Products to Generate:</label>
-          <input type="number" name="count" id="id_count" value="10" min="1" max="50" required>
-          <p>Generate between 1 and 50 sample products</p>
-        </div>
-      </div>
-
-      <div>
-        <div>
-          <label for="id_category">Category (Optional):</label>
-          <select name="category" id="id_category">
-            <option value="">--- Default (Imported Products) ---</option>
-            {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-          </select>
-          <p>Select a category to assign imported products to</p>
-        </div>
-      </div>
-
-      <div>
-        <input type="submit" value="Generate Products">
-        <a href="{% url 'admin:shop_product_changelist' %}">Cancel</a>
-      </div>
-    </form>
-
-    <div>
-      <h3>How to Use the Real Scraper:</h3>
-      <p>To scrape real products from AliExpress using the command line:</p>
-      <pre><code>
-# Scrape products with keyword search
-python manage.py scrape_aliexpress --keyword "phone accessories" --count 10
-
-# Use mock mode (current admin interface uses this)
+          <h4>AliExpress Commands:</h4>
+          <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 3px; font-size: 12px;"><code># Mock mode (safe for testing)
 python manage.py scrape_aliexpress --mock --count 15
 
-# Specify a category
-python manage.py scrape_aliexpress --mock --count 10 --category electronics
+# Real scraping (if implemented)
+python manage.py scrape_aliexpress --keyword "phone accessories" --count 10
 
-# Import from CSV file
-python manage.py import_products --file products.csv --format csv
-      </code></pre>
+# Import from CSV
+python manage.py import_products --file products.csv --format csv</code></pre>
+        </div>
+
+        <div>
+          <h4>Jumia Commands:</h4>
+          <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 3px; font-size: 12px;"><code># Mock mode (recommended for testing)
+python manage.py scrape_jumia --mock --category "electronics" --count 20
+
+# Real scraping by keyword
+python manage.py scrape_jumia --keyword "smartphones" --count 20
+
+# Real scraping by category  
+python manage.py scrape_jumia --category "electronics" --count 50
+
+# Real scraping all categories
+python manage.py scrape_jumia --all-categories --count 10
+
+# With custom settings
+python manage.py scrape_jumia --keyword "laptops" --count 25 --db-category electronics --user admin</code></pre>
+        </div>
+      </div>
     </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="{% url 'admin:shop_product_changelist' %}" style="background-color: #666; color: white; padding: 8px 16px; text-decoration: none; border-radius: 3px;">Back to Products</a>
+    </div>
+
+    <script>
+      // JavaScript to toggle form sections
+      document.addEventListener('DOMContentLoaded', function() {
+        const modeInputs = document.querySelectorAll('input[name="scrape_mode"]');
+        const keywordInput = document.getElementById('keyword_input');
+        const categoryInput = document.getElementById('category_input');
+
+        function updateFormVisibility() {
+          const selectedMode = document.querySelector('input[name="scrape_mode"]:checked').value;
+          
+          if (selectedMode === 'keyword') {
+            keywordInput.style.display = 'block';
+            categoryInput.style.display = 'none';
+          } else if (selectedMode === 'category') {
+            keywordInput.style.display = 'none';
+            categoryInput.style.display = 'block';
+          } else {
+            keywordInput.style.display = 'none';
+            categoryInput.style.display = 'none';
+          }
+        }
+
+        modeInputs.forEach(input => {
+          input.addEventListener('change', updateFormVisibility);
+        });
+
+        // Initialize visibility
+        updateFormVisibility();
+      });
+    </script>
   </div>
 </div>
 {% endblock %}

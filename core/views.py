@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from accounts.models import User
 
 # Import models from service apps
-from rent.models import Property, Equipment, RentalBooking
+from rent.models import Equipment, RentalBooking
 from pharmacy.models import Medicine, Order as PharmacyOrder
 from shop.models import Product, Order as ShopOrder
 from food.models import Restaurant, MenuItem, Order as FoodOrder
@@ -15,7 +15,7 @@ def home(request):
     """Home page view with featured content and statistics from all service apps"""
 
     # RENT APP DATA
-    featured_properties = Property.objects.filter(
+    featured_equipment = Equipment.objects.filter(
         is_available=True
     ).order_by('-created_at')[:6]
 
@@ -23,7 +23,7 @@ def home(request):
         is_available=True
     ).order_by('-created_at')[:4]
 
-    total_properties = Property.objects.filter(is_available=True).count()
+    total_equipment = Equipment.objects.filter(is_available=True).count()
     total_equipment = Equipment.objects.filter(is_available=True).count()
     total_rentals = RentalBooking.objects.filter(status__in=['confirmed', 'active']).count()
 
@@ -72,15 +72,13 @@ def home(request):
     total_orders = total_pharmacy_orders + total_shop_orders + total_food_orders + total_rides
 
     # Count unique cities from properties, restaurants, etc.
-    property_cities = Property.objects.values_list('city', flat=True).distinct()
+    equipment_cities = Equipment.objects.values_list('city', flat=True).distinct()
     restaurant_cities = Restaurant.objects.values_list('city', flat=True).distinct()
-    unique_cities = len(set(list(property_cities) + list(restaurant_cities)))
+    unique_cities = len(set(list(equipment_cities) + list(restaurant_cities)))
 
     context = {
         # Rent data
-        'featured_properties': featured_properties,
         'featured_equipment': featured_equipment,
-        'total_properties': total_properties,
         'total_equipment': total_equipment,
         'total_rentals': total_rentals,
 

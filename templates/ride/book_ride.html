@@ -43,7 +43,7 @@
     <div class="col-lg-7">
       <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
         <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 40px; height: 40px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-map-marked-alt" style="color: #2563eb;"></i>
           </div>
           Live Map
@@ -68,7 +68,7 @@
         <!-- Distance and Time Info -->
         <div class="row g-3" style="margin-top: 1.5rem;">
           <div class="col-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #93c5fd;">
               <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <i class="fas fa-route" style="color: #2563eb; font-size: 1.125rem;"></i>
                 <span style="color: #1e40af; font-size: 0.875rem; font-weight: 700;">Estimated Distance</span>
@@ -77,7 +77,7 @@
             </div>
           </div>
           <div class="col-6">
-            <div style="background: #2563eb; padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d;">
+            <div style="padding: 1.25rem; border-radius: 1rem; border: 2px solid #fcd34d;">
               <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <i class="fas fa-clock" style="color: #2563eb; font-size: 1.125rem;"></i>
                 <span style="color: #92400e; font-size: 0.875rem; font-weight: 700;">Estimated Time</span>
@@ -93,7 +93,7 @@
     <div class="col-lg-5">
       <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; position: sticky; top: 2rem;">
         <h3 style="font-size: 1.5rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-          <div style="width: 40px; height: 40px; background: #2563eb; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 40px; height: 40px; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-clipboard-list" style="color: #2563eb;"></i>
           </div>
           Ride Details
@@ -158,17 +158,19 @@
                    data-price-per-km="{{ primary_vehicle.category.price_per_km }}"
                    data-price-per-minute="{{ primary_vehicle.category.price_per_minute }}"
                    data-max-passengers="{{ primary_vehicle.category.max_passengers }}"
-                   style="background: #2563eb; border: 2px solid #e5e7eb; border-radius: 0.875rem; padding: 1rem; cursor: pointer; transition: all 0.3s ease;"
-                   onmouseover="if(!this.classList.contains('selected')) { this.style.borderColor='#dbeafe'; this.style.background='#f5f3ff'; }"
+                   style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 0.875rem; padding: 1rem; cursor: pointer; transition: all 0.3s ease;"
+                   onmouseover="if(!this.classList.contains('selected')) { this.style.borderColor='#2563eb'; this.style.background='#f0f9ff'; }"
                    onmouseout="if(!this.classList.contains('selected')) { this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'; }">
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                   <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
                     <!-- Driver Photo -->
-                    <div style="width: 50px; height: 50px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                    <div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
                       {% if driver.profile_photo %}
                       <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% elif driver.user.profile_picture and driver.user.profile_picture.strip %}
+                      <img src="{{ driver.user.profile_picture }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
                       {% else %}
-                      <i class="fas fa-user" style="color: #2563eb; font-size: 1.5rem;"></i>
+                      <i class="fas fa-user" style="color: #6b7280; font-size: 1.5rem;"></i>
                       {% endif %}
                     </div>
 
@@ -198,7 +200,7 @@
               {% endfor %}
             </div>
             {% else %}
-            <div style="background: #2563eb; border: 2px solid #fca5a5; border-radius: 0.875rem; padding: 1.5rem; text-align: center;">
+            <div style="background: #fef2f2; border: 2px solid #fca5a5; border-radius: 0.875rem; padding: 1.5rem; text-align: center;">
               <i class="fas fa-exclamation-circle" style="color: #dc2626; font-size: 2rem; margin-bottom: 0.5rem;"></i>
               <p style="color: #991b1b; font-weight: 700; margin-bottom: 0.5rem;">No drivers available</p>
               <p style="color: #b91c1c; font-size: 0.875rem; margin: 0;">Please try again later or contact support.</p>
@@ -236,7 +238,7 @@
           </div>
 
           <!-- Fare Breakdown -->
-          <div id="fareCard" style="display: none; background: #2563eb; border: 2px solid #bfdbfe; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div id="fareCard" style="display: none; border: 2px solid #bfdbfe; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
             <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem;">
               <i class="fas fa-calculator" style="color: #2563eb; font-size: 1.125rem;"></i>
               <h6 style="font-weight: 800; color: #1f2937; margin: 0; font-size: 1rem;">Fare Breakdown</h6>
@@ -262,7 +264,7 @@
             </div>
           </div>
 
-          <div style="background: #2563eb; border: 2px solid #93c5fd; border-radius: 0.875rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="border: 2px solid #93c5fd; border-radius: 0.875rem; padding: 1.25rem; margin-bottom: 1.5rem;">
             <div style="display: flex; gap: 0.75rem;">
               <i class="fas fa-info-circle" style="color: #2563eb; font-size: 1.25rem; flex-shrink: 0;"></i>
               <p style="color: #1e40af; font-size: 0.875rem; font-weight: 600; margin: 0; line-height: 1.5;">Click on the map to set pickup and destination points. The fare will be calculated automatically.</p>
@@ -285,7 +287,7 @@
 <section style="padding: 4rem 0;">
   <div class="container">
     <div style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
-      <div style="background: #2563eb; padding: 0.5rem 1.25rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.625rem; margin-bottom: 1.5rem; border: 2px solid #bfdbfe;">
+      <div style="padding: 0.5rem 1.25rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.625rem; margin-bottom: 1.5rem; border: 2px solid #bfdbfe;">
         <i class="fas fa-user-friends" style="color: #2563eb;"></i>
         <span style="font-weight: 700; font-size: 0.875rem; color: #6b21a8;">More Drivers</span>
       </div>
@@ -303,7 +305,7 @@
         <div style="flex: 0 0 320px; scroll-snap-align: start;">
           <div style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 2px solid #f3f4f6; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); height: 100%;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 20px 60px rgba(139, 92, 246, 0.2)'; this.style.borderColor='#dbeafe'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(0, 0, 0, 0.1)'; this.style.borderColor='#f3f4f6'">
             <!-- Driver Photo -->
-            <div style="background: #2563eb; padding: 2rem; position: relative; height: 180px; display: flex; align-items: center; justify-content: center;">
+            <div style="padding: 2rem; position: relative; height: 180px; display: flex; align-items: center; justify-content: center;">
               <div style="width: 120px; height: 120px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); overflow: hidden;">
                 {% if driver.profile_photo %}
                 <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -328,7 +330,7 @@
               </p>
 
               <!-- Pricing -->
-              <div style="background: #2563eb; border-radius: 1rem; padding: 1.25rem; margin-bottom: 1.25rem; border: 2px solid #dbeafe;">
+              <div style="border-radius: 1rem; padding: 1.25rem; margin-bottom: 1.25rem; border: 2px solid #dbeafe;">
                 <div style="text-align: center;">
                   <div style="color: #6b7280; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">Base Fare</div>
                   <div style="color: #2563eb; font-weight: 900; font-size: 1.5rem;">GHS {{ primary_vehicle.category.base_fare }}</div>

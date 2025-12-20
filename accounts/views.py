@@ -163,7 +163,16 @@ class CustomLoginView(LoginView):
         return response
 
     def get_success_url(self):
-        # Simply redirect to dashboard after login
+        # Check if user has a driver profile and redirect to driver dashboard
+        try:
+            from ride.models import DriverProfile
+            driver_profile = DriverProfile.objects.filter(user=self.request.user).first()
+            if driver_profile:
+                return reverse_lazy('ride:driver_dashboard')
+        except Exception as e:
+            logger.error(f"Error checking driver profile for user {self.request.user.username}: {str(e)}")
+        
+        # Default redirect to regular dashboard
         return reverse_lazy('accounts:dashboard')
 
 @login_required
@@ -632,6 +641,16 @@ def profile_view(request):
 @login_required
 def dashboard_view(request):
     user = request.user
+    
+    # Check if user has a driver profile and redirect to driver dashboard
+    try:
+        from ride.models import DriverProfile
+        driver_profile = DriverProfile.objects.filter(user=user).first()
+        if driver_profile:
+            return redirect('ride:driver_dashboard')
+    except Exception as e:
+        logger.error(f"Error checking driver profile for user {user.username}: {str(e)}")
+    
     context = {
         'user': user,
     }
@@ -1858,6 +1877,18 @@ def pwa_login_view(request):
         if request.user.has_role('delivery_driver') or request.user.has_role('rider'):
             from django.urls import reverse
             return redirect(reverse('express_pwa:rider_dashboard'))
+        
+        # Check if user has a driver profile for ride app and redirect to driver dashboard
+        try:
+            from ride.models import DriverProfile
+            driver_profile = DriverProfile.objects.filter(user=request.user).first()
+            if driver_profile:
+                return redirect('ride:driver_dashboard')
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error checking driver profile for user {request.user.username}: {str(e)}")
+        
         # Get the 'next' parameter or default to Food PWA
         next_url = request.GET.get('next')
         if next_url:
@@ -1967,6 +1998,17 @@ def pwa_login_view(request):
                     logger.error(f"Error redirecting to rider dashboard: {e}")
                     # Fall back to express main page
                     return redirect('/pwa/express/')
+            
+            # Check if user has a driver profile for ride app and redirect to driver dashboard
+            try:
+                from ride.models import DriverProfile
+                driver_profile = DriverProfile.objects.filter(user=user).first()
+                if driver_profile:
+                    logger.info(f"Redirecting driver {user.username} to driver dashboard")
+                    return redirect('ride:driver_dashboard')
+            except Exception as e:
+                logger.error(f"Error checking driver profile for user {user.username}: {str(e)}")
+            
             return redirect(next_url)
         else:
             app_context['error'] = 'Invalid username or password'

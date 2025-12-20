@@ -1,25 +1,32 @@
 from django.conf import settings
-from twilio.rest import Client
+import requests
+import json
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class NotificationService:
-    """Service for sending notifications via SMS, WhatsApp, and in-app"""
+    """Service for sending notifications via SMS (Arkeseel), WhatsApp, and in-app"""
 
     def __init__(self):
-        # Initialize Twilio client
+        # Legacy Twilio for WhatsApp (optional)
         self.twilio_account_sid = getattr(settings, 'TWILIO_ACCOUNT_SID', None)
         self.twilio_auth_token = getattr(settings, 'TWILIO_AUTH_TOKEN', None)
-        self.twilio_phone_number = getattr(settings, 'TWILIO_PHONE_NUMBER', None)
         self.twilio_whatsapp_number = getattr(settings, 'TWILIO_WHATSAPP_NUMBER', 'whatsapp:+14155238886')
 
+        # Initialize Twilio client only if needed for WhatsApp
         if self.twilio_account_sid and self.twilio_auth_token:
-            self.client = Client(self.twilio_account_sid, self.twilio_auth_token)
+            try:
+                from twilio.rest import Client
+                self.twilio_client = Client(self.twilio_account_sid, self.twilio_auth_token)
+            except ImportError:
+                self.twilio_client = None
+                logger.warning("Twilio library not installed. WhatsApp notifications will be disabled.")
         else:
-            self.client = None
-            logger.warning("Twilio credentials not configured. SMS/WhatsApp notifications will be disabled.")
+            self.twilio_client = None
+
+        # SMS will be handled by existing utils/sms_utils.py
 
     def create_notification(self, user, notification_type, title, message, channels=None,
                           reference_id=None, reference_type=None, data=None):
@@ -63,42 +70,47 @@ class NotificationService:
         return notifications_created
 
     def send_sms(self, notification):
-        """Send SMS via Twilio"""
-        if not self.client:
-            logger.error("Twilio client not initialized")
-            notification.mark_as_failed()
-            return False
-
+        """Send SMS via Arkesel using existing SMS utils"""
         if not notification.phone_number:
             logger.error(f"No phone number for user {notification.user.username}")
             notification.mark_as_failed()
             return False
 
         try:
-            # Format phone number (ensure it has country code)
-            phone = notification.phone_number
-            if not phone.startswith('+'):
-                phone = f"+{phone}"
+            # Use existing SMS utils
+            from utils.sms_utils import ArkeselSMS
+            sms = ArkeselSMS()
+            
+            # Prepare SMS message
+            message_text = f"{notification.title}\n\n{notification.message}"
+            
+            # Send SMS using existing utility
+            result = sms.send_sms(notification.phone_number, message_text)
+            
+            if result.get('success'):
+                message_id = result.get('data', {}).get('id', 'unknown') if result.get('data') else 'unknown'
+                notification.mark_as_sent(message_sid=str(message_id))
+                logger.info(f"SMS sent to {notification.phone_number} via Arkesel: {message_id}")
+                return True
+            else:
+                error_msg = result.get('message', 'Unknown error')
+                logger.error(f"Arkesel SMS error: {error_msg}")
+                notification.mark_as_failed()
+                return False
 
-            message = self.client.messages.create(
-                body=f"{notification.title}\n\n{notification.message}",
-                from_=self.twilio_phone_number,
-                to=phone
-            )
-
-            notification.mark_as_sent(message_sid=message.sid)
-            logger.info(f"SMS sent to {phone}: {message.sid}")
-            return True
-
+        except ImportError:
+            logger.error("SMS utils not available. Cannot send SMS.")
+            notification.mark_as_failed()
+            return False
         except Exception as e:
-            logger.error(f"Failed to send SMS to {notification.phone_number}: {str(e)}")
+            logger.error(f"Unexpected error sending SMS to {notification.phone_number}: {str(e)}")
             notification.mark_as_failed()
             return False
 
     def send_whatsapp(self, notification):
-        """Send WhatsApp message via Twilio"""
-        if not self.client:
-            logger.error("Twilio client not initialized")
+        """Send WhatsApp message via Twilio (optional)"""
+        if not self.twilio_client:
+            logger.error("Twilio client not initialized for WhatsApp")
             notification.mark_as_failed()
             return False
 
@@ -113,7 +125,7 @@ class NotificationService:
             if not phone.startswith('+'):
                 phone = f"+{phone}"
 
-            message = self.client.messages.create(
+            message = self.twilio_client.messages.create(
                 body=f"*{notification.title}*\n\n{notification.message}",
                 from_=self.twilio_whatsapp_number,
                 to=f"whatsapp:{phone}"
