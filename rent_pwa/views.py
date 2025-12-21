@@ -18,126 +18,101 @@ from rent.models import Equipment, EquipmentCategory, RentalBooking, SavedEquipm
 
 @login_required
 def pwa_dashboard(request):
-    """PWA Rent Dashboard - Role-based (Customer/Landlord)"""
+    """PWA Rent Dashboard - Role-based (Customer/Equipment Owner)"""
     # Mark as PWA session
     request.session['is_pwa_user'] = True
     request.session['pwa_app'] = 'rent'
 
     user = request.user
-    # Check if user has landlord or equipment_owner role
-    is_owner = user.has_role('landlord') or user.has_role('equipment_owner')
+    # Check if user has equipment_owner role
+    is_owner = user.has_role('equipment_owner')
     has_equipment = Equipment.objects.filter(owner=user).exists()
 
-    if is_owner and has_properties:
+    if is_owner and has_equipment:
         return redirect('rent_pwa:owner_dashboard')
 
     # Customer dashboard
-    featured_props = Property.objects.filter(
+    featured_equipment = Equipment.objects.filter(
         is_available=True, listing_type='for_rent'
     ).order_by('-created_at')
 
     context = {
         'featured_equipment': featured_equipment[:6],
         'recent_equipment': featured_equipment[6:12] if len(featured_equipment) > 6 else featured_equipment[:6],
-        'featured_equipment': Equipment.objects.filter(
-            is_available=True
-        ).order_by('-created_at')[:4],
         'recent_bookings': RentalBooking.objects.filter(
             renter=user
         ).order_by('-created_at')[:3],
-        'recent_orders': RentalBooking.objects.filter(
-            renter=user
-        ).order_by('-created_at'),
         'cart_count': 0,  # Placeholder - implement cart later if needed
-        'wishlist_count': user.saved_properties.count() if hasattr(user, 'saved_properties') else 0,
-        'saved_count': user.saved_properties.count() if hasattr(user, 'saved_properties') else 0,
+        'saved_count': SavedEquipment.objects.filter(user=user).count(),
     }
     return render(request, 'rent/pwa/dashboard.html', context)
 
 
-@login_required
-def pwa_property_list(request):
-    """Browse all properties"""
-    properties = Property.objects.filter(is_available=True, listing_type='for_rent')
+@login_required  
+def pwa_equipment_list(request):
+    """Browse all equipment"""
+    equipment = Equipment.objects.filter(is_available=True, listing_type='for_rent')
 
     # Filters
     category_id = request.GET.get('category')
     city = request.GET.get('city')
-    property_type = request.GET.get('type')
     search_query = request.GET.get('q', '').strip()
     sort = request.GET.get('sort', 'newest')
 
     if category_id:
-        properties = properties.filter(category_id=category_id)
+        equipment = equipment.filter(category_id=category_id)
 
     if city:
-        properties = properties.filter(city__icontains=city)
-
-    if property_type:
-        properties = properties.filter(property_type=property_type)
+        equipment = equipment.filter(city__icontains=city)
 
     if search_query:
-        properties = properties.filter(
-            Q(title__icontains=search_query) |
+        equipment = equipment.filter(
+            Q(name__icontains=search_query) |
             Q(description__icontains=search_query) |
-            Q(address__icontains=search_query) |
+            Q(brand__icontains=search_query) |
             Q(city__icontains=search_query)
         )
 
     # Sorting
     if sort == 'price_low':
-        properties = properties.order_by('price_per_period')
+        equipment = equipment.order_by('price_per_period')
     elif sort == 'price_high':
-        properties = properties.order_by('-price_per_period')
-    elif sort == 'bedrooms':
-        properties = properties.order_by('-bedrooms')
+        equipment = equipment.order_by('-price_per_period')
     else:  # newest
-        properties = properties.order_by('-created_at')
+        equipment = equipment.order_by('-created_at')
 
     context = {
-        'properties': properties,
-        'categories': PropertyCategory.objects.all(),
-        'cities': Property.objects.values_list('city', flat=True).distinct(),
+        'equipment': equipment,
+        'categories': EquipmentCategory.objects.all(),
+        'cities': Equipment.objects.values_list('city', flat=True).distinct(),
         'selected_category': category_id,
         'selected_city': city,
-        'selected_type': property_type,
         'selected_sort': sort,
         'search_query': search_query,
     }
-    return render(request, 'rent/pwa/property_list.html', context)
+    return render(request, 'rent/pwa/equipment_list.html', context)
 
 
 @login_required
-def pwa_property_detail(request, pk):
-    """Property details page"""
-    property_obj = get_object_or_404(Property, pk=pk, is_available=True)
+def pwa_equipment_detail(request, pk):
+    """Equipment details page"""
+    equipment = get_object_or_404(Equipment, pk=pk, is_available=True)
 
-    # Check if property is saved by user
-    is_saved = SavedProperty.objects.filter(user=request.user, property=property_obj).exists()
+    # Check if equipment is saved by user
+    is_saved = SavedEquipment.objects.filter(user=request.user, equipment=equipment).exists()
 
     context = {
-        'property': property_obj,
+        'equipment': equipment,
         'is_saved': is_saved,
-        'images': property_obj.images.all() if hasattr(property_obj, 'images') else [],
+        'images': equipment.images.all() if hasattr(equipment, 'images') else [],
     }
-    return render(request, 'rent/pwa/property_detail.html', context)
+    return render(request, 'rent/pwa/equipment_detail.html', context)
 
 
 @login_required
 def pwa_category_properties(request, category):
-    """Properties filtered by category"""
-    category_obj = get_object_or_404(PropertyCategory, name=category)
-    properties = Property.objects.filter(
-        category=category_obj,
-        is_available=True,
-        listing_type='for_rent'
-    ).order_by('-created_at')
-
-    context = {
-        'category': category_obj,
-        'properties': properties,
-    }
-    return render(request, 'rent/pwa/category_properties.html', context)
+    """Equipment filtered by category (legacy endpoint)"""
+    return redirect('rent_pwa:category_equipment', category=category)
 
 
 @login_required
@@ -161,9 +136,9 @@ def pwa_equipment_list(request):
 
     # Sorting
     if sort == 'price_low':
-        equipment = equipment.order_by('price_per_day')
+        equipment = equipment.order_by('price_per_period')
     elif sort == 'price_high':
-        equipment = equipment.order_by('-price_per_day')
+        equipment = equipment.order_by('-price_per_period')
     else:  # newest
         equipment = equipment.order_by('-created_at')
 
@@ -205,59 +180,6 @@ def pwa_category_equipment(request, category):
 
 
 @login_required
-def pwa_book_property(request, property_id):
-    """Book a property"""
-    property_obj = get_object_or_404(Property, pk=property_id, is_available=True)
-
-    if request.method == 'POST':
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        rental_years = request.POST.get('rental_years', property_obj.minimum_rental_years)
-        payment_method = request.POST.get('payment_method', 'cash')
-        notes = request.POST.get('notes', '')
-
-        # Calculate total amount based on rental period
-        years = int(rental_years)
-
-        # Determine number of periods in a year based on rental_period
-        if property_obj.rental_period == 'daily':
-            periods_per_year = 365
-        elif property_obj.rental_period == 'weekly':
-            periods_per_year = 52
-        elif property_obj.rental_period == 'monthly':
-            periods_per_year = 12
-        elif property_obj.rental_period == 'yearly':
-            periods_per_year = 1
-        else:
-            periods_per_year = 12  # Default to monthly
-
-        total_periods = years * periods_per_year
-        total_amount = property_obj.price_per_period * total_periods
-
-        # Create booking
-        booking = RentalBooking.objects.create(
-            booking_type='property',
-            property=property_obj,
-            renter=request.user,
-            start_date=start_date,
-            end_date=end_date,
-            rental_years=rental_years,
-            payment_method=payment_method,
-            notes=notes,
-            total_amount=total_amount,
-            status='pending'
-        )
-
-        messages.success(request, f'Booking request submitted! Booking ID: #{booking.id}')
-        return redirect('rent_pwa:booking_detail', booking_id=booking.id)
-
-    context = {
-        'property': property_obj,
-    }
-    return render(request, 'rent/pwa/book_property.html', context)
-
-
-@login_required
 def pwa_book_equipment(request, equipment_id):
     """Book equipment"""
     equipment = get_object_or_404(Equipment, pk=equipment_id, is_available=True)
@@ -274,7 +196,7 @@ def pwa_book_equipment(request, equipment_id):
             start_date=start_date,
             end_date=end_date,
             notes=notes,
-            total_amount=equipment.price_per_day,
+            total_amount=equipment.price_per_period,
             status='pending'
         )
 
@@ -332,65 +254,56 @@ def pwa_cancel_booking(request, booking_id):
 
 
 @login_required
-def pwa_saved_properties(request):
-    """View saved properties"""
-    # Get saved property objects and extract the actual properties
-    saved_property_objects = request.user.saved_properties.all().select_related('property')
-    properties = [sp.property for sp in saved_property_objects if sp.property.is_available]
+def pwa_saved_equipment(request):
+    """View saved equipment"""
+    # Get saved equipment objects
+    saved_equipment_objects = SavedEquipment.objects.filter(user=request.user).select_related('equipment')
+    equipment = [se.equipment for se in saved_equipment_objects if se.equipment.is_available]
 
     context = {
-        'properties': properties,
+        'equipment': equipment,
     }
-    return render(request, 'rent/pwa/saved_properties.html', context)
+    return render(request, 'rent/pwa/saved_equipment.html', context)
 
 
 @login_required
-def pwa_toggle_saved(request, property_id):
-    """Toggle property saved status"""
-    property_obj = get_object_or_404(Property, pk=property_id)
+def pwa_toggle_saved(request, equipment_id):
+    """Toggle equipment saved status"""
+    equipment_obj = get_object_or_404(Equipment, pk=equipment_id)
 
-    # Check if property is already saved
-    saved_obj = SavedProperty.objects.filter(user=request.user, property=property_obj).first()
+    # Check if equipment is already saved
+    saved_obj = SavedEquipment.objects.filter(user=request.user, equipment=equipment_obj).first()
     
     if saved_obj:
         # Remove from saved
         saved_obj.delete()
-        messages.success(request, f'{property_obj.title} removed from saved!')
+        messages.success(request, f'{equipment_obj.name} removed from saved!')
     else:
         # Add to saved
-        SavedProperty.objects.create(user=request.user, property=property_obj)
-        messages.success(request, f'{property_obj.title} added to saved!')
+        SavedEquipment.objects.create(user=request.user, equipment=equipment_obj)
+        messages.success(request, f'{equipment_obj.name} added to saved!')
 
-    return redirect('rent_pwa:property_detail', pk=property_id)
+    return redirect('rent_pwa:equipment_detail', pk=equipment_id)
 
 
 @login_required
 def pwa_search(request):
-    """Search properties and equipment"""
+    """Search equipment"""
     query = request.GET.get('q', '')
 
-    properties = []
     equipment = []
 
     if query:
-        properties = Property.objects.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query) |
-            Q(address__icontains=query) |
-            Q(city__icontains=query),
-            is_available=True,
-            listing_type='for_rent'
-        )[:10]
-
         equipment = Equipment.objects.filter(
             Q(name__icontains=query) |
-            Q(description__icontains=query),
+            Q(description__icontains=query) |
+            Q(brand__icontains=query) |
+            Q(city__icontains=query),
             is_available=True
-        )[:10]
+        )[:20]
 
     context = {
         'query': query,
-        'properties': properties,
         'equipment': equipment,
     }
     return render(request, 'rent/pwa/search.html', context)
@@ -402,154 +315,47 @@ def pwa_search(request):
 
 @login_required
 def pwa_owner_dashboard(request):
-    """Landlord dashboard"""
-    # Check if user has landlord or equipment_owner role
-    if not (request.user.has_role('landlord') or request.user.has_role('equipment_owner')):
-        messages.error(request, 'You need to be a landlord or equipment owner to access this page.')
+    """Equipment owner dashboard"""
+    # Check if user has equipment_owner role
+    if not request.user.has_role('equipment_owner'):
+        messages.error(request, 'You need to be an equipment owner to access this page.')
         return redirect('rent_pwa:dashboard')
     
-    properties = Property.objects.filter(owner=request.user)
     equipment = Equipment.objects.filter(owner=request.user)
 
-    if not properties.exists() and not equipment.exists():
-        messages.info(request, 'You do not have any properties or equipment listed.')
+    if not equipment.exists():
+        messages.info(request, 'You do not have any equipment listed.')
         return redirect('rent_pwa:dashboard')
 
     today = date.today()
 
     # Stats
     total_bookings = RentalBooking.objects.filter(
-        Q(property__owner=request.user) | Q(equipment__owner=request.user)
+        equipment__owner=request.user
     ).count()
     pending_bookings = RentalBooking.objects.filter(
-        Q(property__owner=request.user) | Q(equipment__owner=request.user),
+        equipment__owner=request.user,
         status__in=['pending', 'confirmed']
     ).count()
     today_bookings = RentalBooking.objects.filter(
-        Q(property__owner=request.user) | Q(equipment__owner=request.user),
+        equipment__owner=request.user,
         created_at__date=today
     ).count()
 
     # Recent bookings
     recent_bookings = RentalBooking.objects.filter(
-        Q(property__owner=request.user) | Q(equipment__owner=request.user)
+        equipment__owner=request.user
     ).order_by('-created_at')[:10]
 
     context = {
-        'total_properties': properties.count(),
         'total_equipment': equipment.count(),
         'total_bookings': total_bookings,
         'pending_bookings': pending_bookings,
         'today_bookings': today_bookings,
         'recent_bookings': recent_bookings,
-        'active_properties': properties.filter(is_available=True).count(),
         'active_equipment': equipment.filter(is_available=True).count(),
     }
     return render(request, 'rent/pwa/owner/dashboard.html', context)
-
-
-@login_required
-def pwa_manage_properties(request):
-    """Manage properties"""
-    # Check if user has landlord role
-    if not request.user.has_role('landlord'):
-        messages.error(request, 'You need to be a landlord to manage properties.')
-        return redirect('rent_pwa:dashboard')
-    
-    properties = Property.objects.filter(owner=request.user).order_by('-created_at')
-
-    context = {
-        'properties': properties,
-    }
-    return render(request, 'rent/pwa/owner/manage_properties.html', context)
-
-
-@login_required
-def pwa_add_property(request):
-    """Add new property"""
-    # Check if user has landlord role
-    if not request.user.has_role('landlord'):
-        messages.error(request, 'You need to be a landlord to add properties.')
-        return redirect('rent_pwa:dashboard')
-    
-    if request.method == 'POST':
-        # Simplified form processing
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        property_type = request.POST.get('property_type')
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        price = request.POST.get('price_per_period')
-
-        Property.objects.create(
-            owner=request.user,
-            title=title,
-            description=description,
-            property_type=property_type,
-            address=address,
-            city=city,
-            price_per_period=price,
-            region='',
-            is_available=True
-        )
-
-        messages.success(request, 'Property added successfully!')
-        return redirect('rent_pwa:manage_properties')
-
-    context = {
-        'property_types': Property.PROPERTY_TYPES,
-        'categories': PropertyCategory.objects.all(),
-    }
-    return render(request, 'rent/pwa/owner/add_property.html', context)
-
-
-@login_required
-def pwa_edit_property(request, property_id):
-    """Edit property"""
-    # Check if user has landlord role
-    if not request.user.has_role('landlord'):
-        messages.error(request, 'You need to be a landlord to edit properties.')
-        return redirect('rent_pwa:dashboard')
-    
-    property_obj = get_object_or_404(Property, pk=property_id, owner=request.user)
-
-    if request.method == 'POST':
-        property_obj.title = request.POST.get('title')
-        property_obj.description = request.POST.get('description')
-        property_obj.property_type = request.POST.get('property_type')
-        property_obj.address = request.POST.get('address')
-        property_obj.city = request.POST.get('city')
-        property_obj.price_per_period = request.POST.get('price_per_period')
-        property_obj.save()
-
-        messages.success(request, 'Property updated!')
-        return redirect('rent_pwa:manage_properties')
-
-    context = {
-        'property': property_obj,
-        'property_types': Property.PROPERTY_TYPES,
-        'categories': PropertyCategory.objects.all(),
-    }
-    return render(request, 'rent/pwa/owner/edit_property.html', context)
-
-
-@login_required
-def pwa_toggle_property(request, property_id):
-    """Toggle property availability"""
-    # Check if user has landlord role
-    if not request.user.has_role('landlord'):
-        messages.error(request, 'You need to be a landlord to manage properties.')
-        return redirect('rent_pwa:dashboard')
-    
-    property_obj = get_object_or_404(Property, pk=property_id, owner=request.user)
-
-    property_obj.is_available = not property_obj.is_available
-    property_obj.save()
-
-    status = 'available' if property_obj.is_available else 'unavailable'
-    messages.success(request, f'{property_obj.title} is now {status}!')
-
-    return redirect('rent_pwa:manage_properties')
 
 
 @login_required
@@ -579,13 +385,13 @@ def pwa_add_equipment(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
-        price = request.POST.get('price_per_day')
+        price = request.POST.get('price_per_period')
 
         Equipment.objects.create(
             owner=request.user,
             name=name,
             description=description,
-            price_per_day=price,
+            price_per_period=price,
             is_available=True
         )
 
@@ -606,7 +412,7 @@ def pwa_edit_equipment(request, equipment_id):
     if request.method == 'POST':
         equipment.name = request.POST.get('name')
         equipment.description = request.POST.get('description')
-        equipment.price_per_day = request.POST.get('price_per_day')
+        equipment.price_per_period = request.POST.get('price_per_period')
         equipment.save()
 
         messages.success(request, 'Equipment updated!')
@@ -700,30 +506,29 @@ def pwa_update_booking_status(request, booking_id):
 @login_required
 def pwa_analytics(request):
     """Analytics dashboard"""
-    # Check if user has landlord or equipment_owner role
-    if not (request.user.has_role('landlord') or request.user.has_role('equipment_owner')):
-        messages.error(request, 'You need to be a landlord or equipment owner to view analytics.')
+    # Check if user has equipment_owner role
+    if not request.user.has_role('equipment_owner'):
+        messages.error(request, 'You need to be an equipment owner to view analytics.')
         return redirect('rent_pwa:dashboard')
     
-    properties = Property.objects.filter(owner=request.user)
     equipment = Equipment.objects.filter(owner=request.user)
 
-    if not properties.exists() and not equipment.exists():
+    if not equipment.exists():
         return redirect('rent_pwa:owner_dashboard')
 
     context = {
         'total_revenue': RentalBooking.objects.filter(
-            Q(property__owner=request.user) | Q(equipment__owner=request.user),
+            equipment__owner=request.user,
             status='completed'
         ).aggregate(total=Sum('total_amount'))['total'] or 0,
         'total_bookings': RentalBooking.objects.filter(
-            Q(property__owner=request.user) | Q(equipment__owner=request.user)
+            equipment__owner=request.user
         ).count(),
         'avg_booking_value': RentalBooking.objects.filter(
-            Q(property__owner=request.user) | Q(equipment__owner=request.user),
+            equipment__owner=request.user,
             status='completed'
         ).aggregate(avg=Avg('total_amount'))['avg'] or 0,
-        'popular_properties': properties.annotate(
+        'popular_equipment': equipment.annotate(
             booking_count=Count('bookings')
         ).order_by('-booking_count')[:5],
     }

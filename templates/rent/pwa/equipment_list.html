@@ -1,0 +1,285 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Equipment Rental - Soma Ko PWA{% endblock %}
+{% block theme_color %}#f59e0b{% endblock %}
+{% block rent_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .equipment-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 2rem 1rem 1.5rem;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    position: relative;
+  }
+
+  .search-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-input:focus {
+    outline: none;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .filter-chip {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .filter-chip.active,
+  .filter-chip:hover {
+    background: white;
+    color: #f59e0b;
+  }
+
+  .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .equipment-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f3f4f6;
+  }
+
+  .equipment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(245, 158, 11, 0.15);
+  }
+
+  .equipment-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f9fafb;
+  }
+
+  .equipment-placeholder {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #f59e0b;
+  }
+
+  .equipment-content {
+    padding: 1.25rem;
+  }
+
+  .equipment-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .equipment-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .equipment-price {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #f59e0b;
+    margin-bottom: 0.75rem;
+  }
+
+  .equipment-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .view-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .view-btn:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #6b7280;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    color: #f59e0b;
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="equipment-header">
+  <h1 style="font-size: 1.875rem; font-weight: 800; margin: 0 0 1rem 0; letter-spacing: -0.025em;">
+    <i class="fas fa-tools"></i> Equipment Rental
+  </h1>
+  
+  <!-- Search Bar -->
+  <form method="GET" class="search-container">
+    <input 
+      type="search" 
+      name="q" 
+      placeholder="Search equipment, tools, machinery..." 
+      value="{{ search_query }}"
+      class="search-input"
+    >
+    <button type="submit" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6b7280; cursor: pointer;">
+      <i class="fas fa-search"></i>
+    </button>
+  </form>
+
+  <!-- Filter Chips -->
+  <div class="filter-chips">
+    <a href="{% url 'rent_pwa:equipment_list' %}" class="filter-chip {% if not selected_category and not selected_city %}active{% endif %}">
+      All Equipment
+    </a>
+    {% for category in categories %}
+    <a href="{% url 'rent_pwa:equipment_list' %}?category={{ category.id }}" class="filter-chip {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+      {% if category.icon %}<i class="{{ category.icon }}"></i>{% endif %}
+      {{ category.name }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div style="background: #f9fafb; min-height: 70vh;">
+  {% if equipment %}
+    <div class="equipment-grid">
+      {% for item in equipment %}
+      <div class="equipment-card">
+        {% if item.images.first %}
+          <img src="{{ item.images.first.image.url }}" alt="{{ item.name }}" class="equipment-image">
+        {% else %}
+          <div class="equipment-placeholder">
+            <i class="fas fa-tools"></i>
+          </div>
+        {% endif %}
+        
+        <div class="equipment-content">
+          <h3 class="equipment-title">{{ item.name }}</h3>
+          
+          <div class="equipment-meta">
+            {% if item.brand %}
+            <span><i class="fas fa-tag"></i> {{ item.brand }}</span>
+            {% endif %}
+            <span><i class="fas fa-star"></i> {{ item.condition|title }}</span>
+          </div>
+          
+          <div class="equipment-price">
+            ₵{{ item.price_per_period }} / {{ item.get_rental_period_display }}
+          </div>
+          
+          <div class="equipment-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ item.city }}, {{ item.region }}
+          </div>
+          
+          <a href="{% url 'rent_pwa:equipment_detail' item.id %}" class="view-btn">
+            <i class="fas fa-eye"></i> View Details
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No Equipment Found</h3>
+      <p>Try adjusting your search or filters to find what you're looking for.</p>
+      <a href="{% url 'rent_pwa:equipment_list' %}" style="color: #f59e0b; text-decoration: none; font-weight: 600; margin-top: 1rem; display: inline-block;">
+        <i class="fas fa-undo"></i> Clear Filters
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav" style="background: white; border-top: 1px solid rgba(245, 158, 11, 0.2); box-shadow: 0 -2px 15px rgba(245, 158, 11, 0.1);">
+  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item active" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
+    <i class="fas fa-tools"></i>
+    <span>Browse</span>
+  </a>
+  <a href="{% url 'rent_pwa:booking_list' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-check"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'rent_pwa:saved_equipment' %}" class="bottom-nav-item">
+    <i class="fas fa-heart"></i>
+    <span>Saved</span>
+  </a>
+  <a href="{% url 'rent_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+</div>
+{% endblock %}

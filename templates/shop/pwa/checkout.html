@@ -8,11 +8,40 @@
 {% block extra_css %}
 <style>
   .checkout-header {
-    background: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     color: white;
-    padding: 1.5rem 1rem 1.25rem;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    padding: 2rem 1rem 1.5rem;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
     position: relative;
+  }
+  
+  .checkout-form input:focus,
+  .checkout-form textarea:focus {
+    border-color: #8b5cf6 !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  }
+  
+  .payment-option {
+    transition: all 0.3s ease;
+  }
+  
+  .payment-option:hover {
+    background: #f9fafb !important;
+    border-color: #c4b5fd !important;
+  }
+  
+  .payment-option input[type="radio"]:checked + div {
+    color: #8b5cf6;
+  }
+  
+  .form-section {
+    transition: all 0.3s ease;
+  }
+  
+  .form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15) !important;
   }
 </style>
 {% endblock %}
@@ -26,77 +55,114 @@
 </div>
 
 <div style="padding: 1rem; margin-bottom: 6rem;">
-  <form method="POST" action="{% url 'shop_pwa:confirm_order' %}">
+  <form method="POST" action="{% url 'shop_pwa:confirm_order' %}" class="checkout-form">>
     {% csrf_token %}
 
     <!-- Delivery Details -->
-    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
-      <h3 style="font-weight: 700; margin-bottom: 1rem;">Delivery Information</h3>
+    <div class="form-section" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1); border: 1px solid #f3f4f6;">
+      <h3 style="font-weight: 700; margin-bottom: 1.25rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-truck" style="color: #8b5cf6;"></i>
+        Delivery Information
+      </h3>
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Shipping Address *</label>
-        <textarea name="shipping_address" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;" rows="3"></textarea>
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+          <i class="fas fa-map-marker-alt" style="color: #8b5cf6; margin-right: 0.5rem;"></i>
+          Shipping Address *
+        </label>
+        <textarea name="shipping_address" required style="width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 0.875rem; transition: all 0.3s; resize: vertical;" rows="3" placeholder="Enter your full delivery address..."></textarea>
       </div>
 
-      <div style="margin-bottom: 1rem;">
-        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Phone Number *</label>
-        <input type="tel" name="shipping_phone" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px;">
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+          <i class="fas fa-phone" style="color: #8b5cf6; margin-right: 0.5rem;"></i>
+          Phone Number *
+        </label>
+        <input type="tel" name="shipping_phone" required style="width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.875rem; transition: all 0.3s;" placeholder="e.g. +233 24 123 4567">
       </div>
 
       <div>
-        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Notes (Optional)</label>
-        <textarea name="notes" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: inherit;" rows="2"></textarea>
+        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+          <i class="fas fa-sticky-note" style="color: #8b5cf6; margin-right: 0.5rem;"></i>
+          Delivery Notes (Optional)
+        </label>
+        <textarea name="notes" style="width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 0.875rem; transition: all 0.3s; resize: vertical;" rows="2" placeholder="Any special delivery instructions..."></textarea>
       </div>
     </div>
 
     <!-- Payment Method -->
-    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
-      <h3 style="font-weight: 700; margin-bottom: 1rem;">Payment Method</h3>
+    <div class="form-section" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1); border: 1px solid #f3f4f6;">
+      <h3 style="font-weight: 700; margin-bottom: 1.25rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-credit-card" style="color: #8b5cf6;"></i>
+        Payment Method
+      </h3>
 
-      <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem;">
-        <input type="radio" name="payment_method" value="cash" checked style="margin-right: 0.75rem;">
-        <span style="font-weight: 600;">Cash on Delivery</span>
+      <label class="payment-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #8b5cf6; border-radius: 12px; margin-bottom: 0.75rem; background: #f5f3ff; cursor: pointer; transition: all 0.3s;">
+        <input type="radio" name="payment_method" value="cash_on_delivery" checked style="margin-right: 1rem; accent-color: #8b5cf6;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937;">
+            <i class="fas fa-money-bill-wave" style="color: #10b981;"></i>
+            Cash on Delivery
+          </div>
+          <p style="font-size: 0.75rem; color: #6b7280; margin: 0.25rem 0 0 0;">Pay when your order arrives</p>
+        </div>
       </label>
 
-      <label style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px;">
-        <input type="radio" name="payment_method" value="card" style="margin-right: 0.75rem;">
-        <span style="font-weight: 600;">Card Payment</span>
+      <label class="payment-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 12px; cursor: pointer; transition: all 0.3s;" onchange="if(this.querySelector('input').checked) this.style.borderColor='#8b5cf6'; this.style.background='#f5f3ff';">
+        <input type="radio" name="payment_method" value="online_payment" style="margin-right: 1rem; accent-color: #8b5cf6;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937;">
+            <i class="fas fa-credit-card" style="color: #3b82f6;"></i>
+            Online Payment
+          </div>
+          <p style="font-size: 0.75rem; color: #6b7280; margin: 0.25rem 0 0 0;">Pay securely with card or mobile money</p>
+        </div>
       </label>
     </div>
 
     <!-- Order Summary -->
-    <div style="background: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
-      <h3 style="font-weight: 700; margin-bottom: 1rem;">Order Summary</h3>
+    <div class="form-section" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1); border: 1px solid #f3f4f6;">
+      <h3 style="font-weight: 700; margin-bottom: 1.25rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-receipt" style="color: #8b5cf6;"></i>
+        Order Summary
+      </h3>
 
       {% for item in cart_items %}
-      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-        <span>{{ item.variant.product.name }} (x{{ item.quantity }})</span>
-        <span style="font-weight: 600;">GHS {{ item.total_price|floatformat:2 }}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div>
+          <div style="font-weight: 600; color: #1f2937; font-size: 0.875rem;">{{ item.variant.product.name }}</div>
+          {% if item.variant %}
+            <div style="font-size: 0.75rem; color: #8b5cf6;">{{ item.variant.name }}</div>
+          {% endif %}
+          <div style="font-size: 0.75rem; color: #6b7280;">Qty: {{ item.quantity }} × GHS {{ item.variant.price|default:item.variant.product.base_price|floatformat:2 }}</div>
+        </div>
+        <span style="font-weight: 700; color: #1f2937;">GHS {{ item.total_price|floatformat:2 }}</span>
       </div>
       {% endfor %}
 
-      <div style="border-top: 2px solid #e5e7eb; margin: 1rem 0; padding-top: 1rem;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+      <div style="border-top: 2px solid #f3f4f6; margin: 1rem 0; padding-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #6b7280;">
           <span>Subtotal</span>
-          <span>GHS {{ subtotal|floatformat:2 }}</span>
+          <span style="font-weight: 600;">GHS {{ subtotal|floatformat:2 }}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-          <span>Shipping</span>
-          <span>GHS {{ shipping_fee|floatformat:2 }}</span>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #6b7280;">
+          <span>Shipping Fee</span>
+          <span style="font-weight: 600;">GHS {{ shipping_fee|floatformat:2 }}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-          <span>Tax</span>
-          <span>GHS {{ tax|floatformat:2 }}</span>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: #6b7280;">
+          <span>Tax (15%)</span>
+          <span style="font-weight: 600;">GHS {{ tax|floatformat:2 }}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.125rem; color: #8b5cf6;">
-          <span>Total</span>
+        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.25rem; color: #8b5cf6; padding: 0.75rem; background: #f5f3ff; border-radius: 8px;">
+          <span>Total Amount</span>
           <span>GHS {{ total|floatformat:2 }}</span>
         </div>
       </div>
     </div>
 
     <!-- Place Order Button -->
-    <button type="submit" style="width: 100%; background: #8b5cf6; color: white; border: none; border-radius: 12px; padding: 1rem; font-size: 1rem; font-weight: 700;">
+    <button type="submit" onclick="return confirm('Confirm your order for GHS {{ total|floatformat:2 }}?')" style="width: 100%; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; border-radius: 16px; padding: 1.25rem; font-size: 1.125rem; font-weight: 700; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); transition: all 0.3s; margin-bottom: 2rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 24px rgba(139, 92, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(139, 92, 246, 0.3)'">
+      <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
       Place Order • GHS {{ total|floatformat:2 }}
     </button>
   </form>

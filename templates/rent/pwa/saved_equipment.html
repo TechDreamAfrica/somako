@@ -1,0 +1,228 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Saved Equipment - Rent PWA{% endblock %}
+{% block page_title %}Saved Equipment{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center mb-4">
+    <button onclick="window.history.back()" class="btn btn-link p-0 me-3 text-dark">
+      <i class="fas fa-arrow-left fs-4"></i>
+    </button>
+    <div>
+      <h1 class="h3 mb-0 fw-bold">Saved Equipment</h1>
+      <p class="text-muted mb-0">Your favorite equipment</p>
+    </div>
+  </div>
+
+  {% if equipment %}
+    <!-- Equipment Grid -->
+    <div class="row g-3">
+      {% for item in equipment %}
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+          <!-- Equipment Image -->
+          <div class="position-relative">
+            {% if item.image %}
+              <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" 
+                   style="height: 200px; object-fit: cover;">
+            {% else %}
+              <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                   style="height: 200px;">
+                <i class="fas fa-tools text-muted" style="font-size: 3rem;"></i>
+              </div>
+            {% endif %}
+            
+            <!-- Save Button -->
+            <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle" 
+                    style="width: 40px; height: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"
+                    onclick="toggleSaved({{ item.id }})">
+              <i class="fas fa-heart text-danger"></i>
+            </button>
+          </div>
+
+          <!-- Equipment Details -->
+          <div class="card-body p-3">
+            <h5 class="card-title fw-bold mb-2" style="font-size: 1rem;">{{ item.name }}</h5>
+            
+            <!-- Price -->
+            <div class="d-flex align-items-center mb-2">
+              <span class="fw-bold text-warning fs-5">₵{{ item.price_per_period|floatformat:0 }}</span>
+              <small class="text-muted ms-1">/{{ item.rental_period }}</small>
+            </div>
+            
+            <!-- Location -->
+            {% if item.city %}
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-map-marker-alt text-muted me-2"></i>
+              <span class="text-muted small">{{ item.city }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Category -->
+            {% if item.category %}
+            <div class="mb-3">
+              <span class="badge bg-light text-dark border">{{ item.category.name }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Action Button -->
+            <a href="{% url 'rent_pwa:equipment_detail' item.pk %}" 
+               class="btn btn-primary w-100 rounded-pill fw-bold" 
+               style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none;">
+              <i class="fas fa-eye me-2"></i>View Details
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Load More (if needed) -->
+    {% comment %}
+    <div class="text-center mt-4">
+      <button class="btn btn-outline-warning rounded-pill px-4 fw-bold">
+        <i class="fas fa-plus me-2"></i>Load More
+      </button>
+    </div>
+    {% endcomment %}
+
+  {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+      <div class="mb-4">
+        <i class="fas fa-heart-broken text-muted" style="font-size: 4rem;"></i>
+      </div>
+      <h3 class="fw-bold mb-3">No Saved Equipment</h3>
+      <p class="text-muted mb-4">You haven't saved any equipment yet.<br>Start browsing to find equipment you love!</p>
+      <a href="{% url 'rent_pwa:equipment_list' %}" class="btn btn-primary rounded-pill px-4 fw-bold" 
+         style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none;">
+        <i class="fas fa-search me-2"></i>Browse Equipment
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" 
+     style="background: rgba(255,255,255,0.9); z-index: 9999;">
+  <div class="d-flex align-items-center justify-content-center h-100">
+    <div class="text-center">
+      <div class="spinner-border text-warning mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted">Updating saved equipment...</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function toggleSaved(equipmentId) {
+  // Show loading state
+  const button = event.target.closest('button');
+  const icon = button.querySelector('i');
+  const originalClass = icon.className;
+  
+  // Show loading
+  icon.className = 'fas fa-spinner fa-spin';
+  document.getElementById('loadingOverlay').classList.remove('d-none');
+
+  try {
+    const response = await fetch(`/pwa/rent/saved/toggle/${equipmentId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      // Remove the equipment card from the page
+      const card = button.closest('.col-12, .col-sm-6, .col-lg-4');
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.9)';
+      
+      setTimeout(() => {
+        card.remove();
+        
+        // Check if no equipment left
+        const remainingCards = document.querySelectorAll('.row.g-3 .col-12, .row.g-3 .col-sm-6, .row.g-3 .col-lg-4');
+        if (remainingCards.length === 0) {
+          // Reload page to show empty state
+          window.location.reload();
+        }
+      }, 300);
+    } else {
+      // Restore original state
+      icon.className = originalClass;
+      alert('Failed to update saved status. Please try again.');
+    }
+  } catch (error) {
+    // Restore original state
+    icon.className = originalClass;
+    alert('Network error. Please check your connection and try again.');
+  }
+
+  // Hide loading
+  document.getElementById('loadingOverlay').classList.add('d-none');
+}
+
+// Add smooth animations
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate cards on page load
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      card.style.transition = 'all 0.4s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+
+// Add haptic feedback for mobile
+function addHapticFeedback() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10);
+  }
+}
+
+// Add haptic feedback to buttons
+document.querySelectorAll('button, .btn').forEach(button => {
+  button.addEventListener('click', addHapticFeedback);
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item">
+    <i class="fas fa-tools"></i>
+    <span>Equipment</span>
+  </a>
+  <a href="{% url 'rent_pwa:booking_list' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-check"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'rent_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item active">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

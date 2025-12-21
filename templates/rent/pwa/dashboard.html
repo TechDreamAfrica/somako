@@ -1,9 +1,8 @@
 {% extends 'pwa_base.html' %}
 {% load static %}
 
-{% block title %}Rent - Soma Ko PWA{% endblock %}
-{% block theme_color %}#3b82f6{% endblock %}
-{% block rent_active %}active{% endblock %}
+{% block title %}Rent Dashboard - Equipment Rental PWA{% endblock %}
+{% block theme_color %}#f59e0b{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
@@ -180,50 +179,50 @@
 <div style="padding: 0 1rem; margin-bottom: 6rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
     <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">Featured Properties</h2>
-    <a href="{% url 'rent_pwa:property_list' %}" style="color: #3b82f6; font-weight: 600; text-decoration: none;">
+    <a href="{% url 'rent_pwa:equipment_list' %}" style="color: #3b82f6; font-weight: 600; text-decoration: none;">
       View All <i class="fas fa-arrow-right"></i>
     </a>
   </div>
 
   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-    {% for property in featured_propertys %}
-    <a href="{% url 'rent_pwa:property_detail' property.id %}" style="text-decoration: none;">
+    {% for equipment in featured_equipment %}
+    <a href="{% url 'rent_pwa:equipment_detail' equipment.id %}" style="text-decoration: none;">
       <div class="property-card">
-        {% if property.main_image %}
-        <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-img">
+        {% if equipment.main_image %}
+        <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" class="property-img">
         {% else %}
-        <div class="property-img" style="background: #3b82f6; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-home" style="font-size: 2rem; color: #3b82f6;"></i>
+        <div class="property-img" style="background: linear-gradient(135deg, #f59e0b, #f97316); display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-tools" style="font-size: 2rem; color: white;"></i>
         </div>
         {% endif %}
 
         <div style="padding: 0.75rem;">
-          <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; line-height: 1.2;">{{ property.title|truncatechars:30 }}</h3>
-          <div style="font-weight: 700; color: #3b82f6; font-size: 1rem;">GHS {{ property.price_per_period|floatformat:2 }}</div>
+          <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; line-height: 1.2;">{{ equipment.name|truncatechars:30 }}</h3>
+          <div style="font-weight: 700; color: #f59e0b; font-size: 1rem;">₵{{ equipment.price_per_period|floatformat:2 }}</div>
         </div>
       </div>
     </a>
     {% endfor %}
   </div>
 
-  <!-- Recent Propertys -->
-  <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin: 2rem 0 1rem;">Latest Arrivals</h2>
+  <!-- Recent Equipment -->
+  <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin: 2rem 0 1rem;">Latest Equipment</h2>
 
   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-    {% for property in recent_propertys %}
-    <a href="{% url 'rent_pwa:property_detail' property.id %}" style="text-decoration: none;">
+    {% for equipment in recent_equipment %}
+    <a href="{% url 'rent_pwa:equipment_detail' equipment.id %}" style="text-decoration: none;">
       <div class="property-card">
-        {% if property.main_image %}
-        <img src="{{ property.main_image.url }}" alt="{{ property.title }}" class="property-img">
+        {% if equipment.main_image %}
+        <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" class="property-img">
         {% else %}
-        <div class="property-img" style="background: #3b82f6; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-home" style="font-size: 2rem; color: #3b82f6;"></i>
+        <div class="property-img" style="background: linear-gradient(135deg, #f59e0b, #f97316); display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-tools" style="font-size: 2rem; color: white;"></i>
         </div>
         {% endif %}
 
         <div style="padding: 0.75rem;">
-          <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; line-height: 1.2;">{{ property.title|truncatechars:30 }}</h3>
-          <div style="font-weight: 700; color: #3b82f6; font-size: 1rem;">GHS {{ property.price_per_period|floatformat:2 }}</div>
+          <h3 style="font-size: 0.875rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; line-height: 1.2;">{{ equipment.name|truncatechars:30 }}</h3>
+          <div style="font-weight: 700; color: #f59e0b; font-size: 1rem;">₵{{ equipment.price_per_period|floatformat:2 }}</div>
         </div>
       </div>
     </a>
@@ -233,26 +232,26 @@
 {% endblock %}
 
 {% block bottom_nav %}
-<div class="bottom-nav">
-  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item active">
+<div class="bottom-nav" style="background: white; border-top: 1px solid rgba(245, 158, 11, 0.2); box-shadow: 0 -2px 15px rgba(245, 158, 11, 0.1);">
+  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item active" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
     <i class="fas fa-home"></i>
     <span>Home</span>
   </a>
-  <a href="{% url 'rent_pwa:property_list' %}" class="bottom-nav-item">
-    <i class="fas fa-building"></i>
-    <span>Properties</span>
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item">
+    <i class="fas fa-tools"></i>
+    <span>Browse</span>
   </a>
   <a href="{% url 'rent_pwa:booking_list' %}" class="bottom-nav-item">
     <i class="fas fa-calendar-check"></i>
     <span>Bookings</span>
   </a>
-  <a href="{% url 'rent_pwa:saved_properties' %}" class="bottom-nav-item">
+  <a href="{% url 'rent_pwa:saved_equipment' %}" class="bottom-nav-item">
     <i class="fas fa-heart"></i>
     <span>Saved</span>
   </a>
-  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
-    <i class="fas fa-user-circle"></i>
-    <span>Profile</span>
+  <a href="{% url 'rent_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
   </a>
 </div>
 {% endblock %}

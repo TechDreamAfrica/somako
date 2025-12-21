@@ -1,9 +1,8 @@
 {% extends 'pwa_base.html' %}
 {% load static %}
 
-{% block title %}Orders - Rent PWA{% endblock %}
-{% block theme_color %}#3b82f6{% endblock %}
-{% block rent_active %}active{% endblock %}
+{% block title %}My Bookings - Equipment Rental PWA{% endblock %}
+{% block theme_color %}#f59e0b{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -65,7 +64,7 @@
       </div>
       <h3 style="color: #1f2937; margin-bottom: 0.5rem;">No orders yet</h3>
       <p style="color: #6b7280; margin-bottom: 2rem;">Start shopping to place your first order!</p>
-      <a href="{% url 'rent_pwa:property_list' %}" style="display: inline-block; background: #3b82f6; color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600;">
+      <a href="{% url 'rent_pwa:equipment_list' %}" style="display: inline-block; background: #3b82f6; color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600;">
         Browse Propertys
       </a>
     </div>
@@ -79,7 +78,7 @@
     <i class="fas fa-home"></i>
     <span>Home</span>
   </a>
-  <a href="{% url 'rent_pwa:property_list' %}" class="bottom-nav-item">
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item">
     <i class="fas fa-building"></i>
     <span>Properties</span>
   </a>
@@ -87,7 +86,7 @@
     <i class="fas fa-calendar-check"></i>
     <span>Bookings</span>
   </a>
-  <a href="{% url 'rent_pwa:saved_properties' %}" class="bottom-nav-item">
+  <a href="{% url 'rent_pwa:saved_equipment' %}" class="bottom-nav-item">
     <i class="fas fa-heart"></i>
     <span>Saved</span>
   </a>

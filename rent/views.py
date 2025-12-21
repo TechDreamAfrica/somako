@@ -227,27 +227,20 @@ def booking_list(request):
 
 @login_required
 def booking_create(request):
-    """Create a new booking"""
-    # Get property or equipment from query params
-    property_id = request.GET.get('property')
+    """Create a new booking for equipment"""
+    # Get equipment from query params
     equipment_id = request.GET.get('equipment')
 
-    property_obj = None
-    equipment_obj = None
+    if not equipment_id:
+        messages.error(request, 'Please select equipment to book.')
+        return redirect('rent:equipment_list')
 
-    if property_id:
-        property_obj = get_object_or_404(Property, pk=property_id, is_available=True)
-    elif equipment_id:
-        equipment_obj = get_object_or_404(Equipment, pk=equipment_id, is_available=True)
-    else:
-        messages.error(request, 'Please select a property or equipment to book.')
-        return redirect('rent:property_list')
+    equipment_obj = get_object_or_404(Equipment, pk=equipment_id, is_available=True)
 
     if request.method == 'POST':
         start_date = request.POST.get('start_date', '').strip()
         end_date = request.POST.get('end_date', '').strip()
         quantity = int(request.POST.get('quantity', 1))
-        rental_years = int(request.POST.get('rental_years', 1))
         notes = request.POST.get('notes', '')
         payment_method = request.POST.get('payment_method', 'paystack')
 
@@ -255,8 +248,7 @@ def booking_create(request):
             from datetime import datetime, date as date_class
 
             # Check if this is a purchase transaction
-            is_purchase = (property_obj and property_obj.listing_type == 'for_sale') or \
-                         (equipment_obj and equipment_obj.listing_type == 'for_sale')
+            is_purchase = equipment_obj.listing_type == 'for_sale'
 
             # For purchases, use today's date if dates are not provided
             if is_purchase:
@@ -271,7 +263,7 @@ def booking_create(request):
                 # For rentals, dates are required
                 if not start_date or not end_date:
                     messages.error(request, 'Please provide both start and end dates.')
-                    return redirect(request.path + f'?{"property=" + property_id if property_id else "equipment=" + equipment_id}')
+                    return redirect(request.path + f'?equipment={equipment_id}')
 
                 start = datetime.strptime(start_date, '%Y-%m-%d').date()
                 end = datetime.strptime(end_date, '%Y-%m-%d').date()
@@ -279,93 +271,45 @@ def booking_create(request):
                 # Validate end date is after start date (only for rentals)
                 if start >= end:
                     messages.error(request, 'End date must be after start date.')
-                    return redirect(request.path + f'?{"property=" + property_id if property_id else "equipment=" + equipment_id}')
-
-                # Validate rental years for property rentals
-                if property_obj:
-                    if rental_years < property_obj.minimum_rental_years:
-                        messages.error(request, f'Minimum rental period for this property is {property_obj.minimum_rental_years} year(s).')
-                        return redirect(request.path + f'?property={property_id}')
-
-                    # Validate that date range matches rental years (with 7 days tolerance)
-                    duration_days = (end - start).days
-                    expected_days = rental_years * 365.25  # Account for leap years
-                    tolerance_days = 7
-
-                    if abs(duration_days - expected_days) > tolerance_days:
-                        messages.error(
-                            request,
-                            f'The date range must match the selected rental period of {rental_years} year(s). '
-                            f'Expected approximately {int(expected_days)} days, but got {duration_days} days. '
-                            f'Please adjust your dates accordingly.'
-                        )
-                        return redirect(request.path + f'?property={property_id}')
+                    return redirect(request.path + f'?equipment={equipment_id}')
 
             # Calculate total amount based on duration
             duration_days = (end - start).days
 
-            if property_obj:
-                # Calculate based on rental period
-                if property_obj.rental_period == 'month':
-                    periods = duration_days / 30
-                elif property_obj.rental_period == 'week':
-                    periods = duration_days / 7
-                else:  # day
-                    periods = duration_days
+            # Calculate for equipment
+            if equipment_obj.rental_period == 'day':
+                periods = duration_days
+            elif equipment_obj.rental_period == 'week':
+                periods = duration_days / 7
+            elif equipment_obj.rental_period == 'month':
+                periods = duration_days / 30
+            else:  # hour
+                periods = duration_days * 24
 
-                total_amount = property_obj.price_per_period * Decimal(str(periods))
-                transaction_type = 'rental'
+            total_amount = equipment_obj.price_per_period * Decimal(str(periods)) * quantity
+            transaction_type = 'rental'
 
-                if property_obj.listing_type == 'for_sale':
-                    total_amount = property_obj.price_per_period  # Fixed price for sale
-                    transaction_type = 'purchase'
+            if equipment_obj.listing_type == 'for_sale':
+                total_amount = equipment_obj.price_per_period * quantity  # Fixed price for sale
+                transaction_type = 'purchase'
 
-                booking = RentalBooking.objects.create(
-                    transaction_type=transaction_type,
-                    property=property_obj,
-                    renter=request.user,
-                    start_date=start,
-                    end_date=end,
-                    rental_years=rental_years,
-                    total_amount=total_amount,
-                    notes=notes,
-                    status='pending'
-                )
-            else:
-                # Calculate for equipment
-                if equipment_obj.rental_period == 'day':
-                    periods = duration_days
-                elif equipment_obj.rental_period == 'week':
-                    periods = duration_days / 7
-                elif equipment_obj.rental_period == 'month':
-                    periods = duration_days / 30
-                else:  # hour
-                    periods = duration_days * 24
-
-                total_amount = equipment_obj.price_per_period * Decimal(str(periods)) * quantity
-                transaction_type = 'rental'
-
-                if equipment_obj.listing_type == 'for_sale':
-                    total_amount = equipment_obj.price_per_period * quantity  # Fixed price for sale
-                    transaction_type = 'purchase'
-
-                booking = RentalBooking.objects.create(
-                    transaction_type=transaction_type,
-                    equipment=equipment_obj,
-                    renter=request.user,
-                    start_date=start,
-                    end_date=end,
-                    quantity=quantity,
-                    total_amount=total_amount,
-                    notes=notes,
-                    status='pending'
-                )
+            booking = RentalBooking.objects.create(
+                transaction_type=transaction_type,
+                equipment=equipment_obj,
+                renter=request.user,
+                start_date=start,
+                end_date=end,
+                quantity=quantity,
+                total_amount=total_amount,
+                notes=notes,
+                status='pending'
+            )
 
             # Handle payment
             if payment_method == 'paystack':
                 from payment.helpers import create_payment, initialize_paystack_payment
 
-                item_name = property_obj.title if property_obj else equipment_obj.name
+                item_name = equipment_obj.name
                 trans_label = 'Purchase' if booking.transaction_type == 'purchase' else 'Rental'
                 payment = create_payment(
                     user=request.user,
@@ -388,12 +332,11 @@ def booking_create(request):
 
         except Exception as e:
             messages.error(request, f'Error creating booking: {str(e)}')
-            return redirect(request.path + f'?{"property=" + property_id if property_id else "equipment=" + equipment_id}')
+            return redirect(request.path + f'?equipment={equipment_id}')
 
     # GET request - show booking form
     from datetime import date
     context = {
-        'property': property_obj,
         'equipment': equipment_obj,
         'today': date.today(),
     }

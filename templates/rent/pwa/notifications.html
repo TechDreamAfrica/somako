@@ -1,6 +1,9 @@
 {% extends 'pwa_base.html' %}
 {% load static %}
 
+{% block theme_color %}#f59e0b{% endblock %}
+{% load static %}
+
 {% block title %}Notifications - Rent PWA{% endblock %}
 {% block theme_color %}#3b82f6{% endblock %}
 {% block rent_active %}active{% endblock %}
@@ -60,7 +63,7 @@
     <i class="fas fa-home"></i>
     <span>Home</span>
   </a>
-  <a href="{% url 'rent_pwa:property_list' %}" class="bottom-nav-item">
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item">
     <i class="fas fa-building"></i>
     <span>Properties</span>
   </a>

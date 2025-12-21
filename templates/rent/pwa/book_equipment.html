@@ -1,0 +1,370 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Book {{ equipment.name }} - Rent PWA{% endblock %}
+{% block theme_color %}#f59e0b{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center mb-4">
+    <button onclick="window.history.back()" class="btn btn-link p-0 me-3 text-dark">
+      <i class="fas fa-arrow-left fs-4"></i>
+    </button>
+    <div>
+      <h1 class="h3 mb-0 fw-bold">Book Equipment</h1>
+      <p class="text-muted mb-0">Complete your booking request</p>
+    </div>
+  </div>
+
+  <!-- Equipment Overview -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
+    <div class="row g-0">
+      <div class="col-4">
+        {% if equipment.image %}
+          <img src="{{ equipment.image.url }}" class="img-fluid w-100 h-100" alt="{{ equipment.name }}" 
+               style="object-fit: cover; min-height: 120px;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light h-100" style="min-height: 120px;">
+            <i class="fas fa-tools text-muted" style="font-size: 2rem;"></i>
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-8">
+        <div class="card-body p-3">
+          <h5 class="card-title fw-bold mb-1">{{ equipment.name }}</h5>
+          <div class="d-flex align-items-center mb-2">
+            <span class="fw-bold text-warning fs-5">₵{{ equipment.price_per_period|floatformat:0 }}</span>
+            <small class="text-muted ms-1">/{{ equipment.rental_period }}</small>
+          </div>
+          {% if equipment.city %}
+          <div class="d-flex align-items-center">
+            <i class="fas fa-map-marker-alt text-muted me-1"></i>
+            <span class="text-muted small">{{ equipment.city }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Form -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4">
+        <i class="fas fa-calendar-check text-warning me-2"></i>Booking Details
+      </h5>
+
+      <form method="post" id="bookingForm">
+        {% csrf_token %}
+        
+        <!-- Date Selection -->
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Start Date</label>
+            <input type="date" class="form-control" name="start_date" id="startDate" required
+                   style="border-radius: 12px; border: 2px solid #e5e7eb; padding: 0.875rem;"
+                   min="{{ today|date:'Y-m-d' }}">
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">End Date</label>
+            <input type="date" class="form-control" name="end_date" id="endDate" required
+                   style="border-radius: 12px; border: 2px solid #e5e7eb; padding: 0.875rem;"
+                   min="{{ today|date:'Y-m-d' }}">
+          </div>
+        </div>
+
+        <!-- Duration Display -->
+        <div class="alert alert-light border-0 mb-4" id="durationDisplay" style="border-radius: 12px; background: #fef3c7;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-clock text-warning me-2"></i>
+            <span class="fw-semibold">Duration: <span id="durationText">Select dates</span></span>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Payment Method</label>
+          <div class="row g-2">
+            <div class="col-6">
+              <input type="radio" class="btn-check" name="payment_method" id="payment_cash" value="cash" checked>
+              <label class="btn btn-outline-warning w-100 py-3" for="payment_cash" style="border-radius: 12px;">
+                <i class="fas fa-money-bill-wave mb-2 d-block"></i>
+                <span class="fw-semibold">Cash</span>
+              </label>
+            </div>
+            <div class="col-6">
+              <input type="radio" class="btn-check" name="payment_method" id="payment_transfer" value="transfer">
+              <label class="btn btn-outline-warning w-100 py-3" for="payment_transfer" style="border-radius: 12px;">
+                <i class="fas fa-university mb-2 d-block"></i>
+                <span class="fw-semibold">Bank Transfer</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Additional Notes (Optional)</label>
+          <textarea class="form-control" name="notes" rows="3" 
+                    style="border-radius: 12px; border: 2px solid #e5e7eb;" 
+                    placeholder="Any special requirements or instructions..."></textarea>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="alert alert-light border-0 mb-4" style="border-radius: 12px; background: #f0f9ff;">
+          <h6 class="fw-bold mb-3">
+            <i class="fas fa-user text-primary me-2"></i>Equipment Owner
+          </h6>
+          <div class="row g-3">
+            <div class="col-12">
+              <p class="mb-1 fw-semibold">{{ equipment.owner.get_full_name|default:equipment.owner.username }}</p>
+              {% if equipment.owner.phone %}
+              <a href="tel:{{ equipment.owner.phone }}" class="btn btn-outline-primary btn-sm rounded-pill me-2">
+                <i class="fas fa-phone me-1"></i>{{ equipment.owner.phone }}
+              </a>
+              {% endif %}
+              {% if equipment.owner.email %}
+              <a href="mailto:{{ equipment.owner.email }}" class="btn btn-outline-primary btn-sm rounded-pill">
+                <i class="fas fa-envelope me-1"></i>Contact
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Cost Calculation -->
+        <div class="card border-0 mb-4" style="background: linear-gradient(135deg, #fef3c7, #fed7aa); border-radius: 12px;">
+          <div class="card-body p-3">
+            <h6 class="fw-bold mb-2">
+              <i class="fas fa-calculator text-warning me-2"></i>Estimated Cost
+            </h6>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-dark">Total Amount:</span>
+              <span class="fw-bold fs-4 text-warning" id="totalCost">₵{{ equipment.price_per_period|floatformat:0 }}</span>
+            </div>
+            <small class="text-muted">
+              <span id="costBreakdown">{{ equipment.price_per_period|floatformat:0 }} per {{ equipment.rental_period }}</span>
+            </small>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn rent-btn w-100 py-3 fw-bold fs-5" 
+                style="border-radius: 12px;">
+          <i class="fas fa-calendar-plus me-2"></i>Submit Booking Request
+        </button>
+
+        <!-- Terms -->
+        <div class="mt-3 text-center">
+          <small class="text-muted">
+            By submitting, you agree to our booking terms and conditions
+          </small>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Important Information -->
+  <div class="alert alert-info border-0 mt-4" style="border-radius: 12px; background: #e0f2fe;">
+    <h6 class="fw-bold mb-2">
+      <i class="fas fa-info-circle text-info me-2"></i>Booking Information
+    </h6>
+    <ul class="mb-0 small">
+      <li>Your booking request will be sent to the equipment owner</li>
+      <li>Owner will confirm availability and contact you</li>
+      <li>Payment is made directly to the equipment owner</li>
+      <li>You can cancel your booking before confirmation</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0" style="border-radius: 16px;">
+      <div class="modal-body text-center py-4">
+        <div class="spinner-border text-warning mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h6 class="fw-bold">Submitting Booking Request...</h6>
+        <p class="text-muted mb-0">Please wait</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Rent PWA Specific Styles */
+.rent-gradient {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.rent-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border: none !important;
+  border-radius: 12px;
+  color: white !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.rent-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  color: white !important;
+}
+</style>
+{% endblock %}
+
+{% block bottom_nav %}
+<!-- Bottom Navigation for Rent PWA -->
+<div class="bottom-nav" style="background: white; border-top: 1px solid rgba(245, 158, 11, 0.2); box-shadow: 0 -2px 15px rgba(245, 158, 11, 0.1);">
+  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}" style="{% if 'dashboard' in request.resolver_match.url_name %}color: #f59e0b; background: rgba(245, 158, 11, 0.1);{% endif %}">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item {% if 'equipment' in request.resolver_match.url_name %}active{% endif %}" style="{% if 'equipment' in request.resolver_match.url_name %}color: #f59e0b; background: rgba(245, 158, 11, 0.1);{% endif %}">
+    <i class="fas fa-tools"></i>
+    <span>Browse</span>
+  </a>
+  
+  <a href="{% url 'rent_pwa:booking_list' %}" class="bottom-nav-item {% if 'booking' in request.resolver_match.url_name %}active{% endif %}" style="{% if 'booking' in request.resolver_match.url_name %}color: #f59e0b; background: rgba(245, 158, 11, 0.1);{% endif %}">
+    <i class="fas fa-calendar-check"></i>
+    <span>Bookings</span>
+  </a>
+  
+  <a href="{% url 'rent_pwa:saved_equipment' %}" class="bottom-nav-item {% if 'saved' in request.resolver_match.url_name %}active{% endif %}" style="{% if 'saved' in request.resolver_match.url_name %}color: #f59e0b; background: rgba(245, 158, 11, 0.1);{% endif %}">
+    <i class="fas fa-heart"></i>
+    <span>Saved</span>
+  </a>
+  
+  <a href="{% url 'rent_pwa:search' %}" class="bottom-nav-item {% if 'search' in request.resolver_match.url_name %}active{% endif %}" style="{% if 'search' in request.resolver_match.url_name %}color: #f59e0b; background: rgba(245, 158, 11, 0.1);{% endif %}">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
+  const durationText = document.getElementById('durationText');
+  const totalCost = document.getElementById('totalCost');
+  const costBreakdown = document.getElementById('costBreakdown');
+  const bookingForm = document.getElementById('bookingForm');
+  
+  const pricePerPeriod = {{ equipment.price_per_period|default:0 }};
+  const rentalPeriod = '{{ equipment.rental_period|default:"day" }}';
+
+  // Update end date minimum when start date changes
+  startDateInput.addEventListener('change', function() {
+    if (startDateInput.value) {
+      endDateInput.min = startDateInput.value;
+      if (endDateInput.value && endDateInput.value < startDateInput.value) {
+        endDateInput.value = '';
+      }
+    }
+    calculateDuration();
+  });
+
+  endDateInput.addEventListener('change', calculateDuration);
+
+  function calculateDuration() {
+    if (startDateInput.value && endDateInput.value) {
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
+      
+      if (endDate >= startDate) {
+        const timeDiff = endDate.getTime() - startDate.getTime();
+        const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // Include start day
+        
+        let periods = dayDiff;
+        let periodText = 'day';
+        
+        // Convert to appropriate period
+        if (rentalPeriod === 'week') {
+          periods = Math.ceil(dayDiff / 7);
+          periodText = 'week';
+        } else if (rentalPeriod === 'month') {
+          periods = Math.ceil(dayDiff / 30);
+          periodText = 'month';
+        } else if (rentalPeriod === 'year') {
+          periods = Math.ceil(dayDiff / 365);
+          periodText = 'year';
+        }
+        
+        const totalAmount = periods * pricePerPeriod;
+        
+        durationText.textContent = `${dayDiff} day${dayDiff > 1 ? 's' : ''}`;
+        totalCost.textContent = `₵${totalAmount.toLocaleString()}`;
+        costBreakdown.textContent = `${periods} ${periodText}${periods > 1 ? 's' : ''} × ₵${pricePerPeriod.toLocaleString()}`;
+      } else {
+        durationText.textContent = 'Invalid date range';
+        totalCost.textContent = `₵${pricePerPeriod.toLocaleString()}`;
+        costBreakdown.textContent = `${pricePerPeriod.toLocaleString()} per ${rentalPeriod}`;
+      }
+    } else {
+      durationText.textContent = 'Select dates';
+      totalCost.textContent = `₦${pricePerPeriod.toLocaleString()}`;
+      costBreakdown.textContent = `${pricePerPeriod.toLocaleString()} per ${rentalPeriod}`;
+    }
+  }
+
+  // Form submission with loading state
+  bookingForm.addEventListener('submit', function(e) {
+    // Validate dates
+    if (!startDateInput.value || !endDateInput.value) {
+      e.preventDefault();
+      alert('Please select both start and end dates');
+      return;
+    }
+
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+    
+    if (endDate < startDate) {
+      e.preventDefault();
+      alert('End date must be after start date');
+      return;
+    }
+
+    // Show loading modal
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+  });
+
+  // Initialize calculation
+  calculateDuration();
+});
+
+// Add touch feedback for mobile
+document.querySelectorAll('.btn, input, textarea').forEach(element => {
+  element.addEventListener('touchstart', function() {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  });
+});
+
+// Add form validation styling
+document.querySelectorAll('input[required], textarea[required]').forEach(input => {
+  input.addEventListener('invalid', function() {
+    this.style.borderColor = '#ef4444';
+    this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+  });
+  
+  input.addEventListener('input', function() {
+    if (this.validity.valid) {
+      this.style.borderColor = '#10b981';
+      this.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+    }
+  });
+});
+</script>
+{% endblock %}

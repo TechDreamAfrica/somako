@@ -295,19 +295,34 @@ def pwa_confirm_order(request):
 
         # Calculate totals
         subtotal = sum(item.total_price for item in cart_items)
-        shipping_fee = Decimal('10.00')
+        shipping_cost = Decimal('10.00')
         tax = subtotal * Decimal('0.15')
-        total = subtotal + shipping_fee + tax
+        total = subtotal + shipping_cost + tax
+
+        # Generate order number
+        import uuid
+        order_number = f"SHO-{uuid.uuid4().hex[:8].upper()}"
 
         # Create order
         order = Order.objects.create(
+            order_number=order_number,
             user=request.user,
             shipping_address=shipping_address,
-            shipping_phone=shipping_phone,
+            shipping_city='Accra',  # Default city
+            shipping_state='Greater Accra',  # Default state
+            shipping_postal_code='00233',  # Default postal code
+            shipping_country='Ghana',  # Default country
+            billing_address=shipping_address,  # Same as shipping
+            billing_city='Accra',
+            billing_state='Greater Accra',
+            billing_postal_code='00233',
+            billing_country='Ghana',
+            customer_phone=shipping_phone,
+            customer_email=request.user.email,
             payment_method=payment_method,
             notes=notes,
             subtotal=subtotal,
-            shipping_fee=shipping_fee,
+            shipping_cost=shipping_cost,
             tax_amount=tax,
             total_amount=total,
             status='pending'

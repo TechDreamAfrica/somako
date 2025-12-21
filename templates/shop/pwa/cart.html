@@ -31,35 +31,59 @@
 
   .cart-item {
     background: white;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.08);
+    border: 1px solid #f3f4f6;
+    transition: all 0.3s ease;
+  }
+
+  .cart-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.12);
   }
 
   .quantity-control {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    background: #f3f4f6;
-    border-radius: 8px;
-    padding: 0.25rem;
+    gap: 0.5rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
   }
 
   .quantity-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border: none;
     background: white;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #8b5cf6;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quantity-btn:hover:not(:disabled) {
+    background: #8b5cf6;
+    color: white;
+    transform: scale(1.05);
   }
 
   .quantity-btn:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
+  }
+
+  .quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f3f4f6;
   }
 
   .checkout-btn {
@@ -100,31 +124,32 @@
     {% for item in cart_items %}
     <div class="cart-item">
       <div style="display: flex; gap: 1rem;">
-  {% if item.variant.product.get_primary_image_url %}
-  <img src="{{ item.variant.product.get_primary_image_url|external_image }}" alt="{{ item.variant.product.name }}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div style="width: 80px; height: 80px; border-radius: 8px; background: #ddd6fe; display: none; align-items: center; justify-content: center;">
-          <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
-        </div>
+        {% if item.variant.product.get_primary_image_url %}
+          <img src="{{ item.variant.product.get_primary_image_url|external_image }}" alt="{{ item.variant.product.name }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 2px solid #f3f4f6;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); display: none; align-items: center; justify-content: center; border: 2px solid #f3f4f6;">
+            <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+          </div>
         {% else %}
-        <div style="width: 80px; height: 80px; border-radius: 8px; background: #ddd6fe; display: flex; align-items: center; justify-content: center;">
-          <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
-        </div>
+          <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); display: flex; align-items: center; justify-content: center; border: 2px solid #f3f4f6;">
+            <i class="fas fa-box" style="color: #8b5cf6; font-size: 1.5rem;"></i>
+          </div>
         {% endif %}
 
         <div style="flex: 1;">
-          <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">{{ item.variant.product.name }}</h3>
+          <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; font-size: 1rem; line-height: 1.3;">{{ item.variant.product.name }}</h3>
           {% if item.variant %}
-          <p style="color: #6b7280; font-size: 0.875rem;">{{ item.variant.name }}</p>
+            <p style="color: #8b5cf6; font-size: 0.875rem; font-weight: 500; background: #f5f3ff; padding: 0.25rem 0.5rem; border-radius: 4px; display: inline-block;">{{ item.variant.name }}</p>
           {% endif %}
+          <p style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">Unit Price: GHS {{ item.variant.price|default:item.variant.product.base_price|floatformat:2 }}</p>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
             <div class="quantity-control">
               <form method="POST" action="{% url 'shop_pwa:update_cart_item' item.id %}" style="display: inline;">
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
-                <button type="submit" class="quantity-btn">-</button>
+                <button type="submit" class="quantity-btn" {% if item.quantity <= 1 %}disabled style="opacity: 0.5;"{% endif %}>-</button>
               </form>
-              <span style="font-weight: 600; min-width: 24px; text-align: center;">{{ item.quantity }}</span>
+              <span style="font-weight: 700; min-width: 32px; text-align: center; color: #1f2937;">{{ item.quantity }}</span>
               <form method="POST" action="{% url 'shop_pwa:update_cart_item' item.id %}" style="display: inline;">
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
@@ -133,12 +158,12 @@
             </div>
 
             <div style="text-align: right;">
-              <div style="font-weight: 700; color: #8b5cf6; font-size: 1.125rem;">
+              <div style="font-weight: 700; color: #8b5cf6; font-size: 1.25rem; margin-bottom: 0.25rem;">
                 GHS {{ item.total_price|floatformat:2 }}
               </div>
               <form method="POST" action="{% url 'shop_pwa:remove_from_cart' item.id %}">
                 {% csrf_token %}
-                <button type="submit" style="background: none; border: none; color: #ef4444; font-size: 0.875rem; cursor: pointer; padding: 0; margin-top: 0.25rem;">
+                <button type="submit" onclick="return confirm('Remove this item from cart?')" style="background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; font-size: 0.75rem; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 500; transition: all 0.2s;">
                   <i class="fas fa-trash"></i> Remove
                 </button>
               </form>

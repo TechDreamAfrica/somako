@@ -1,0 +1,420 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}{{ equipment.name }} - Equipment Rental{% endblock %}
+{% block theme_color %}#f59e0b{% endblock %}
+{% block rent_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  .equipment-detail-header {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .equipment-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .equipment-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: #f59e0b;
+  }
+
+  .back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+
+  .save-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    border: none;
+    cursor: pointer;
+  }
+
+  .save-button.saved {
+    background: #ef4444;
+  }
+
+  .equipment-content {
+    padding: 1.5rem;
+    background: white;
+    margin-top: -20px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    z-index: 5;
+  }
+
+  .equipment-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .equipment-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    background: #f3f4f6;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .price-section {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .price-main {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #d97706;
+    margin-bottom: 0.5rem;
+  }
+
+  .price-period {
+    color: #92400e;
+    font-weight: 600;
+  }
+
+  .section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .section-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spec-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .spec-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .spec-item:last-child {
+    border-bottom: none;
+  }
+
+  .book-button {
+    position: fixed;
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    left: 1rem;
+    right: 6rem;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    z-index: 998;
+  }
+
+  .contact-section {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 12px;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .call-btn {
+    background: #10b981;
+    color: white;
+  }
+
+  .message-btn {
+    background: #3b82f6;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="equipment-detail-header">
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="back-button">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  
+  <button class="save-button {% if is_saved %}saved{% endif %}" onclick="toggleSave({{ equipment.id }})">
+    <i class="fas fa-heart"></i>
+  </button>
+  
+  {% if equipment.images.first %}
+    <img src="{{ equipment.images.first.image.url }}" alt="{{ equipment.name }}" class="equipment-image">
+  {% else %}
+    <div class="equipment-placeholder">
+      <i class="fas fa-tools"></i>
+    </div>
+  {% endif %}
+</div>
+
+<div class="equipment-content">
+  <h1 class="equipment-title">{{ equipment.name }}</h1>
+  
+  <div class="equipment-meta">
+    {% if equipment.brand %}
+    <span class="meta-item">
+      <i class="fas fa-tag" style="color: #f59e0b;"></i>
+      {{ equipment.brand }}
+    </span>
+    {% endif %}
+    
+    <span class="meta-item">
+      <i class="fas fa-star" style="color: #f59e0b;"></i>
+      {{ equipment.get_condition_display }}
+    </span>
+    
+    <span class="meta-item">
+      <i class="fas fa-map-marker-alt" style="color: #f59e0b;"></i>
+      {{ equipment.city }}, {{ equipment.region }}
+    </span>
+  </div>
+  
+  <!-- Price Section -->
+  <div class="price-section">
+    <div class="price-main">₵{{ equipment.price_per_period }}</div>
+    <div class="price-period">Per {{ equipment.get_rental_period_display }}</div>
+    {% if equipment.security_deposit %}
+    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #92400e;">
+      + ₵{{ equipment.security_deposit }} security deposit
+    </div>
+    {% endif %}
+  </div>
+  
+  <!-- Contact Owner -->
+  <div class="contact-section">
+    <a href="tel:{{ equipment.owner.phone_number }}" class="contact-btn call-btn">
+      <i class="fas fa-phone"></i>
+      Call Owner
+    </a>
+    <a href="#" class="contact-btn message-btn" onclick="alert('Messaging feature coming soon!')">
+      <i class="fas fa-envelope"></i>
+      Message
+    </a>
+  </div>
+  
+  <!-- Description -->
+  <div class="section">
+    <h3 class="section-title">
+      <i class="fas fa-info-circle" style="color: #f59e0b;"></i>
+      Description
+    </h3>
+    <p style="color: #6b7280; line-height: 1.6;">{{ equipment.description }}</p>
+  </div>
+  
+  <!-- Specifications -->
+  {% if equipment.specifications %}
+  <div class="section">
+    <h3 class="section-title">
+      <i class="fas fa-cogs" style="color: #f59e0b;"></i>
+      Specifications
+    </h3>
+    <p style="color: #6b7280; line-height: 1.6; white-space: pre-line;">{{ equipment.specifications }}</p>
+  </div>
+  {% endif %}
+  
+  <!-- Equipment Details -->
+  <div class="section">
+    <h3 class="section-title">
+      <i class="fas fa-list" style="color: #f59e0b;"></i>
+      Details
+    </h3>
+    <ul class="spec-list">
+      <li class="spec-item">
+        <span>Category</span>
+        <strong>{{ equipment.category.name }}</strong>
+      </li>
+      {% if equipment.model %}
+      <li class="spec-item">
+        <span>Model</span>
+        <strong>{{ equipment.model }}</strong>
+      </li>
+      {% endif %}
+      <li class="spec-item">
+        <span>Condition</span>
+        <strong>{{ equipment.get_condition_display }}</strong>
+      </li>
+      <li class="spec-item">
+        <span>Rental Period</span>
+        <strong>{{ equipment.get_rental_period_display }}</strong>
+      </li>
+      <li class="spec-item">
+        <span>Currency</span>
+        <strong>{{ equipment.currency }}</strong>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Owner Info -->
+  <div class="section">
+    <h3 class="section-title">
+      <i class="fas fa-user" style="color: #f59e0b;"></i>
+      Equipment Owner
+    </h3>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="width: 50px; height: 50px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-user" style="color: #6b7280;"></i>
+      </div>
+      <div>
+        <div style="font-weight: 600; color: #1f2937;">{{ equipment.owner.first_name|default:equipment.owner.username }}</div>
+        <div style="color: #6b7280; font-size: 0.875rem;">Equipment Owner</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Spacer for fixed button and navigation -->
+  <div style="height: 140px;"></div>
+</div>
+
+<!-- Book Equipment Button -->
+<a href="{% url 'rent_pwa:book_equipment' equipment.id %}" class="book-button">
+  <i class="fas fa-calendar-plus"></i>
+  Book This Equipment
+</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleSave(equipmentId) {
+  const saveBtn = document.querySelector('.save-button');
+  
+  // Add loading state
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  
+  fetch(`/pwa/rent/saved/toggle/${equipmentId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      if (data.saved) {
+        saveBtn.classList.add('saved');
+        saveBtn.innerHTML = '<i class="fas fa-heart"></i>';
+      } else {
+        saveBtn.classList.remove('saved');
+        saveBtn.innerHTML = '<i class="far fa-heart"></i>';
+      }
+    } else {
+      saveBtn.innerHTML = '<i class="fas fa-heart"></i>';
+      alert('Error saving equipment. Please try again.');
+    }
+  })
+  .catch(error => {
+    saveBtn.innerHTML = '<i class="fas fa-heart"></i>';
+    console.error('Error:', error);
+  });
+}
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="{% url 'rent_pwa:equipment_list' %}" class="bottom-nav-item active">
+    <i class="fas fa-tools"></i>
+    <span>Equipment</span>
+  </a>
+  <a href="{% url 'rent_pwa:booking_list' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-check"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'rent_pwa:search' %}" class="bottom-nav-item">
+    <i class="fas fa-search"></i>
+    <span>Search</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user-circle"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}
