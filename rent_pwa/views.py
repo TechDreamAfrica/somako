@@ -200,7 +200,7 @@ def pwa_book_equipment(request, equipment_id):
             status='pending'
         )
 
-        messages.success(request, f'Booking request submitted! Booking #{booking.booking_number}')
+        messages.success(request, f'Booking request submitted! Booking #{booking.id}')
         return redirect('rent_pwa:booking_detail', booking_id=booking.id)
 
     context = {
