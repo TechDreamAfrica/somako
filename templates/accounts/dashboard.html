@@ -908,7 +908,7 @@
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem;">
               <span style="font-size: 0.875rem; color: #4b5563;">Profile Picture</span>
-              {% if user.profile_picture and user.profile_picture.strip and 'http' in user.profile_picture %}
+              {% if user.profile_picture %}
                 <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.125rem;"></i>
               {% else %}
                 <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.125rem;"></i>

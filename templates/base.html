@@ -460,14 +460,14 @@
     <!-- Navigation -->
     <nav class="navbar-custom sticky-top" style="background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(34, 197, 94, 0.1);">
       <div class="container-fluid px-3 px-md-4 px-lg-5">
-        <div class="row align-items-center py-2 py-lg-3 w-100 mx-0">
+        <div class="row align-items-center py-1 py-lg-2 w-100 mx-0">
           <!-- Logo -->
           <div class="col-6 col-lg-2">
-            <a href="{% url 'core:home' %}" class="logo-container text-decoration-none" style="display: flex; align-items: center; gap: 0.75rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.querySelector('.logo-icon').style.transform='rotate(5deg) scale(1.05)'; this.querySelector('.logo-icon').style.boxShadow='0 8px 25px rgba(34, 197, 94, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.querySelector('.logo-icon').style.transform='rotate(0) scale(1)'; this.querySelector('.logo-icon').style.boxShadow='0 4px 15px rgba(34, 197, 94, 0.3)'">
-              <div class="logo-icon" style="width: 44px; height: 44px; background: #22c55e; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-                <i class="fas fa-briefcase" style="color: white; font-size: 1.25rem; position: relative; z-index: 2;"></i>
+            <a href="{% url 'core:home' %}" class="logo-container text-decoration-none" style="display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-2px)'; this.querySelector('.logo-icon').style.transform='rotate(5deg) scale(1.05)'; this.querySelector('.logo-icon').style.boxShadow='0 8px 25px rgba(34, 197, 94, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.querySelector('.logo-icon').style.transform='rotate(0) scale(1)'; this.querySelector('.logo-icon').style.boxShadow='0 4px 15px rgba(34, 197, 94, 0.3)'">
+              <div class="logo-icon" style="width: 36px; height: 36px; background: #22c55e; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <i class="fas fa-briefcase" style="color: white; font-size: 1.125rem; position: relative; z-index: 2;"></i>
               </div>
-              <span class="d-none d-md-inline fw-bold" style="color: #22c55e; font-size: 1.5rem; letter-spacing: -0.75px; font-family: 'Inter', -apple-system, sans-serif; position: relative;">
+              <span class="d-none d-md-inline fw-bold" style="color: #22c55e; font-size: 1.25rem; letter-spacing: -0.5px; font-family: 'Inter', -apple-system, sans-serif; position: relative;">
                 Soma Ko
                 <span style="position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #22c55e; transition: width 0.3s ease;"></span>
               </span>
@@ -477,24 +477,24 @@
           <!-- Desktop Navigation - Main Links -->
           <div class="col-lg-7 d-none d-lg-block">
             <div class="d-flex justify-content-center gap-1">
-              <a href="{% url 'rent:equipment_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
-                <i class="fas fa-home" style="color: #059669; font-size: 1.125rem;"></i>
+              <a href="{% url 'rent:equipment_list' %}" class="nav-link-custom position-relative" style="padding: 0.5rem 0.75rem; font-weight: 500;">
+                <i class="fas fa-home" style="color: #059669; font-size: 1rem;"></i>
                 <span style="color: #1f2937;">Rent</span>
               </a>
-              <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
-                <i class="fas fa-pills" style="color: #059669; font-size: 1.125rem;"></i>
+              <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom position-relative" style="padding: 0.5rem 0.75rem; font-weight: 500;">
+                <i class="fas fa-pills" style="color: #059669; font-size: 1rem;"></i>
                 <span style="color: #1f2937;">Pharmacy</span>
               </a>
-              <a href="{% url 'shop:product_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
-                <i class="fas fa-shopping-bag" style="color: #059669; font-size: 1.125rem;"></i>
+              <a href="{% url 'shop:product_list' %}" class="nav-link-custom position-relative" style="padding: 0.5rem 0.75rem; font-weight: 500;">
+                <i class="fas fa-shopping-bag" style="color: #059669; font-size: 1rem;"></i>
                 <span style="color: #1f2937;">Shop</span>
               </a>
-              <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
-                <i class="fas fa-utensils" style="color: #059669; font-size: 1.125rem;"></i>
+              <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom position-relative" style="padding: 0.5rem 0.75rem; font-weight: 500;">
+                <i class="fas fa-utensils" style="color: #059669; font-size: 1rem;"></i>
                 <span style="color: #1f2937;">Food</span>
               </a>
-              <a href="{% url 'ride:book_ride' %}" class="nav-link-custom position-relative" style="padding: 0.625rem 1rem; font-weight: 500;">
-                <i class="fas fa-car" style="color: #059669; font-size: 1.125rem;"></i>
+              <a href="{% url 'ride:book_ride' %}" class="nav-link-custom position-relative" style="padding: 0.5rem 0.75rem; font-weight: 500;">
+                <i class="fas fa-car" style="color: #059669; font-size: 1rem;"></i>
                 <span style="color: #1f2937;">Ride</span>
               </a>
             </div>
@@ -511,11 +511,11 @@
                   type="button"
                   class="cart-dropdown-button"
                   onclick="toggleCartDropdown(event)"
-                  style="background: #ecfdf5; border: 2px solid #059669; color: #059669; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; position: relative;"
+                  style="background: #ecfdf5; border: 2px solid #059669; color: #059669; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; position: relative;"
                   onmouseover="this.style.background='#059669'; this.style.color='white'"
                   onmouseout="this.style.background='#ecfdf5'; this.style.color='#059669'"
                 >
-                  <i class="fas fa-shopping-cart" style="font-size: 1.125rem;"></i>
+                  <i class="fas fa-shopping-cart" style="font-size: 1rem;"></i>
                   {% if total_cart_count > 0 %}
                   <span class="cart-count" style="position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);">{{ total_cart_count }}</span>
                   {% endif %}
@@ -571,9 +571,9 @@
                   class="user-dropdown-button"
                   onclick="toggleDropdown(event)"
                 >
-                  {% if user.profile_picture and user.profile_picture.strip and 'http' in user.profile_picture %}
+                  {% if user.profile_picture %}
                   <img
-                    src="{{ user.profile_picture }}"
+                    src="{{ user.profile_picture.url }}"
                     alt="{{ user.username }}"
                   />
                   {% else %}
@@ -618,11 +618,11 @@
                 </div>
               </div>
               {% else %}
-              <a href="{% url 'accounts:login' %}" class="nav-link-custom" style="padding: 0.625rem 1rem;">
+              <a href="{% url 'accounts:login' %}" class="nav-link-custom" style="padding: 0.5rem 0.75rem;">
                 <i class="fas fa-sign-in-alt" style="color: #059669;"></i>
                 <span style="color: #1f2937; font-weight: 500;">Login</span>
               </a>
-              <a href="{% url 'accounts:signup' %}" class="btn-custom btn-primary" style="padding: 0.625rem 1.5rem; background: #22c55e; color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); border: none; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s ease; text-decoration: none;">
+              <a href="{% url 'accounts:signup' %}" class="btn-custom btn-primary" style="padding: 0.5rem 1.25rem; background: #22c55e; color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); border: none; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s ease; text-decoration: none;">
                 <i class="fas fa-user-plus"></i>
                 <span>Sign Up</span>
               </a>
@@ -649,43 +649,43 @@
         <!-- Mobile Navigation Menu -->
         <div id="mobileMenu" class="mobile-nav-menu hidden" style="background: white; border-top: 2px solid #ecfdf5; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); animation: slideDown 0.3s ease;">
           <div class="pb-3 px-2">
-            <a href="{% url 'rent:equipment_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-              <i class="fas fa-home me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+            <a href="{% url 'rent:equipment_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-home me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
               <span style="color: #1f2937; font-weight: 500;">Rent</span>
             </a>
-            <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-              <i class="fas fa-pills me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+            <a href="{% url 'pharmacy:medicine_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-pills me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
               <span style="color: #1f2937; font-weight: 500;">Pharmacy</span>
             </a>
-            <a href="{% url 'shop:product_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-              <i class="fas fa-shopping-bag me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+            <a href="{% url 'shop:product_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-shopping-bag me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
               <span style="color: #1f2937; font-weight: 500;">Shop</span>
             </a>
-            <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-              <i class="fas fa-utensils me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+            <a href="{% url 'food:restaurant_list' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-utensils me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
               <span style="color: #1f2937; font-weight: 500;">Food</span>
             </a>
-            <a href="{% url 'ride:book_ride' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-              <i class="fas fa-car me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+            <a href="{% url 'ride:book_ride' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+              <i class="fas fa-car me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
               <span style="color: #1f2937; font-weight: 500;">Ride</span>
             </a>
 
             <div class="mt-3 pt-3" style="border-top: 2px solid #ecfdf5;">
               {% if user.is_authenticated %}
-                <a href="{% url 'accounts:dashboard' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-                  <i class="fas fa-chart-line me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                <a href="{% url 'accounts:dashboard' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-chart-line me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
                   <span style="color: #1f2937; font-weight: 500;">Dashboard</span>
                 </a>
-                <a href="{% url 'accounts:profile' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-                  <i class="fas fa-user-circle me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                <a href="{% url 'accounts:profile' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-user-circle me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
                   <span style="color: #1f2937; font-weight: 500;">Profile</span>
                 </a>
-                <a href="{% url 'accounts:notifications' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-                  <i class="fas fa-bell me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                <a href="{% url 'accounts:notifications' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-bell me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
                   <span style="color: #1f2937; font-weight: 500;">Notifications</span>
                 </a>
-                <a href="{% url 'rent:my_messages' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
-                  <i class="fas fa-envelope me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                <a href="{% url 'rent:my_messages' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; transition: all 0.3s ease;">
+                  <i class="fas fa-envelope me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
                   <span style="color: #1f2937; font-weight: 500;">Messages</span>
                 </a>
                 <form method="post" action="{% url 'accounts:logout' %}" class="mt-2">
@@ -696,12 +696,12 @@
                   </button>
                 </form>
               {% else %}
-                <a href="{% url 'accounts:login' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
-                  <i class="fas fa-sign-in-alt me-3" style="color: #059669; font-size: 1.125rem; width: 20px;"></i>
+                <a href="{% url 'accounts:login' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                  <i class="fas fa-sign-in-alt me-3" style="color: #059669; font-size: 1rem; width: 20px;"></i>
                   <span style="color: #1f2937; font-weight: 500;">Login</span>
                 </a>
-                <a href="{% url 'accounts:signup' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.875rem 1rem; border-radius: 0.5rem; background: #ecfdf5; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.background='#059669'; this.querySelector('i').style.color='white'; this.querySelector('span').style.color='white'" onmouseout="this.style.background='#ecfdf5'; this.querySelector('i').style.color='#059669'; this.querySelector('span').style.color='#059669'">
-                  <i class="fas fa-user-plus me-3" style="color: #059669; font-size: 1.125rem; width: 20px; transition: color 0.3s ease;"></i>
+                <a href="{% url 'accounts:signup' %}" class="nav-link-custom d-flex align-items-center" style="padding: 0.75rem; border-radius: 0.5rem; background: #ecfdf5; border: 2px solid #059669; transition: all 0.3s ease;" onmouseover="this.style.background='#059669'; this.querySelector('i').style.color='white'; this.querySelector('span').style.color='white'" onmouseout="this.style.background='#ecfdf5'; this.querySelector('i').style.color='#059669'; this.querySelector('span').style.color='#059669'">
+                  <i class="fas fa-user-plus me-3" style="color: #059669; font-size: 1rem; width: 20px; transition: color 0.3s ease;"></i>
                   <span style="color: #059669; font-weight: 600; transition: color 0.3s ease;">Sign Up</span>
                 </a>
               {% endif %}
@@ -1196,6 +1196,51 @@
       /* Enhanced navbar styling */
       .navbar-custom {
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* User dropdown button styling */
+      .user-dropdown-button {
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .user-dropdown-button:hover {
+        background: rgba(34, 197, 94, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .user-dropdown-button img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+      }
+
+      .user-avatar-placeholder {
+        width: 28px;
+        height: 28px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #e5e7eb;
+        color: #9ca3af;
+      }
+
+      .user-avatar-placeholder i {
+        font-size: 0.875rem;
       }
 
       /* Logo hover effect */
