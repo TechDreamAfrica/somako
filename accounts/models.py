@@ -44,11 +44,11 @@ class User(AbstractUser):
         blank=True
     )
     location = models.CharField(max_length=100, blank=True)
-    profile_picture = models.URLField(
-        max_length=500,
+    profile_picture = models.ImageField(
+        upload_to='profile_pictures/',
         blank=True,
         null=True,
-        help_text="Direct profile picture URL from any image hosting service"
+        help_text="Upload your profile picture"
     )
     bio = models.TextField(max_length=500, blank=True)
     is_verified = models.BooleanField(default=False)

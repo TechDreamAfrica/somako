@@ -1,79 +1,248 @@
 {% extends 'base.html' %}
 {% block content_class %}app-rent{% endblock %}
-{% block title %}Browse Equipment - Soma Ko{% endblock %}
+{% block title %}Rent Equipment - Soma Ko{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section>
-  <div>
-    <div></div>
+<section style="background: #059669; padding: 2rem 0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Equipment Rentals</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">
+          <i class="fas fa-tools"></i> Find professional tools and equipment for your projects
+        </p>
+      </div>
+      <div style="color: rgba(255, 255, 255, 0.8); text-align: right;">
+        <div style="font-size: 1.5rem; font-weight: 900;">{{ page_obj.paginator.count }}+ Items</div>
+        <div style="font-size: 0.875rem;">Available to Rent</div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <div>
-    <div>
-      <span>
-        <i></i>Equipment Rentals
-      </span>
-      <h1>Rent Equipment</h1>
-      <p>Find the equipment you need for your projects</p>
+<!-- Search and Filters Section -->
+<section style="background: #f8fafc; padding: 2rem 0; border-bottom: 1px solid #e5e7eb;">
+  <div class="container">
+    <form method="get" class="search-form">
+      <div class="row g-3 align-items-end">
+        <!-- Search -->
+        <div class="col-lg-4 col-md-6">
+          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Search Equipment</label>
+          <div style="position: relative;">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by name, brand, or location..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 2px solid #d1d5db; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease;" onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none'">
+            <i class="fas fa-search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+          </div>
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="col-lg-2 col-md-6">
+          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Category</label>
+          <select name="category" style="width: 100%; padding: 0.75rem; border: 2px solid #d1d5db; border-radius: 0.75rem; font-size: 1rem;">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <!-- City Filter -->
+        <div class="col-lg-2 col-md-6">
+          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">City</label>
+          <input type="text" name="city" value="{{ selected_city }}" placeholder="Enter city..." style="width: 100%; padding: 0.75rem; border: 2px solid #d1d5db; border-radius: 0.75rem; font-size: 1rem;">
+        </div>
+        
+        <!-- Condition Filter -->
+        <div class="col-lg-2 col-md-6">
+          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Condition</label>
+          <select name="condition" style="width: 100%; padding: 0.75rem; border: 2px solid #d1d5db; border-radius: 0.75rem; font-size: 1rem;">
+            <option value="">Any Condition</option>
+            <option value="new" {% if selected_condition == 'new' %}selected{% endif %}>New</option>
+            <option value="excellent" {% if selected_condition == 'excellent' %}selected{% endif %}>Excellent</option>
+            <option value="good" {% if selected_condition == 'good' %}selected{% endif %}>Good</option>
+            <option value="fair" {% if selected_condition == 'fair' %}selected{% endif %}>Fair</option>
+          </select>
+        </div>
+        
+        <!-- Search Button -->
+        <div class="col-lg-2">
+          <button type="submit" style="width: 100%; padding: 0.75rem; background: #059669; color: white; border: none; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.background='#047857'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Results Info -->
+<section style="padding: 1.5rem 0; background: white; border-bottom: 1px solid #e5e7eb;">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <span style="color: #6b7280;">Showing <strong>{{ page_obj.start_index }}-{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> equipment items</span>
+      </div>
+      <div>
+        <form method="get" style="display: inline-block;">
+          {% for key, value in request.GET.items %}
+            {% if key != 'sort' %}
+              <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+          {% endfor %}
+          <select name="sort" onchange="this.form.submit()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;">
+            <option value="-created_at">Newest First</option>
+            <option value="created_at">Oldest First</option>
+            <option value="price_per_period">Price: Low to High</option>
+            <option value="-price_per_period">Price: High to Low</option>
+            <option value="name">Name: A-Z</option>
+            <option value="-name">Name: Z-A</option>
+          </select>
+        </form>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- Equipment Grid Section -->
-<section>
-  <div>
-    <div>
-      {% for equipment in equipment_list %}
-      <div>
-        {% if equipment.equipmentimage_set.first %}
-        <div>
-          <img src="{{ equipment.equipmentimage_set.first.get_image_url }}" alt="{{ equipment.name }}">
-          <div></div>
-          <div>
-            <button>
-              <i></i>
-            </button>
-          </div>
-        </div>
-        {% else %}
-        <div>
-          <i></i>
-        </div>
-        {% endif %}
-
-        <div>
-          <div>
-            <span>{{ equipment.category.name }}</span>
-          </div>
-
-          <h3>{{ equipment.name }}</h3>
-
-          <p>{{ equipment.brand }}</p>
-
-          <div>
-            <div>
-              <span>GHS {{ equipment.price_per_period }}</span>
-              <span>/{{ equipment.rental_period }}</span>
+<section style="padding: 3rem 0">
+  <div class="container">
+    <div class="row g-4">
+      {% for equipment in page_obj %}
+      <div class="col-lg-4 col-md-6">
+        <div style="background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 12px 30px rgba(0, 0, 0, 0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)'">
+          
+          <!-- Image Section -->
+          {% if equipment.main_image %}
+          <div style="position: relative; height: 240px; overflow: hidden; background: #f3f4f6;">
+            <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; top: 1rem; left: 1rem;">
+              <span style="background: rgba(5, 150, 105, 0.9); color: white; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600;">
+                {{ equipment.get_condition_display }}
+              </span>
             </div>
-            <a href="{% url 'rent:equipment_detail' equipment.pk %}">
-              View
-            </a>
+            <div style="position: absolute; top: 1rem; right: 1rem;">
+              <button style="background: rgba(255, 255, 255, 0.9); border: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='white'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.9)'; this.style.transform='scale(1)'">
+                <i class="fas fa-heart" style="color: #ef4444;"></i>
+              </button>
+            </div>
+          </div>
+          {% else %}
+          <div style="height: 240px; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-tools" style="font-size: 3rem; color: #9ca3af;"></i>
+          </div>
+          {% endif %}
+
+          <!-- Content Section -->
+          <div style="padding: 1.5rem;">
+            <!-- Category Badge -->
+            <div style="margin-bottom: 1rem;">
+              <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600;">
+                {{ equipment.category.name }}
+              </span>
+            </div>
+
+            <!-- Title and Brand -->
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; line-height: 1.3;">{{ equipment.name }}</h3>
+            
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <i class="fas fa-industry" style="color: #6b7280; font-size: 0.875rem;"></i>
+              <span style="color: #6b7280; font-size: 0.875rem; font-weight: 500;">{{ equipment.brand }} {{ equipment.model }}</span>
+            </div>
+
+            <!-- Location -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <i class="fas fa-map-marker-alt" style="color: #ef4444; font-size: 0.875rem;"></i>
+              <span style="color: #6b7280; font-size: 0.875rem;">{{ equipment.city }}, {{ equipment.region }}</span>
+            </div>
+
+            <!-- Description -->
+            <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.5; margin-bottom: 1.5rem;">{{ equipment.description|truncatewords:15 }}</p>
+
+            <!-- Price and Action -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+                  <span style="font-size: 1.5rem; font-weight: 900; color: #059669;">GHS {{ equipment.price_per_period }}</span>
+                  <span style="color: #6b7280; font-size: 0.875rem;">/{{ equipment.rental_period }}</span>
+                </div>
+                {% if equipment.security_deposit %}
+                <div style="font-size: 0.75rem; color: #9ca3af;">
+                  +GHS {{ equipment.security_deposit }} deposit
+                </div>
+                {% endif %}
+              </div>
+              <a href="{% url 'rent:equipment_detail' equipment.pk %}" style="background: #059669; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem; transition: all 0.3s ease;" onmouseover="this.style.background='#047857'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'">
+                View Details
+              </a>
+            </div>
           </div>
         </div>
       </div>
       {% empty %}
-      <div>
-        <div>
-          <div>
-            <i></i>
+      <!-- No Results State -->
+      <div class="col-12">
+        <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <div style="margin-bottom: 2rem;">
+            <i class="fas fa-search" style="font-size: 4rem; color: #d1d5db;"></i>
           </div>
-          <h4>No Equipment Available</h4>
-          <p>Check back later for new equipment</p>
+          <h4 style="font-size: 1.5rem; font-weight: 700; color: #374151; margin-bottom: 1rem;">No Equipment Found</h4>
+          <p style="color: #6b7280; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">We couldn't find any equipment matching your criteria. Try adjusting your filters or search terms.</p>
+          <a href="{% url 'rent:equipment_list' %}" style="background: #059669; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">
+            <i class="fas fa-refresh"></i> Clear Filters
+          </a>
         </div>
       </div>
       {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="margin-top: 3rem; text-align: center;">
+      <nav>
+        <ul style="display: inline-flex; gap: 0.5rem; margin: 0; padding: 0; list-style: none;">
+          {% if page_obj.has_previous %}
+          <li>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; color: #374151; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li>
+              <span style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background: #059669; color: white; border-radius: 0.5rem; font-weight: 600;">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li>
+              <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; color: #374151; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">{{ num }}</a>
+            </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; color: #374151; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section style="background: #1f2937; padding: 4rem 0; color: white; text-align: center;">
+  <div class="container">
+    <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">Have Equipment to Rent?</h2>
+    <p style="font-size: 1.25rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Join our platform and start earning by renting out your tools and equipment to people who need them.</p>
+    <a href="{% url 'accounts:dashboard' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 1rem 2rem; border-radius: 0.75rem; text-decoration: none; font-weight: 700; font-size: 1.125rem; transition: all 0.3s ease;" onmouseover="this.style.background='#047857'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'">
+      <i class="fas fa-plus-circle"></i>
+      List Your Equipment
+    </a>
   </div>
 </section>
 {% endblock %}

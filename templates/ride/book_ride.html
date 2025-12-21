@@ -167,8 +167,8 @@
                     <div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
                       {% if driver.profile_photo %}
                       <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                      {% elif driver.user.profile_picture and driver.user.profile_picture.strip %}
-                      <img src="{{ driver.user.profile_picture }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% elif driver.user.profile_picture %}
+                      <img src="{{ driver.user.profile_picture.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
                       {% else %}
                       <i class="fas fa-user" style="color: #6b7280; font-size: 1.5rem;"></i>
                       {% endif %}

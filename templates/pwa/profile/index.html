@@ -214,7 +214,7 @@
   <div class="profile-avatar-container">
     <div class="profile-avatar">
       {% if user.profile_picture %}
-        <img src="{{ user.profile_picture }}" alt="{{ user.get_full_name }}">
+        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
       {% else %}
         <i class="fas fa-user"></i>
       {% endif %}

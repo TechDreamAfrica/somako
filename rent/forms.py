@@ -2,7 +2,7 @@
 Forms for Rent app
 """
 from django import forms
-from .models import Property, Room, PropertyImage, Equipment, RentalMessage
+from .models import Property, Room, PropertyImage, Equipment, RentalMessage, RentalBooking
 
 
 class PropertyForm(forms.ModelForm):
@@ -113,6 +113,52 @@ class EquipmentForm(forms.ModelForm):
             'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'main_image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
+
+
+class RentalBookingForm(forms.ModelForm):
+    """Form for creating equipment rental bookings"""
+
+    class Meta:
+        model = RentalBooking
+        fields = [
+            'start_date', 'end_date', 'quantity', 'notes', 'payment_method'
+        ]
+        widgets = {
+            'start_date': forms.DateInput(attrs={
+                'class': 'form-control', 
+                'type': 'date',
+                'required': True
+            }),
+            'end_date': forms.DateInput(attrs={
+                'class': 'form-control', 
+                'type': 'date',
+                'required': True
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1',
+                'max': '10',
+                'value': '1',
+                'required': True
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Any special requests or additional information...'
+            }),
+            'payment_method': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.equipment = kwargs.pop('equipment', None)
+        super().__init__(*args, **kwargs)
+        
+        if self.equipment and self.equipment.listing_type == 'for_sale':
+            # For sales, remove date fields
+            self.fields.pop('start_date', None)
+            self.fields.pop('end_date', None)
 
 
 class RentalMessageForm(forms.ModelForm):

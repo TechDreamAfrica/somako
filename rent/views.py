@@ -66,7 +66,9 @@ def equipment_list(request):
 
 
 def equipment_detail(request, pk):
-    """Display equipment details"""
+    """Equipment detail view with inline booking form"""
+    from datetime import date as date_class
+    
     equipment = get_object_or_404(
         Equipment.objects.select_related('owner', 'category').prefetch_related('images', 'reviews'),
         pk=pk
@@ -82,9 +84,119 @@ def equipment_detail(request, pk):
         is_available=True
     ).exclude(pk=pk)[:4]
 
+    # Handle inline booking form submission
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            from decimal import Decimal
+            from .notifications import notify_rental_booked
+            
+            start_date = request.POST.get('start_date', '').strip()
+            end_date = request.POST.get('end_date', '').strip() 
+            quantity = int(request.POST.get('quantity', 1))
+            notes = request.POST.get('notes', '')
+            payment_method = request.POST.get('payment_method', 'paystack')
+
+            # For purchases, use today's date if dates are not provided
+            if equipment.listing_type == 'for_sale':
+                if not start_date or not end_date:
+                    today = date_class.today()
+                    start = today
+                    end = today
+                else:
+                    from datetime import datetime
+                    start = datetime.strptime(start_date, '%Y-%m-%d').date()
+                    end = datetime.strptime(end_date, '%Y-%m-%d').date()
+            else:
+                # For rentals, dates are required
+                if not start_date or not end_date:
+                    messages.error(request, 'Please provide both start and end dates.')
+                    return redirect('rent:equipment_detail', pk=pk)
+
+                from datetime import datetime
+                start = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+                # Validate end date is after start date
+                if start >= end:
+                    messages.error(request, 'End date must be after start date.')
+                    return redirect('rent:equipment_detail', pk=pk)
+
+            # Validate quantity
+            if quantity > equipment.quantity_available:
+                messages.error(request, f'Only {equipment.quantity_available} unit(s) available.')
+                return redirect('rent:equipment_detail', pk=pk)
+
+            # Calculate total amount based on duration
+            duration_days = (end - start).days
+            
+            if equipment.rental_period == 'day':
+                periods = duration_days if duration_days > 0 else 1
+            elif equipment.rental_period == 'week':
+                periods = duration_days / 7 if duration_days > 0 else 1
+            elif equipment.rental_period == 'month':
+                periods = duration_days / 30 if duration_days > 0 else 1
+            else:  # hour
+                periods = duration_days * 24 if duration_days > 0 else 1
+
+            total_amount = equipment.price_per_period * Decimal(str(periods)) * quantity
+            transaction_type = 'rental'
+
+            if equipment.listing_type == 'for_sale':
+                total_amount = equipment.price_per_period * quantity  # Fixed price for sale
+                transaction_type = 'purchase'
+
+            # Create booking
+            booking = RentalBooking.objects.create(
+                transaction_type=transaction_type,
+                equipment=equipment,
+                renter=request.user,
+                start_date=start,
+                end_date=end,
+                quantity=quantity,
+                total_amount=total_amount,
+                notes=notes,
+                status='pending'
+            )
+
+            # Send SMS notification to equipment owner
+            try:
+                notify_rental_booked(booking)
+            except Exception as e:
+                # Don't fail the booking if SMS fails
+                print(f"SMS notification failed: {str(e)}")
+
+            # Handle payment
+            if payment_method == 'paystack':
+                from payment.helpers import create_payment, initialize_paystack_payment
+
+                trans_label = 'Purchase' if booking.transaction_type == 'purchase' else 'Rental'
+                payment = create_payment(
+                    user=request.user,
+                    amount=total_amount,
+                    source_app='rent',
+                    order_id=str(booking.id),
+                    description=f'{trans_label} Booking #{booking.id} - {equipment.name}',
+                    payment_method='paystack'
+                )
+
+                result = initialize_paystack_payment(payment)
+                if result['status']:
+                    return redirect(result['authorization_url'])
+                else:
+                    messages.error(request, f"Payment initialization failed: {result['message']}")
+                    return redirect('rent:booking_detail', pk=booking.id)
+            else:
+                messages.success(request, 'Booking request submitted successfully! Payment on arrival.')
+                return redirect('rent:booking_detail', pk=booking.id)
+
+        except Exception as e:
+            messages.error(request, f'Error creating booking: {str(e)}')
+            return redirect('rent:equipment_detail', pk=pk)
+
     context = {
         'equipment': equipment,
         'related_equipment': related_equipment,
+        'today': date_class.today(),
     }
     return render(request, 'rent/equipment_detail.html', context)
 
@@ -209,7 +321,6 @@ def booking_create(request):
                     transaction_type = 'purchase'
 
                 booking = RentalBooking.objects.create(
-                    booking_type='property',
                     transaction_type=transaction_type,
                     property=property_obj,
                     renter=request.user,
@@ -239,7 +350,6 @@ def booking_create(request):
                     transaction_type = 'purchase'
 
                 booking = RentalBooking.objects.create(
-                    booking_type='equipment',
                     transaction_type=transaction_type,
                     equipment=equipment_obj,
                     renter=request.user,

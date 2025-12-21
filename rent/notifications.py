@@ -5,21 +5,25 @@ def notify_rental_booked(booking):
     """Notify owner when new booking is made"""
     owner = None
 
-    if booking.property:
+    if hasattr(booking, 'property') and booking.property:
         owner = booking.property.owner
         item_name = booking.property.title
         item_type = "property"
-    elif booking.equipment:
+    elif hasattr(booking, 'equipment') and booking.equipment:
         owner = booking.equipment.owner
         item_name = booking.equipment.name
         item_type = "equipment"
 
     if owner:
+        # Use the correct field names based on the booking model
+        renter = booking.renter if hasattr(booking, 'renter') else booking.customer
+        total_amount = booking.total_amount if hasattr(booking, 'total_amount') else booking.total_price
+        
         send_notification(
             user=owner,
             notification_type='rental_booked',
             title=f'New {item_type.title()} Booking!',
-            message=f'New booking for your {item_name}. Customer: {booking.customer.get_full_name() or booking.customer.username}. Dates: {booking.start_date.strftime("%b %d")} - {booking.end_date.strftime("%b %d, %Y")}. Total: GHS {booking.total_price}',
+            message=f'New booking for your {item_name}. Customer: {renter.get_full_name() or renter.username}. Dates: {booking.start_date.strftime("%b %d")} - {booking.end_date.strftime("%b %d, %Y")}. Total: GHS {total_amount}',
             channels=['in_app', 'sms', 'whatsapp'],
             reference_id=str(booking.id),
             reference_type='RentalBooking',
@@ -27,7 +31,7 @@ def notify_rental_booked(booking):
                 'booking_id': str(booking.id),
                 'item_type': item_type,
                 'item_name': item_name,
-                'total': str(booking.total_price),
+                'total': str(total_amount),
                 'start_date': booking.start_date.isoformat(),
                 'end_date': booking.end_date.isoformat()
             }

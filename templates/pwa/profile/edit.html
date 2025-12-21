@@ -246,17 +246,17 @@
       <div class="profile-pic-section">
         <div class="current-avatar" id="avatarPreview">
           {% if user.profile_picture %}
-            <img src="{{ user.profile_picture }}" alt="Profile">
+            <img src="{{ user.profile_picture.url }}" alt="Profile">
           {% else %}
             <i class="fas fa-user"></i>
           {% endif %}
         </div>
         <label for="profile_picture" class="upload-btn">
-          <i class="fas fa-link"></i>
-          Image URL
+          <i class="fas fa-camera"></i>
+          Choose Image
         </label>
-        <input type="url" id="profile_picture" name="profile_picture" placeholder="https://example.com/image.jpg" value="{{ user.profile_picture|default:'' }}">
-        <p class="form-help">Enter direct image URL from GitHub, Imgur, etc.</p>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display: none;">
+        <p class="form-help">Upload an image file (JPG, PNG, etc.)</p>
       </div>
 
       <!-- Basic Information -->
