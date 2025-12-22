@@ -13,7 +13,7 @@
 </section>
 
 <!-- Cart Content -->
-<section style="padding: 3rem 0; background: #f9fafb;">
+<section style="padding: 3rem 0;">
   <div class="container">
     {% if cart_items %}
     <div class="row g-4">
@@ -64,7 +64,7 @@
                   </form>
                   <form method="post" action="{% url 'pharmacy:remove_from_cart' item.id %}">
                     {% csrf_token %}
-                    <button type="submit" style="padding: 0.5rem 1rem; background: #a855f7; color: #dc2626; border: 2px solid #fca5a5; border-radius: 0.5rem; font-weight: 600; cursor: pointer;" onmouseover="this.style.background='#dc2626'; this.style.color='white'" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626'">
+                    <button type="submit" style="padding: 0.5rem 1rem; color: #dc2626; border: 2px solid #fca5a5; border-radius: 0.5rem; font-weight: 600; cursor: pointer;" onmouseover="this.style.background='#dc2626'; this.style.color='white'" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626'">
                       <i class="fas fa-trash"></i> Remove
                     </button>
                   </form>
@@ -107,7 +107,7 @@
             <a href="{% url 'pharmacy:checkout' %}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1.125rem; background: #a855f7; color: white; text-decoration: none; border-radius: 0.875rem; font-weight: 700; margin-bottom: 1rem; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
               <i class="fas fa-shopping-cart"></i>Proceed to Checkout
             </a>
-            <div style="background: #a855f7; border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #fcd34d;">
+            <div style="border-radius: 0.875rem; padding: 1.25rem; border: 2px solid #fcd34d;">
               <h4 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 700; color: #92400e; margin-bottom: 0.75rem;">
                 <i class="fas fa-info-circle"></i>Important
               </h4>
@@ -119,7 +119,7 @@
     </div>
     {% else %}
     <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
-      <div style="width: 120px; height: 120px; background: #a855f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+      <div style="width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
         <i class="fas fa-pills" style="font-size: 4rem; color: #a855f7; opacity: 0.5;"></i>
       </div>
       <h2 style="font-size: 1.875rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Your cart is empty</h2>

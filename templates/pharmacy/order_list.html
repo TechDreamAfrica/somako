@@ -26,7 +26,7 @@
       <div class="row align-items-center g-4">
         <div class="col-md-8">
           <div style="display: flex; gap: 1.5rem; align-items: start;">
-            <div style="width: 60px; height: 60px; background: #a855f7; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <i class="fas fa-pills" style="color: #a855f7; font-size: 1.75rem;"></i>
             </div>
             <div style="flex: 1;">
@@ -44,23 +44,23 @@
                 {% endif %}
               </p>
               {% if order.status == 'delivered' %}
-              <span style="background: #a855f7; color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #6ee7b7; display: inline-block;">
+              <span style="color: #065f46; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #6ee7b7; display: inline-block;">
                 <i class="fas fa-check-circle"></i> {{ order.get_status_display }}
               </span>
               {% elif order.status == 'cancelled' %}
-              <span style="background: #a855f7; color: #991b1b; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fca5a5; display: inline-block;">
+              <span style="color: #991b1b; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fca5a5; display: inline-block;">
                 <i class="fas fa-times-circle"></i> {{ order.get_status_display }}
               </span>
               {% elif order.status == 'pending' %}
-              <span style="background: #a855f7; color: #92400e; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fcd34d; display: inline-block;">
+              <span style="color: #92400e; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #fcd34d; display: inline-block;">
                 <i class="fas fa-clock"></i> {{ order.get_status_display }}
               </span>
               {% elif order.status == 'processing' %}
-              <span style="background: #a855f7; color: #7e22ce; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #d8b4fe; display: inline-block;">
+              <span style="color: #7e22ce; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #d8b4fe; display: inline-block;">
                 <i class="fas fa-spinner fa-spin"></i> {{ order.get_status_display }}
               </span>
               {% else %}
-              <span style="background: #a855f7; color: #7e22ce; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #d8b4fe; display: inline-block;">
+              <span style="color: #7e22ce; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; border: 2px solid #d8b4fe; display: inline-block;">
                 <i class="fas fa-info-circle"></i> {{ order.get_status_display }}
               </span>
               {% endif %}
@@ -79,7 +79,7 @@
     </div>
     {% empty %}
     <div style="text-align: center; padding: 5rem 2rem; background: white; border-radius: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
-      <div style="width: 120px; height: 120px; background: #a855f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+      <div style="width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
         <i class="fas fa-prescription-bottle" style="font-size: 4rem; color: #a855f7; opacity: 0.5;"></i>
       </div>
       <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Orders Yet</h4>
