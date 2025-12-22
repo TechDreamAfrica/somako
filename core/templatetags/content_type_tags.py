@@ -62,3 +62,64 @@ def has_role(user, role):
     if hasattr(user, 'has_role'):
         return user.has_role(role)
     return False
+
+
+@register.filter
+def currency(value, currency_code='GHS'):
+    """
+    Format a price value with the appropriate currency symbol
+    
+    Args:
+        value: The price value to format
+        currency_code: The currency code (default: 'GHS')
+    
+    Returns:
+        Formatted price string with currency symbol
+    """
+    if not value:
+        return '₵0.00'
+    
+    try:
+        amount = float(value)
+    except (ValueError, TypeError):
+        return '₵0.00'
+    
+    # Currency symbol mapping
+    currency_symbols = {
+        'GHS': '₵',
+        'NGN': '₦',
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£',
+    }
+    
+    symbol = currency_symbols.get(currency_code.upper(), '₵')
+    return f'{symbol}{amount:,.2f}'
+
+
+@register.filter
+def cedis(value):
+    """
+    Format a price value with Ghana Cedis symbol
+    
+    Args:
+        value: The price value to format
+    
+    Returns:
+        Formatted price string with Cedis symbol
+    """
+    return currency(value, 'GHS')
+
+
+@register.filter
+def naira(value):
+    """
+    Format a price value with Nigerian Naira symbol (kept for backward compatibility)
+    
+    Args:
+        value: The price value to format
+    
+    Returns:
+        Formatted price string with Naira symbol
+    """
+    return currency(value, 'NGN')

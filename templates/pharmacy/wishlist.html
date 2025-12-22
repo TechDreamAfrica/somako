@@ -16,7 +16,7 @@
       <div>
         <div>
           <h5>{{ item.medicine.name }}</h5>
-          <p>${{ item.medicine.price }}</p>
+          <p>{{ item.medicine.price|cedis }}</p>
           <a href="{% url 'pharmacy:medicine_detail' item.medicine.slug %}">View</a>
         </div>
       </div>
