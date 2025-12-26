@@ -304,13 +304,20 @@
       </div>
       <div>
         <label class="form-label">Pickup Region</label>
-        <select name="pickup_region" class="form-control">
+        <select name="pickup_region" id="pickup_region" class="form-control region-select">
           <option value="">Select Region</option>
           {% for region in regions %}
           <option value="{{ region.id }}">{{ region.name }}</option>
           {% endfor %}
         </select>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Pickup Area</label>
+      <select name="pickup_area" id="pickup_area" class="form-control" disabled>
+        <option value="">Select Region First</option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -344,7 +351,7 @@
       </div>
       <div>
         <label class="form-label">Delivery Region</label>
-        <select name="delivery_region" class="form-control">
+        <select name="delivery_region" id="delivery_region" class="form-control region-select">
           <option value="">Select Region</option>
           {% for region in regions %}
           <option value="{{ region.id }}">{{ region.name }}</option>
@@ -352,6 +359,14 @@
         </select>
       </div>
     </div>
+
+    <div class="form-group">
+      <label class="form-label">Delivery Area</label>
+      <select name="delivery_area" id="delivery_area" class="form-control" disabled>
+        <option value="">Select Region First</option>
+      </select>
+    </div>
+
 
     <div class="form-group">
       <label class="form-label">Delivery Instructions</label>
@@ -420,26 +435,171 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-calculate estimated cost based on weight and urgency
+    // Region and Area Selection functionality
+    const pickupRegionSelect = document.getElementById('pickup_region');
+    const pickupAreaSelect = document.getElementById('pickup_area');
+    const deliveryRegionSelect = document.getElementById('delivery_region');
+    const deliveryAreaSelect = document.getElementById('delivery_area');
+    
+    // Function to load areas for a specific region
+    function loadAreas(regionId, areaSelect) {
+        if (!regionId) {
+            areaSelect.disabled = true;
+            areaSelect.innerHTML = '<option value="">Select Region First</option>';
+            return;
+        }
+        
+        // Show loading
+        areaSelect.innerHTML = '<option value="">Loading areas...</option>';
+        areaSelect.disabled = true;
+        
+        // Fetch areas
+        fetch(`{% url 'express_pwa:get_areas_by_region' %}?region_id=${regionId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    areaSelect.innerHTML = '<option value="">Select Area (Optional)</option>';
+                    data.areas.forEach(area => {
+                        areaSelect.innerHTML += `<option value="${area.id}">${area.name}</option>`;
+                    });
+                    areaSelect.disabled = false;
+                } else {
+                    areaSelect.innerHTML = '<option value="">Error loading areas</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading areas:', error);
+                areaSelect.innerHTML = '<option value="">Error loading areas</option>';
+            });
+    }
+    
+    // Event listeners for region changes
+    pickupRegionSelect.addEventListener('change', function() {
+        loadAreas(this.value, pickupAreaSelect);
+        calculateCost();
+    });
+    
+    deliveryRegionSelect.addEventListener('change', function() {
+        loadAreas(this.value, deliveryAreaSelect);
+        calculateCost();
+    });
+    
+    // Updated cost calculation with new pricing structure
     const weightInput = document.querySelector('input[name="weight"]');
     const urgencySelect = document.querySelector('select[name="urgency"]');
-    const costInput = document.querySelector('input[name="estimated_cost"]');
     
     function calculateCost() {
         const weight = parseFloat(weightInput.value) || 1;
         const urgency = urgencySelect.value;
+        const pickupRegionId = pickupRegionSelect.value;
+        const deliveryRegionId = deliveryRegionSelect.value;
         
-        let baseCost = 20; // Base cost
-        let weightCost = Math.max(0, weight - 1) * 2; // Extra cost per kg above 1kg
-        let urgencyMultiplier = 1;
+        // Base pricing logic
+        let baseCost = 20; // Default to local delivery (GHS 20)
+        if (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId) {
+            baseCost = 40; // Cross-region delivery (GHS 40)
+        }
         
-        if (urgency === 'express') urgencyMultiplier = 1.5;
-        if (urgency === 'urgent') urgencyMultiplier = 2;
+        // Weight-based pricing
+        let weightCost = 0;
+        if (weight <= 1) {
+            // Included in base rate for 1kg
+            weightCost = 0;
+        } else if (weight <= 3) {
+            // Additional weight beyond 1kg
+            const extraWeight = weight - 1;
+            weightCost = extraWeight * (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId ? 40 : 20);
+        } else if (weight <= 5) {
+            // 3KG to 5KG: base weight cost + GHS 5
+            const baseWeight = 2; // 2kg beyond 1kg
+            weightCost = baseWeight * (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId ? 40 : 20);
+            weightCost += 5; // Additional GHS 5 for 3-5kg range
+        } else if (weight <= 10) {
+            // 5KG to 10KG: base weight cost + GHS 5 + GHS 10
+            const baseWeight = 2; // 2kg beyond 1kg
+            weightCost = baseWeight * (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId ? 40 : 20);
+            weightCost += 5; // 3-5kg range
+            weightCost += 10; // Additional GHS 10 for 5-10kg range
+        } else {
+            // Beyond 10kg: calculate proportionally
+            const baseWeight = 2; // 2kg beyond 1kg
+            weightCost = baseWeight * (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId ? 40 : 20);
+            weightCost += 5; // 3-5kg range
+            weightCost += 10; // 5-10kg range
+            // Additional weight beyond 10kg
+            const extraWeight = weight - 10;
+            weightCost += extraWeight * (pickupRegionId && deliveryRegionId && pickupRegionId !== deliveryRegionId ? 40 : 20);
+        }
         
-        const totalCost = Math.round((baseCost + weightCost) * urgencyMultiplier * 100) / 100;
-        costInput.value = totalCost.toFixed(2);
+        // Urgency-based additional charges
+        let urgencyAdditional = 0;
+        if (urgency === 'express') {
+            urgencyAdditional = 5; // Additional GHS 5 for same day
+        } else if (urgency === 'urgent') {
+            urgencyAdditional = 10; // Additional GHS 10 for 2-4 hours
+        }
+        
+        const totalCost = baseCost + weightCost + urgencyAdditional;
+        
+        // Display cost information
+        displayCostBreakdown(baseCost, weightCost, urgencyAdditional, totalCost);
     }
     
+    // Function to display cost breakdown
+    function displayCostBreakdown(baseCost, weightCost, urgencyAdditional, totalCost) {
+        // Remove existing cost display
+        const existingDisplay = document.querySelector('.cost-breakdown');
+        if (existingDisplay) {
+            existingDisplay.remove();
+        }
+        
+        // Create cost breakdown display
+        const costDisplay = document.createElement('div');
+        costDisplay.className = 'cost-breakdown';
+        costDisplay.style.cssText = `
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        `;
+        
+        costDisplay.innerHTML = `
+            <h4 style="margin: 0 0 0.5rem 0; color: #1f2937; font-size: 0.875rem; font-weight: 600;">
+                <i class="fas fa-calculator"></i> Cost Breakdown
+            </h4>
+            <div style="font-size: 0.8rem; color: #6b7280;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span>Base Rate:</span>
+                    <span>GHS ${baseCost.toFixed(2)}</span>
+                </div>
+                ${weightCost > 0 ? `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span>Weight Charges:</span>
+                    <span>GHS ${weightCost.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                ${urgencyAdditional > 0 ? `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span>Urgency Charges:</span>
+                    <span>GHS ${urgencyAdditional.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-weight: 600; color: #1f2937;">
+                    <span>Total Estimated Cost:</span>
+                    <span>GHS ${totalCost.toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+        
+        // Insert after weight input section
+        const weightSection = document.querySelector('input[name="weight"]').closest('.form-group').parentElement;
+        weightSection.parentNode.insertBefore(costDisplay, weightSection.nextSibling);
+    }
+    
+    // Event listeners for cost calculation
     weightInput.addEventListener('input', calculateCost);
     urgencySelect.addEventListener('change', calculateCost);
     

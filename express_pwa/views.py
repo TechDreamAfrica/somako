@@ -752,22 +752,80 @@ def pwa_add_item(request, order_number):
                 context = {
                     'order': order,
                     'package_types': DeliveryRequest.PACKAGE_TYPES,
-                    'urgency_levels': DeliveryRequest.URGENCY_LEVELS,
+                    'urgency_levels': [
+                        ('standard', 'Standard (24-48 hours)'),
+                        ('express', 'Same Day (+GHS 5)'),
+                        ('urgent', 'Urgent (2-4 hours) (+GHS 10)'),
+                    ],
                     'regions': DeliveryRegion.objects.filter(is_active=True).order_by('name'),
                 }
                 return render(request, 'express_pwa/add_item.html', context)
 
-            # Calculate estimated cost
-            base_cost = Decimal('25.0')
-            weight_cost = weight * Decimal('2.0')
-            urgency_multiplier = {
-                'standard': Decimal('1.0'),
-                'express': Decimal('1.5'),
-                'urgent': Decimal('2.0')
-            }
-            estimated_cost = (base_cost + weight_cost) * urgency_multiplier.get(
-                request.POST.get('urgency', 'standard'), Decimal('1.0')
-            )
+            # Calculate estimated cost with new pricing structure
+            pickup_region_id = request.POST.get('pickup_region')
+            delivery_region_id = request.POST.get('delivery_region')
+            urgency = request.POST.get('urgency', 'standard')
+            
+            # Base pricing logic
+            if pickup_region_id and delivery_region_id:
+                # Cross-region delivery
+                if pickup_region_id != delivery_region_id:
+                    base_cost = Decimal('40.0')  # GHS 40 for cross region
+                else:
+                    base_cost = Decimal('20.0')  # GHS 20 for local delivery
+            else:
+                # Default to local delivery if regions not specified
+                base_cost = Decimal('20.0')
+            
+            # Weight-based pricing
+            weight_cost = Decimal('0.0')
+            if weight <= Decimal('1.0'):
+                # Included in base rate for 1kg
+                weight_cost = Decimal('0.0')
+            elif weight <= Decimal('3.0'):
+                # Additional weight beyond 1kg at 20 GHS per kg for local, 40 for cross-region
+                if pickup_region_id and delivery_region_id and pickup_region_id != delivery_region_id:
+                    weight_cost = (weight - Decimal('1.0')) * Decimal('40.0')
+                else:
+                    weight_cost = (weight - Decimal('1.0')) * Decimal('20.0')
+            elif weight <= Decimal('5.0'):
+                # 3KG to 5KG: GHS 5 additional
+                if pickup_region_id and delivery_region_id and pickup_region_id != delivery_region_id:
+                    weight_cost = Decimal('2.0') * Decimal('40.0')  # First 2kg beyond 1kg
+                else:
+                    weight_cost = Decimal('2.0') * Decimal('20.0')  # First 2kg beyond 1kg
+                weight_cost += Decimal('5.0')  # Additional GHS 5 for 3-5kg range
+            elif weight <= Decimal('10.0'):
+                # 5KG to 10KG: GHS 10 additional
+                if pickup_region_id and delivery_region_id and pickup_region_id != delivery_region_id:
+                    weight_cost = Decimal('2.0') * Decimal('40.0')  # First 2kg beyond 1kg
+                else:
+                    weight_cost = Decimal('2.0') * Decimal('20.0')  # First 2kg beyond 1kg
+                weight_cost += Decimal('5.0')  # 3-5kg range
+                weight_cost += Decimal('10.0')  # Additional GHS 10 for 5-10kg range
+            else:
+                # Beyond 10kg: calculate proportionally
+                if pickup_region_id and delivery_region_id and pickup_region_id != delivery_region_id:
+                    weight_cost = Decimal('2.0') * Decimal('40.0')  # First 2kg beyond 1kg
+                else:
+                    weight_cost = Decimal('2.0') * Decimal('20.0')  # First 2kg beyond 1kg
+                weight_cost += Decimal('5.0')  # 3-5kg range
+                weight_cost += Decimal('10.0')  # 5-10kg range
+                # Additional weight beyond 10kg
+                extra_weight = weight - Decimal('10.0')
+                if pickup_region_id and delivery_region_id and pickup_region_id != delivery_region_id:
+                    weight_cost += extra_weight * Decimal('40.0')
+                else:
+                    weight_cost += extra_weight * Decimal('20.0')
+            
+            # Urgency-based additional charges
+            urgency_additional = Decimal('0.0')
+            if urgency == 'express':
+                urgency_additional = Decimal('5.0')  # Additional GHS 5 for same day
+            elif urgency == 'urgent':  # 2-4 hours
+                urgency_additional = Decimal('10.0')  # Additional GHS 10 for 2-4 hours
+            
+            estimated_cost = base_cost + weight_cost + urgency_additional
 
             # Add item to order
             item = ExpressOrderItem.objects.create(
@@ -782,9 +840,13 @@ def pwa_add_item(request, order_number):
                 pickup_address=request.POST.get('pickup_address').strip(),
                 pickup_landmark=request.POST.get('pickup_landmark', '').strip(),
                 pickup_instructions=request.POST.get('pickup_instructions', '').strip(),
+                pickup_region_id=pickup_region_id if pickup_region_id else None,
+                pickup_area_id=request.POST.get('pickup_area') if request.POST.get('pickup_area') else None,
                 delivery_address=request.POST.get('delivery_address').strip(),
                 delivery_landmark=request.POST.get('delivery_landmark', '').strip(),
                 delivery_instructions=request.POST.get('delivery_instructions', '').strip(),
+                delivery_region_id=delivery_region_id if delivery_region_id else None,
+                delivery_area_id=request.POST.get('delivery_area') if request.POST.get('delivery_area') else None,
                 estimated_cost=estimated_cost,
                 status='pending'
             )
@@ -802,7 +864,11 @@ def pwa_add_item(request, order_number):
     context = {
         'order': order,
         'package_types': DeliveryRequest.PACKAGE_TYPES,
-        'urgency_levels': DeliveryRequest.URGENCY_LEVELS,
+        'urgency_levels': [
+            ('standard', 'Standard (24-48 hours)'),
+            ('express', 'Same Day (+GHS 5)'),
+            ('urgent', 'Urgent (2-4 hours) (+GHS 10)'),
+        ],
         'regions': DeliveryRegion.objects.filter(is_active=True).order_by('name'),
     }
     return render(request, 'express_pwa/add_item.html', context)
@@ -1236,3 +1302,26 @@ def pwa_order_tracking(request):
         ]
     }
     return render(request, 'express_pwa/order_tracking.html', context)
+
+
+@pwa_login_required(pwa_app='express')
+def get_areas_by_region(request):
+    """AJAX endpoint to get delivery areas for a specific region"""
+    region_id = request.GET.get('region_id')
+    
+    if not region_id:
+        return JsonResponse({'success': False, 'message': 'Region ID is required'})
+    
+    try:
+        region = DeliveryRegion.objects.get(id=region_id, is_active=True)
+        areas = list(region.areas.filter(is_active=True).values('id', 'name'))
+        
+        return JsonResponse({
+            'success': True,
+            'areas': areas
+        })
+    
+    except DeliveryRegion.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Region not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})

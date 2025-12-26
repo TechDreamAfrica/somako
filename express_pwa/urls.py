@@ -80,6 +80,9 @@ urlpatterns = [
     path('orders/<str:order_number>/assign-driver/', views.pwa_assign_driver, name='assign_driver'),
     path('orders/<str:order_number>/update-status/', views.pwa_update_order_status, name='update_order_status'),
     path('orders/<str:order_number>/delete/', views.pwa_delete_order, name='delete_order'),
+    
+    # AJAX endpoints
+    path('ajax/get-areas/', views.get_areas_by_region, name='get_areas_by_region'),
 
     # Rider Order Management
     path('rider/order/<int:order_id>/', views_rider.order_detail_rider, name='order_detail_rider'),
