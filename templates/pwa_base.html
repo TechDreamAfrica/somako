@@ -400,57 +400,55 @@
   </div>
 
   <!-- App Switcher FAB - Only for General Users -->
-  {% if user.is_authenticated and not user.is_staff and not user.is_superuser %}
-    {% if 'general' in user.get_roles_list %}
-  <div class="fab-container">
-    <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
-      <i class="fas fa-th-large"></i>
-    </button>
-    
-    <div class="fab-menu" id="fabMenu">
-      <div style="font-weight: 700; color: #1f2937; margin-bottom: 1rem; font-size: 0.875rem; text-align: center;">
-        <i class="fas fa-rocket me-2"></i>Switch Apps
+  {% if user.is_authenticated and 'general' in user.get_roles_list %}
+    <div class="fab-container">
+      <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
+        <i class="fas fa-th-large"></i>
+      </button>
+      
+      <div class="fab-menu" id="fabMenu">
+        <div style="font-weight: 700; color: #1f2937; margin-bottom: 1rem; font-size: 0.875rem; text-align: center;">
+          <i class="fas fa-rocket me-2"></i>Switch Apps
+        </div>
+        
+        <a href="/pwa/food/" class="fab-menu-item">
+          <i class="fas fa-utensils" style="color: #ef4444;"></i>
+          <span>Food Delivery</span>
+        </a>
+        
+        <a href="/pwa/shop/" class="fab-menu-item">
+          <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i>
+          <span>Shop</span>
+        </a>
+        
+        {% comment %} <a href="/pwa/pharmacy/" class="fab-menu-item">
+          <i class="fas fa-pills" style="color: #10b981;"></i>
+          <span>Pharmacy</span>
+        </a> {% endcomment %}
+        
+        <a href="/pwa/rent/" class="fab-menu-item">
+          <i class="fas fa-tools" style="color: #f59e0b;"></i>
+          <span>Equipment Rental</span>
+        </a>
+        
+        <a href="/pwa/ride/" class="fab-menu-item">
+          <i class="fas fa-car" style="color: #8b5cf6;"></i>
+          <span>Ride Share</span>
+        </a>
+        
+        <a href="/pwa/express/" class="fab-menu-item">
+          <i class="fas fa-shipping-fast" style="color: #06b6d4;"></i>
+          <span>Express Delivery</span>
+        </a>
+        
+        <div class="fab-menu-divider"></div>
+        
+        {% comment %} <a href="/" class="fab-menu-item">
+          <i class="fas fa-globe" style="color: #6b7280;"></i>
+          <span>Main Website</span>
+        </a> {% endcomment %}
       </div>
-      
-      <a href="/pwa/food/" class="fab-menu-item">
-        <i class="fas fa-utensils" style="color: #ef4444;"></i>
-        <span>Food Delivery</span>
-      </a>
-      
-      <a href="/pwa/shop/" class="fab-menu-item">
-        <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i>
-        <span>Shop</span>
-      </a>
-      
-      {% comment %} <a href="/pwa/pharmacy/" class="fab-menu-item">
-        <i class="fas fa-pills" style="color: #10b981;"></i>
-        <span>Pharmacy</span>
-      </a> {% endcomment %}
-      
-      <a href="/pwa/rent/" class="fab-menu-item">
-        <i class="fas fa-tools" style="color: #f59e0b;"></i>
-        <span>Equipment Rental</span>
-      </a>
-      
-      <a href="/pwa/ride/" class="fab-menu-item">
-        <i class="fas fa-car" style="color: #8b5cf6;"></i>
-        <span>Ride Share</span>
-      </a>
-      
-      <a href="/pwa/express/" class="fab-menu-item">
-        <i class="fas fa-shipping-fast" style="color: #06b6d4;"></i>
-        <span>Express Delivery</span>
-      </a>
-      
-      <div class="fab-menu-divider"></div>
-      
-      {% comment %} <a href="/" class="fab-menu-item">
-        <i class="fas fa-globe" style="color: #6b7280;"></i>
-        <span>Main Website</span>
-      </a> {% endcomment %}
     </div>
-  </div>
-  {% endif %}
   {% endif %}
 
   <!-- Bottom Navigation -->
