@@ -60,8 +60,8 @@ def home(request):
 
     # RIDE APP DATA
     total_drivers = DriverProfile.objects.filter(
-        status='approved',
-        availability='available'
+        status='APPROVED',
+        availability='ONLINE'
     ).count()
 
     total_rides = Ride.objects.filter(status='completed').count()

@@ -165,10 +165,12 @@
                   <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
                     <!-- Driver Photo -->
                     <div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
-                      {% if driver.profile_photo %}
-                      <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                      {% elif driver.user.profile_picture %}
-                      <img src="{{ driver.user.profile_picture.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% if driver.profile_photo and driver.profile_photo.name %}
+                      <img src="{{ driver.profile_photo.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                      <i class="fas fa-user" style="color: #6b7280; font-size: 1.5rem; display: none;"></i>
+                      {% elif driver.user.profile_picture and driver.user.profile_picture.name %}
+                      <img src="{{ driver.user.profile_picture.url }}" alt="{{ driver.user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                      <i class="fas fa-user" style="color: #6b7280; font-size: 1.5rem; display: none;"></i>
                       {% else %}
                       <i class="fas fa-user" style="color: #6b7280; font-size: 1.5rem;"></i>
                       {% endif %}
