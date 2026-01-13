@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Medicine - Soma Ko Pharmacy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'pharmacy:owner_medicine_list' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="mb-0">{{ action }} Medicine</h2>
+                    <p class="text-muted mb-0">{% if action == 'Create' %}Add a new medicine to your inventory{% else %}Update medicine information{% endif %}</p>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Basic Information -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Medicine Name *</label>
+                                        {{ form.name }}
+                                        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Generic Name</label>
+                                        {{ form.generic_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Brand Name</label>
+                                        {{ form.brand_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Category *</label>
+                                        {{ form.category }}
+                                        {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dosage Form *</label>
+                                        {{ form.dosage_form }}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Description *</label>
+                                        {{ form.description }}
+                                        {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Information -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-medkit text-primary me-2"></i>Medical Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dosage *</label>
+                                        {{ form.dosage }}
+                                        <small class="text-muted">e.g., 500mg, 10ml</small>
+                                        {% if form.dosage.errors %}<div class="text-danger small">{{ form.dosage.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Pack Size</label>
+                                        {{ form.pack_size }}
+                                        <small class="text-muted">e.g., 10 tablets, 100ml</small>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Usage Instructions *</label>
+                                        {{ form.usage }}
+                                        {% if form.usage.errors %}<div class="text-danger small">{{ form.usage.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Active Ingredients *</label>
+                                        {{ form.active_ingredients }}
+                                        {% if form.active_ingredients.errors %}<div class="text-danger small">{{ form.active_ingredients.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Side Effects</label>
+                                        {{ form.side_effects }}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Warnings</label>
+                                        {{ form.warnings }}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Storage Instructions</label>
+                                        {{ form.storage_instructions }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prescription Requirements -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-file-prescription text-primary me-2"></i>Prescription Requirements</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            {{ form.requires_prescription }}
+                                            <label class="form-check-label" for="id_requires_prescription">
+                                                Requires Prescription
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Prescription Type</label>
+                                        {{ form.prescription_type }}
+                                        <small class="text-muted">e.g., Regular, Controlled substance</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-box text-primary me-2"></i>Product Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Manufacturer *</label>
+                                        {{ form.manufacturer }}
+                                        {% if form.manufacturer.errors %}<div class="text-danger small">{{ form.manufacturer.errors.0 }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Country of Origin</label>
+                                        {{ form.country_of_origin }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Batch Number</label>
+                                        {{ form.batch_number }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Expiry Date</label>
+                                        {{ form.expiry_date }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Pricing & Stock -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-tag text-primary me-2"></i>Pricing & Stock</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Price (GHS) *</label>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Price (GHS)</label>
+                                    {{ form.discount_price }}
+                                    <small class="text-muted">Leave empty if no discount</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Quantity *</label>
+                                    {{ form.stock_quantity }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Low Stock Alert Threshold</label>
+                                    {{ form.low_stock_threshold }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Images -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-image text-primary me-2"></i>Images</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Main Image</label>
+                                    {{ form.image }}
+                                    {% if medicine and medicine.image %}
+                                    <div class="mt-2">
+                                        <img src="{{ medicine.image.url }}" alt="Current image" class="img-thumbnail" style="max-height: 100px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image 2</label>
+                                    {{ form.image_2 }}
+                                    {% if medicine and medicine.image_2 %}
+                                    <div class="mt-2">
+                                        <img src="{{ medicine.image_2.url }}" alt="Image 2" class="img-thumbnail" style="max-height: 100px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Image 3</label>
+                                    {{ form.image_3 }}
+                                    {% if medicine and medicine.image_3 %}
+                                    <div class="mt-2">
+                                        <img src="{{ medicine.image_3.url }}" alt="Image 3" class="img-thumbnail" style="max-height: 100px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-toggle-on text-primary me-2"></i>Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="id_is_active">Active (visible to customers)</label>
+                                </div>
+                                <div class="form-check">
+                                    {{ form.is_featured }}
+                                    <label class="form-check-label" for="id_is_featured">Featured medicine</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>{{ action }} Medicine
+                            </button>
+                            <a href="{% url 'pharmacy:owner_medicine_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

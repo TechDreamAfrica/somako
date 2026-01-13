@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Medicines - Soma Ko Pharmacy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">My Medicines</h2>
+            <p class="text-muted mb-0">Manage your medicine inventory</p>
+        </div>
+        <a href="{% url 'pharmacy:owner_medicine_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Medicine
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Total Medicines</h6>
+                            <h3 class="mb-0">{{ total_medicines }}</h3>
+                        </div>
+                        <i class="fas fa-pills fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Active</h6>
+                            <h3 class="mb-0">{{ active_medicines }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Low Stock</h6>
+                            <h3 class="mb-0">{{ low_stock }}</h3>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medicines List -->
+    {% if medicines %}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medicine in medicines %}
+                    <tr>
+                        <td>
+                            {% if medicine.image %}
+                            <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-pills text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ medicine.name }}</strong>
+                            {% if medicine.requires_prescription %}
+                            <span class="badge bg-danger ms-1">Rx</span>
+                            {% endif %}
+                            {% if medicine.is_featured %}
+                            <span class="badge bg-warning text-dark ms-1">Featured</span>
+                            {% endif %}
+                            <br>
+                            <small class="text-muted">{{ medicine.generic_name|default:medicine.brand_name }}</small>
+                        </td>
+                        <td>{{ medicine.category.name|default:"-" }}</td>
+                        <td>
+                            {% if medicine.discount_price %}
+                            <span class="text-decoration-line-through text-muted">GHS {{ medicine.price }}</span><br>
+                            <span class="text-success fw-bold">GHS {{ medicine.discount_price }}</span>
+                            {% else %}
+                            <span class="fw-bold">GHS {{ medicine.price }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="{% if medicine.is_low_stock %}text-warning{% elif medicine.stock_quantity == 0 %}text-danger{% else %}text-success{% endif %}">
+                                {{ medicine.stock_quantity }}
+                            </span>
+                            {% if medicine.is_low_stock %}
+                            <i class="fas fa-exclamation-circle text-warning ms-1" title="Low stock"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if medicine.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if medicine.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'pharmacy:owner_medicine_detail' pk=medicine.pk %}" class="btn btn-outline-primary" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'pharmacy:owner_medicine_update' pk=medicine.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'pharmacy:owner_medicine_toggle' pk=medicine.pk %}" class="btn btn-outline-warning" title="Toggle Status">
+                                    <i class="fas fa-power-off"></i>
+                                </a>
+                                <a href="{% url 'pharmacy:owner_medicine_delete' pk=medicine.pk %}" class="btn btn-outline-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-pills fa-4x text-muted mb-3"></i>
+            <h4>No Medicines Yet</h4>
+            <p class="text-muted">Start by adding your first medicine</p>
+            <a href="{% url 'pharmacy:owner_medicine_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Your First Medicine
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ medicine.name }} - Soma Ko Pharmacy{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex align-items-center">
+            <a href="{% url 'pharmacy:owner_medicine_list' %}" class="btn btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1">{{ medicine.name }}</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge {% if medicine.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if medicine.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                    {% if medicine.requires_prescription %}
+                    <span class="badge bg-danger">Prescription Required</span>
+                    {% endif %}
+                    {% if medicine.is_featured %}
+                    <span class="badge bg-warning text-dark">Featured</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <a href="{% url 'pharmacy:owner_medicine_update' pk=medicine.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'pharmacy:owner_medicine_toggle' pk=medicine.pk %}" class="btn btn-outline-warning">
+                <i class="fas fa-power-off me-2"></i>Toggle
+            </a>
+            <a href="{% url 'pharmacy:owner_medicine_delete' pk=medicine.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Images -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if medicine.image %}
+                            <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}" class="img-fluid rounded">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-pills fa-5x text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row g-2">
+                                {% if medicine.image_2 %}
+                                <div class="col-6">
+                                    <img src="{{ medicine.image_2.url }}" alt="{{ medicine.name }}" class="img-fluid rounded">
+                                </div>
+                                {% endif %}
+                                {% if medicine.image_3 %}
+                                <div class="col-6">
+                                    <img src="{{ medicine.image_3.url }}" alt="{{ medicine.name }}" class="img-fluid rounded">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ medicine.description }}</p>
+                </div>
+            </div>
+
+            <!-- Medical Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-medkit text-primary me-2"></i>Medical Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Usage</h6>
+                            <p>{{ medicine.usage }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Active Ingredients</h6>
+                            <p>{{ medicine.active_ingredients }}</p>
+                        </div>
+                        {% if medicine.side_effects %}
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Side Effects</h6>
+                            <p class="text-warning">{{ medicine.side_effects }}</p>
+                        </div>
+                        {% endif %}
+                        {% if medicine.warnings %}
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Warnings</h6>
+                            <p class="text-danger">{{ medicine.warnings }}</p>
+                        </div>
+                        {% endif %}
+                        {% if medicine.storage_instructions %}
+                        <div class="col-12">
+                            <h6 class="text-muted mb-1">Storage Instructions</h6>
+                            <p>{{ medicine.storage_instructions }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Pricing -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tag text-primary me-2"></i>Pricing</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicine.discount_price %}
+                    <h3 class="text-success mb-1">GHS {{ medicine.discount_price }}</h3>
+                    <p class="text-decoration-line-through text-muted mb-0">GHS {{ medicine.price }}</p>
+                    <span class="badge bg-success">{{ medicine.discount_percentage }}% OFF</span>
+                    {% else %}
+                    <h3 class="mb-0">GHS {{ medicine.price }}</h3>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Stock -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-boxes text-primary me-2"></i>Stock</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Current Stock</span>
+                        <span class="fw-bold {% if medicine.is_low_stock %}text-warning{% elif medicine.stock_quantity == 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ medicine.stock_quantity }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Low Stock Alert</span>
+                        <span>{{ medicine.low_stock_threshold }}</span>
+                    </div>
+                    {% if medicine.is_low_stock %}
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Stock is running low!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-box text-primary me-2"></i>Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td class="text-muted">Category</td>
+                            <td class="fw-bold">{{ medicine.category.name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Dosage</td>
+                            <td>{{ medicine.dosage }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Form</td>
+                            <td>{{ medicine.get_dosage_form_display }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Pack Size</td>
+                            <td>{{ medicine.pack_size|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Manufacturer</td>
+                            <td>{{ medicine.manufacturer }}</td>
+                        </tr>
+                        {% if medicine.country_of_origin %}
+                        <tr>
+                            <td class="text-muted">Origin</td>
+                            <td>{{ medicine.country_of_origin }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if medicine.batch_number %}
+                        <tr>
+                            <td class="text-muted">Batch</td>
+                            <td>{{ medicine.batch_number }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if medicine.expiry_date %}
+                        <tr>
+                            <td class="text-muted">Expiry</td>
+                            <td class="{% if medicine.is_expired %}text-danger{% endif %}">
+                                {{ medicine.expiry_date|date:"M d, Y" }}
+                                {% if medicine.is_expired %}<span class="badge bg-danger">Expired</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar text-primary me-2"></i>Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Views</span>
+                        <span class="fw-bold">{{ medicine.views_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Rating</span>
+                        <span>
+                            <i class="fas fa-star text-warning"></i>
+                            {{ medicine.average_rating|floatformat:1 }} ({{ medicine.review_count }})
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Added</span>
+                        <span>{{ medicine.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
