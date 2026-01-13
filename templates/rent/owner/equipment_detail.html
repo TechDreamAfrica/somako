@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ equipment.name }} - Soma Ko Rent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-secondary me-3">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="h3 mb-0">{{ equipment.name }}</h1>
+        <p class="text-muted mb-0">
+          <span class="badge {% if equipment.is_available %}bg-success{% else %}bg-warning{% endif %}">
+            {% if equipment.is_available %}Available{% else %}Unavailable{% endif %}
+          </span>
+        </p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'rent:owner_equipment_update' equipment.pk %}" class="btn btn-primary">
+        <i class="fas fa-edit me-2"></i>Edit
+      </a>
+      <a href="{% url 'rent:owner_equipment_toggle' equipment.pk %}?next={{ request.path }}" class="btn {% if equipment.is_available %}btn-warning{% else %}btn-success{% endif %}">
+        <i class="fas fa-power-off me-2"></i>{% if equipment.is_available %}Mark Unavailable{% else %}Mark Available{% endif %}
+      </a>
+      <a href="{% url 'rent:owner_equipment_delete' equipment.pk %}" class="btn btn-outline-danger">
+        <i class="fas fa-trash"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Equipment Details -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="position-relative">
+          {% if equipment.main_image %}
+          <img src="{{ equipment.main_image.url }}" class="card-img-top" alt="{{ equipment.name }}" style="height: 350px; object-fit: cover;">
+          {% else %}
+          <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 350px;">
+            <i class="fas fa-tools fa-5x text-muted"></i>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <h4 class="text-success mb-3">GHS {{ equipment.price_per_period|floatformat:2 }} / {{ equipment.get_rental_period_display }}</h4>
+          
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p class="mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i><strong>Location:</strong> {{ equipment.city }}, {{ equipment.region }}</p>
+              <p class="mb-2"><i class="fas fa-layer-group text-primary me-2"></i><strong>Category:</strong> {{ equipment.category.name|default:'N/A' }}</p>
+              <p class="mb-2"><i class="fas fa-check-circle text-success me-2"></i><strong>Condition:</strong> {{ equipment.get_condition_display }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-2"><i class="fas fa-industry text-secondary me-2"></i><strong>Brand:</strong> {{ equipment.brand|default:'N/A' }}</p>
+              <p class="mb-2"><i class="fas fa-cog text-secondary me-2"></i><strong>Model:</strong> {{ equipment.model|default:'N/A' }}</p>
+              <p class="mb-2"><i class="fas fa-boxes text-warning me-2"></i><strong>Quantity:</strong> {{ equipment.quantity_available }}</p>
+            </div>
+          </div>
+          
+          {% if equipment.security_deposit %}
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-shield-alt me-2"></i><strong>Security Deposit:</strong> GHS {{ equipment.security_deposit|floatformat:2 }}
+          </div>
+          {% endif %}
+          
+          <h5>Description</h5>
+          <p>{{ equipment.description }}</p>
+          
+          {% if equipment.specifications %}
+          <h5>Specifications</h5>
+          <p class="text-muted">{{ equipment.specifications }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats & Recent Bookings -->
+    <div class="col-lg-4">
+      <!-- Stats -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-chart-bar text-primary me-2"></i>Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">Total Bookings</span>
+            <span class="fw-bold">{{ total_bookings }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">Active Bookings</span>
+            <span class="fw-bold text-success">{{ active_bookings }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Views</span>
+            <span class="fw-bold">{{ equipment.views_count|default:0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-calendar-alt text-warning me-2"></i>Recent Bookings</h5>
+          <a href="{% url 'rent:owner_booking_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body p-0">
+          {% if bookings %}
+          <ul class="list-group list-group-flush">
+            {% for booking in bookings %}
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold">{{ booking.customer.get_full_name|default:booking.customer.username }}</div>
+                  <div class="text-muted small">{{ booking.start_date|date:"M d" }} - {{ booking.end_date|date:"M d, Y" }}</div>
+                </div>
+                <span class="badge 
+                  {% if booking.status == 'pending' %}bg-warning
+                  {% elif booking.status == 'confirmed' %}bg-info
+                  {% elif booking.status == 'active' %}bg-primary
+                  {% elif booking.status == 'completed' %}bg-success
+                  {% else %}bg-secondary{% endif %}">
+                  {{ booking.status|title }}
+                </span>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="text-center py-4 text-muted">
+            <i class="fas fa-calendar-times fa-2x mb-2"></i>
+            <p class="mb-0">No bookings yet</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

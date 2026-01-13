@@ -1,0 +1,350 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Edit Equipment - Soma Ko Rent{% endblock %}
+{% block theme_color %}#10b981{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    flex: 1;
+  }
+  
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #10b981;
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-check input {
+    width: 20px;
+    height: 20px;
+    accent-color: #10b981;
+  }
+  
+  .current-image {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .current-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 6rem;
+  }
+  
+  .submit-btn:active {
+    transform: scale(0.98);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-header">
+  <a href="{% url 'rent_pwa:manage_equipment' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <h1 class="form-title">Edit Equipment</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data" style="padding: 0 1rem;">
+  {% csrf_token %}
+  
+  <!-- Basic Information -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-info-circle"></i>
+      Basic Information
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Equipment Name</label>
+      <input type="text" name="name" class="form-control" value="{{ equipment.name }}" required>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Category</label>
+      <select name="category" class="form-control" required>
+        <option value="">Select Category</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if equipment.category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Description</label>
+      <textarea name="description" class="form-control" required>{{ equipment.description }}</textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Listing Type</label>
+      <select name="listing_type" class="form-control" required>
+        <option value="for_rent" {% if equipment.listing_type == 'for_rent' %}selected{% endif %}>For Rent</option>
+        <option value="for_sale" {% if equipment.listing_type == 'for_sale' %}selected{% endif %}>For Sale</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Equipment Details -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-tools"></i>
+      Equipment Details
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Brand</label>
+        <input type="text" name="brand" class="form-control" value="{{ equipment.brand|default:'' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <input type="text" name="model" class="form-control" value="{{ equipment.model|default:'' }}">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Condition</label>
+      <select name="condition" class="form-control" required>
+        <option value="new" {% if equipment.condition == 'new' %}selected{% endif %}>New</option>
+        <option value="excellent" {% if equipment.condition == 'excellent' %}selected{% endif %}>Excellent</option>
+        <option value="good" {% if equipment.condition == 'good' %}selected{% endif %}>Good</option>
+        <option value="fair" {% if equipment.condition == 'fair' %}selected{% endif %}>Fair</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Specifications</label>
+      <textarea name="specifications" class="form-control">{{ equipment.specifications|default:'' }}</textarea>
+    </div>
+  </div>
+  
+  <!-- Location -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-map-marker-alt"></i>
+      Location
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">City</label>
+        <input type="text" name="city" class="form-control" value="{{ equipment.city }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Region</label>
+        <input type="text" name="region" class="form-control" value="{{ equipment.region }}" required>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Pricing -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-tag"></i>
+      Pricing
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">Price (GHS)</label>
+        <input type="number" name="price_per_period" class="form-control" step="0.01" min="0.01" value="{{ equipment.price_per_period }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Rental Period</label>
+        <select name="rental_period" class="form-control" required>
+          <option value="hourly" {% if equipment.rental_period == 'hourly' %}selected{% endif %}>Per Hour</option>
+          <option value="daily" {% if equipment.rental_period == 'daily' %}selected{% endif %}>Per Day</option>
+          <option value="weekly" {% if equipment.rental_period == 'weekly' %}selected{% endif %}>Per Week</option>
+          <option value="monthly" {% if equipment.rental_period == 'monthly' %}selected{% endif %}>Per Month</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Security Deposit (GHS)</label>
+        <input type="number" name="security_deposit" class="form-control" step="0.01" min="0" value="{{ equipment.security_deposit|default:'' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Quantity Available</label>
+        <input type="number" name="quantity_available" class="form-control" min="0" value="{{ equipment.quantity_available }}" required>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Image Upload -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-image"></i>
+      Equipment Image
+    </div>
+    
+    {% if equipment.main_image %}
+    <div class="current-image">
+      <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}">
+      <div>
+        <div style="font-weight: 600;">Current Image</div>
+        <div style="font-size: 0.75rem; color: #6b7280;">Upload new image to replace</div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+      <label class="form-label">Upload New Image</label>
+      <input type="file" name="main_image" class="form-control" accept="image/*">
+    </div>
+  </div>
+  
+  <!-- Availability -->
+  <div class="form-section">
+    <div class="form-check">
+      <input type="checkbox" name="is_available" id="is_available" {% if equipment.is_available %}checked{% endif %}>
+      <label for="is_available">Available for booking</label>
+    </div>
+  </div>
+  
+  <button type="submit" class="submit-btn">
+    <i class="fas fa-save"></i>
+    Save Changes
+  </button>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_equipment' %}" class="bottom-nav-item active">
+    <i class="fas fa-tools"></i>
+    <span>Equipment</span>
+  </a>
+  <a href="{% url 'rent_pwa:add_equipment' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Add</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_bookings' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

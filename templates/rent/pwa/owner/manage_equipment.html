@@ -1,0 +1,251 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Manage Equipment - Soma Ko Rent{% endblock %}
+{% block theme_color %}#10b981{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1rem;
+    margin: -1rem -1rem 1rem -1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .search-box {
+    padding: 0 1rem 1rem;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #10b981;
+  }
+  
+  .equipment-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .equipment-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .equipment-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .equipment-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .equipment-name {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .equipment-location {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+  
+  .equipment-price {
+    font-weight: 700;
+    color: #10b981;
+  }
+  
+  .equipment-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  
+  .status-available { background: #d1fae5; color: #065f46; }
+  .status-unavailable { background: #fee2e2; color: #991b1b; }
+  
+  .equipment-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+  
+  .action-edit { background: #dbeafe; color: #2563eb; }
+  .action-view { background: #ede9fe; color: #7c3aed; }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #d1d5db;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">My Equipment</h1>
+  <a href="{% url 'rent_pwa:add_equipment' %}" class="add-btn">
+    <i class="fas fa-plus"></i>
+    Add New
+  </a>
+</div>
+
+<!-- Search -->
+<div class="search-box">
+  <div style="position: relative;">
+    <input type="text" class="search-input" placeholder="Search equipment..." id="searchInput">
+    <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+  </div>
+</div>
+
+<!-- Equipment List -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  {% if equipment %}
+    {% for item in equipment %}
+    <div class="equipment-card" data-name="{{ item.name|lower }}">
+      <div class="equipment-image">
+        {% if item.main_image %}
+        <img src="{{ item.main_image.url }}" alt="{{ item.name }}">
+        {% else %}
+        <i class="fas fa-tools" style="font-size: 1.5rem; color: #10b981;"></i>
+        {% endif %}
+      </div>
+      
+      <div class="equipment-info">
+        <div class="equipment-name">{{ item.name }}</div>
+        <div class="equipment-location">
+          <i class="fas fa-map-marker-alt"></i> {{ item.city }}, {{ item.region }}
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="equipment-price">GHS {{ item.price_per_period|floatformat:2 }}/{{ item.get_rental_period_display }}</span>
+          <span class="equipment-status {% if item.is_available %}status-available{% else %}status-unavailable{% endif %}">
+            {% if item.is_available %}Available{% else %}Unavailable{% endif %}
+          </span>
+        </div>
+      </div>
+      
+      <div class="equipment-actions">
+        <a href="{% url 'rent_pwa:edit_equipment' item.id %}" class="action-btn action-edit" title="Edit">
+          <i class="fas fa-edit"></i>
+        </a>
+        <a href="{% url 'rent_pwa:equipment_detail' item.id %}" class="action-btn action-view" title="View">
+          <i class="fas fa-eye"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-tools"></i>
+      <h3>No Equipment Yet</h3>
+      <p>Add your first equipment to get started</p>
+      <a href="{% url 'rent_pwa:add_equipment' %}" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: #10b981; color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        <i class="fas fa-plus me-2"></i>Add Equipment
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll('.equipment-card').forEach(card => {
+    const name = card.dataset.name;
+    card.style.display = name.includes(query) ? 'flex' : 'none';
+  });
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_equipment' %}" class="bottom-nav-item active">
+    <i class="fas fa-tools"></i>
+    <span>Equipment</span>
+  </a>
+  <a href="{% url 'rent_pwa:add_equipment' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Add</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_bookings' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

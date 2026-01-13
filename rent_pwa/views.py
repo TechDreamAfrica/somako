@@ -316,16 +316,17 @@ def pwa_search(request):
 @login_required
 def pwa_owner_dashboard(request):
     """Equipment owner dashboard"""
-    # Check if user has equipment_owner role
-    if not request.user.has_role('equipment_owner'):
-        messages.error(request, 'You need to be an equipment owner to access this page.')
+    # Check if user has landlord or equipment_owner role
+    if not (request.user.has_role('landlord') or request.user.has_role('equipment_owner')):
+        messages.error(request, 'You need to be a landlord or equipment owner to access this page.')
         return redirect('rent_pwa:dashboard')
     
     equipment = Equipment.objects.filter(owner=request.user)
 
-    if not equipment.exists():
-        messages.info(request, 'You do not have any equipment listed.')
-        return redirect('rent_pwa:dashboard')
+    # Allow access even if no equipment - user might want to add their first equipment
+    # if not equipment.exists():
+    #     messages.info(request, 'You do not have any equipment listed.')
+    #     return redirect('rent_pwa:dashboard')
 
     today = date.today()
 
@@ -361,9 +362,9 @@ def pwa_owner_dashboard(request):
 @login_required
 def pwa_manage_equipment(request):
     """Manage equipment"""
-    # Check if user has equipment_owner role
-    if not request.user.has_role('equipment_owner'):
-        messages.error(request, 'You need to be an equipment owner to manage equipment.')
+    # Check if user has landlord or equipment_owner role
+    if not (request.user.has_role('landlord') or request.user.has_role('equipment_owner')):
+        messages.error(request, 'You need to be a landlord or equipment owner to manage equipment.')
         return redirect('rent_pwa:dashboard')
     
     equipment = Equipment.objects.filter(owner=request.user).order_by('-created_at')
@@ -377,9 +378,9 @@ def pwa_manage_equipment(request):
 @login_required
 def pwa_add_equipment(request):
     """Add new equipment"""
-    # Check if user has equipment_owner role
-    if not request.user.has_role('equipment_owner'):
-        messages.error(request, 'You need to be an equipment owner to add equipment.')
+    # Check if user has landlord or equipment_owner role
+    if not (request.user.has_role('landlord') or request.user.has_role('equipment_owner')):
+        messages.error(request, 'You need to be a landlord or equipment owner to add equipment.')
         return redirect('rent_pwa:dashboard')
     
     if request.method == 'POST':
@@ -434,7 +435,7 @@ def pwa_manage_bookings(request):
         return redirect('rent_pwa:dashboard')
     
     bookings = RentalBooking.objects.filter(
-        Q(property__owner=request.user) | Q(equipment__owner=request.user)
+        equipment__owner=request.user
     ).order_by('-created_at')
 
     # Filter by status
@@ -457,15 +458,10 @@ def pwa_booking_detail_owner(request, booking_id):
         pk=booking_id
     )
 
-    # Verify ownership
-    if booking.property:
-        if booking.property.owner != request.user:
-            messages.error(request, 'Access denied.')
-            return redirect('rent_pwa:owner_dashboard')
-    elif booking.equipment:
-        if booking.equipment.owner != request.user:
-            messages.error(request, 'Access denied.')
-            return redirect('rent_pwa:owner_dashboard')
+    # Verify ownership - only equipment bookings supported
+    if booking.equipment.owner != request.user:
+        messages.error(request, 'Access denied.')
+        return redirect('rent_pwa:owner_dashboard')
 
     context = {
         'booking': booking,
@@ -478,14 +474,8 @@ def pwa_update_booking_status(request, booking_id):
     """Update booking status"""
     booking = get_object_or_404(RentalBooking, pk=booking_id)
 
-    # Verify ownership
-    is_owner = False
-    if booking.property and booking.property.owner == request.user:
-        is_owner = True
-    elif booking.equipment and booking.equipment.owner == request.user:
-        is_owner = True
-
-    if not is_owner:
+    # Verify ownership - only equipment bookings supported
+    if booking.equipment.owner != request.user:
         messages.error(request, 'Access denied.')
         return redirect('rent_pwa:owner_dashboard')
 

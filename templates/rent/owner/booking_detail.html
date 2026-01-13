@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking #{{ booking.id }} - Soma Ko Rent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center mb-4">
+    <a href="{% url 'rent:owner_booking_list' %}" class="btn btn-outline-secondary me-3">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+    <div>
+      <h1 class="h3 mb-0">Booking #{{ booking.id }}</h1>
+      <span class="badge 
+        {% if booking.status == 'pending' %}bg-warning
+        {% elif booking.status == 'confirmed' %}bg-info
+        {% elif booking.status == 'active' %}bg-primary
+        {% elif booking.status == 'completed' %}bg-success
+        {% else %}bg-secondary{% endif %} fs-6">
+        {{ booking.status|title }}
+      </span>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Booking Details -->
+    <div class="col-lg-8">
+      <!-- Equipment Info -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-tools text-primary me-2"></i>Equipment Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex">
+            {% if booking.equipment.main_image %}
+            <img src="{{ booking.equipment.main_image.url }}" class="rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
+            {% else %}
+            <div class="rounded bg-light me-3 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+              <i class="fas fa-tools fa-2x text-muted"></i>
+            </div>
+            {% endif %}
+            <div>
+              <h5 class="mb-1">{{ booking.equipment.name }}</h5>
+              <p class="text-muted mb-1">
+                <i class="fas fa-map-marker-alt me-1"></i>{{ booking.equipment.city }}, {{ booking.equipment.region }}
+              </p>
+              <p class="text-success mb-0 fw-bold">
+                GHS {{ booking.equipment.price_per_period|floatformat:2 }} / {{ booking.equipment.get_rental_period_display }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Info -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-user text-info me-2"></i>Customer Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="mb-2"><strong>Name:</strong> {{ booking.customer.get_full_name|default:booking.customer.username }}</p>
+              <p class="mb-2"><strong>Email:</strong> {{ booking.customer.email }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-2"><strong>Phone:</strong> {{ booking.customer.phone_number|default:'N/A' }}</p>
+              <p class="mb-2"><strong>Booked On:</strong> {{ booking.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Period -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-calendar text-warning me-2"></i>Rental Period</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="text-muted small">Start Date</div>
+              <div class="h5">{{ booking.start_date|date:"M d, Y" }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-muted small">End Date</div>
+              <div class="h5">{{ booking.end_date|date:"M d, Y" }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-muted small">Duration</div>
+              <div class="h5">{{ booking.duration_days }} day(s)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      {% if booking.notes %}
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-sticky-note text-secondary me-2"></i>Notes</h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-0">{{ booking.notes }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Payment Summary -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-receipt text-success me-2"></i>Payment Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Rental Amount</span>
+            <span>GHS {{ booking.rental_amount|floatformat:2 }}</span>
+          </div>
+          {% if booking.security_deposit %}
+          <div class="d-flex justify-content-between mb-2">
+            <span>Security Deposit</span>
+            <span>GHS {{ booking.security_deposit|floatformat:2 }}</span>
+          </div>
+          {% endif %}
+          <hr>
+          <div class="d-flex justify-content-between fw-bold">
+            <span>Total Amount</span>
+            <span class="text-success">GHS {{ booking.total_amount|floatformat:2 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Status -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="fas fa-edit text-primary me-2"></i>Update Status</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'rent:owner_booking_update_status' booking.pk %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <select name="status" class="form-select">
+                <option value="pending" {% if booking.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="confirmed" {% if booking.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="active" {% if booking.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="completed" {% if booking.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="cancelled" {% if booking.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-save me-2"></i>Update Status
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

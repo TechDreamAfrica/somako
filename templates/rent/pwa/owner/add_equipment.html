@@ -1,0 +1,322 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Add Equipment - Soma Ko Rent{% endblock %}
+{% block theme_color %}#10b981{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #10b981;
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-check input {
+    width: 20px;
+    height: 20px;
+    accent-color: #10b981;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 6rem;
+  }
+  
+  .submit-btn:active {
+    transform: scale(0.98);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-header">
+  <a href="{% url 'rent_pwa:owner_dashboard' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <h1 class="form-title">Add New Equipment</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data" style="padding: 0 1rem;">
+  {% csrf_token %}
+  
+  <!-- Basic Information -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-info-circle"></i>
+      Basic Information
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Equipment Name</label>
+      <input type="text" name="name" class="form-control" placeholder="e.g., Power Drill, Excavator" required>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Category</label>
+      <select name="category" class="form-control" required>
+        <option value="">Select Category</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Description</label>
+      <textarea name="description" class="form-control" placeholder="Describe the equipment, its features, and usage..." required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Listing Type</label>
+      <select name="listing_type" class="form-control" required>
+        <option value="for_rent">For Rent</option>
+        <option value="for_sale">For Sale</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Equipment Details -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-tools"></i>
+      Equipment Details
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Brand</label>
+        <input type="text" name="brand" class="form-control" placeholder="e.g., Caterpillar">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <input type="text" name="model" class="form-control" placeholder="e.g., 320D">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Condition</label>
+      <select name="condition" class="form-control" required>
+        <option value="new">New</option>
+        <option value="excellent">Excellent</option>
+        <option value="good" selected>Good</option>
+        <option value="fair">Fair</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Specifications</label>
+      <textarea name="specifications" class="form-control" placeholder="Technical specifications, dimensions, power requirements..."></textarea>
+    </div>
+  </div>
+  
+  <!-- Location -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-map-marker-alt"></i>
+      Location
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">City</label>
+        <input type="text" name="city" class="form-control" placeholder="e.g., Accra" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Region</label>
+        <input type="text" name="region" class="form-control" placeholder="e.g., Greater Accra" required>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Pricing -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-tag"></i>
+      Pricing
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">Price (GHS)</label>
+        <input type="number" name="price_per_period" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Rental Period</label>
+        <select name="rental_period" class="form-control" required>
+          <option value="hourly">Per Hour</option>
+          <option value="daily" selected>Per Day</option>
+          <option value="weekly">Per Week</option>
+          <option value="monthly">Per Month</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Security Deposit (GHS)</label>
+        <input type="number" name="security_deposit" class="form-control" step="0.01" min="0" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label required">Quantity Available</label>
+        <input type="number" name="quantity_available" class="form-control" min="1" value="1" required>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Image Upload -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-image"></i>
+      Equipment Image
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Upload Image</label>
+      <input type="file" name="main_image" class="form-control" accept="image/*">
+    </div>
+  </div>
+  
+  <!-- Availability -->
+  <div class="form-section">
+    <div class="form-check">
+      <input type="checkbox" name="is_available" id="is_available" checked>
+      <label for="is_available">Available for booking</label>
+    </div>
+  </div>
+  
+  <button type="submit" class="submit-btn">
+    <i class="fas fa-plus-circle"></i>
+    Add Equipment
+  </button>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'rent_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_equipment' %}" class="bottom-nav-item">
+    <i class="fas fa-tools"></i>
+    <span>Equipment</span>
+  </a>
+  <a href="{% url 'rent_pwa:add_equipment' %}" class="bottom-nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Add</span>
+  </a>
+  <a href="{% url 'rent_pwa:manage_bookings' %}" class="bottom-nav-item">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Bookings</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

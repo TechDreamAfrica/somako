@@ -76,11 +76,11 @@
           <div style="background: #fff7ed; padding: 1.5rem; border-radius: 1rem; border: 2px solid #fb923c; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(251, 146, 60, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
             <div style="display: flex; align-items: center; gap: 1rem;">
               <div style="width: 60px; height: 60px; background: #f97316; border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);">
-                <i class="fas fa-building" style="font-size: 1.75rem; color: white;"></i>
+                <i class="fas fa-tools" style="font-size: 1.75rem; color: white;"></i>
               </div>
               <div>
-                <div style="color: #9a3412; font-size: 0.875rem; font-weight: 600;">My Properties</div>
-                <div style="font-size: 2rem; font-weight: 900; color: #ea580c;">{{ my_properties.count|default:0 }}</div>
+                <div style="color: #9a3412; font-size: 0.875rem; font-weight: 600;">My Equipment</div>
+                <div style="font-size: 2rem; font-weight: 900; color: #ea580c;">{{ my_equipment.count|default:0 }}</div>
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@
                 <i class="fas fa-eye" style="font-size: 1.75rem; color: white;"></i>
               </div>
               <div>
-                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Property Views</div>
+                <div style="color: #78350f; font-size: 0.875rem; font-weight: 600;">Equipment Views</div>
                 <div style="font-size: 2rem; font-weight: 900; color: #d97706;">0</div>
               </div>
             </div>
@@ -685,27 +685,35 @@
           <div class="row g-3">
             {% if service_role == 'landlord' %}
               <div class="col-sm-6 col-md-4">
-                <a href="{% url 'rent:property_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'rent:owner_equipment_create' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 1rem; text-decoration: none; border: 2px solid #10b981; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #10b981; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-plus" style="color: white; font-size: 1.25rem;"></i>
                   </div>
-                  <div style="color: #065f46; font-weight: 700;">List Property</div>
+                  <div style="color: #065f46; font-weight: 700;">Add Equipment</div>
                 </a>
               </div>
               <div class="col-sm-6 col-md-4">
-                <a href="{% url 'rent:property_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'rent:owner_equipment_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-list" style="color: white; font-size: 1.25rem;"></i>
+                    <i class="fas fa-tools" style="color: white; font-size: 1.25rem;"></i>
                   </div>
-                  <div style="color: #1e3a8a; font-weight: 700;">My Listings</div>
+                  <div style="color: #1e3a8a; font-weight: 700;">My Equipment</div>
                 </a>
               </div>
               <div class="col-sm-6 col-md-4">
-                <a href="{% url 'shop:product_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-shopping-cart" style="color: white; font-size: 1.25rem;"></i>
+                <a href="{% url 'rent:owner_booking_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fff7ed; border-radius: 1rem; text-decoration: none; border: 2px solid #f97316; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(249, 115, 22, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #f97316; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-calendar-alt" style="color: white; font-size: 1.25rem;"></i>
                   </div>
-                  <div style="color: #1e3a8a; font-weight: 700;">Shop Now</div>
+                  <div style="color: #9a3412; font-weight: 700;">Manage Bookings</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'rent:equipment_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ede9fe; border-radius: 1rem; text-decoration: none; border: 2px solid #8b5cf6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #8b5cf6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-search" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #5b21b6; font-weight: 700;">Browse Equipment</div>
                 </a>
               </div>
               <div class="col-sm-6 col-md-4">
@@ -752,7 +760,23 @@
               </div>
             {% elif service_role == 'restaurant_owner' %}
               <div class="col-sm-6 col-md-4">
-                <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                <a href="{% url 'food:owner_restaurant_create' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #7f1d1d; font-weight: 700;">Add Restaurant</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'food:owner_restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fef3c7; border-radius: 1rem; text-decoration: none; border: 2px solid #f59e0b; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #f59e0b; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-store" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #78350f; font-weight: 700;">My Restaurants</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'food:manage_menu' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
                   <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-utensils" style="color: white; font-size: 1.25rem;"></i>
                   </div>
@@ -760,11 +784,19 @@
                 </a>
               </div>
               <div class="col-sm-6 col-md-4">
-                <a href="{% url 'food:restaurant_list' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fee2e2; border-radius: 1rem; text-decoration: none; border: 2px solid #ef4444; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
-                  <div style="width: 48px; height: 48px; background: #ef4444; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-hamburger" style="color: white; font-size: 1.25rem;"></i>
+                <a href="{% url 'food:manage_orders' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #dbeafe; border-radius: 1rem; text-decoration: none; border: 2px solid #3b82f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-clipboard-list" style="color: white; font-size: 1.25rem;"></i>
                   </div>
-                  <div style="color: #7f1d1d; font-weight: 700;">Order Food</div>
+                  <div style="color: #1e3a8a; font-weight: 700;">Manage Orders</div>
+                </a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a href="{% url 'food:restaurant_analytics' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #ede9fe; border-radius: 1rem; text-decoration: none; border: 2px solid #8b5cf6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                  <div style="width: 48px; height: 48px; background: #8b5cf6; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-chart-line" style="color: white; font-size: 1.25rem;"></i>
+                  </div>
+                  <div style="color: #5b21b6; font-weight: 700;">Analytics</div>
                 </a>
               </div>
               <div class="col-sm-6 col-md-4">

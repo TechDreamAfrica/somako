@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Equipment - Soma Ko Rent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">My Equipment</h1>
+      <p class="text-muted mb-0">Manage your equipment listings</p>
+    </div>
+    <a href="{% url 'rent:owner_equipment_create' %}" class="btn btn-success">
+      <i class="fas fa-plus me-2"></i>Add Equipment
+    </a>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+              <i class="fas fa-tools text-primary"></i>
+            </div>
+            <div>
+              <div class="text-muted small">Total Equipment</div>
+              <div class="h4 mb-0">{{ total_equipment }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+              <i class="fas fa-check-circle text-success"></i>
+            </div>
+            <div>
+              <div class="text-muted small">Available</div>
+              <div class="h4 mb-0">{{ available_count }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+              <i class="fas fa-pause-circle text-warning"></i>
+            </div>
+            <div>
+              <div class="text-muted small">Unavailable</div>
+              <div class="h4 mb-0">{{ unavailable_count }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-2">
+      <div class="d-flex gap-2">
+        <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-sm {% if not request.GET.availability %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="?availability=available" class="btn btn-sm {% if request.GET.availability == 'available' %}btn-success{% else %}btn-outline-secondary{% endif %}">Available</a>
+        <a href="?availability=unavailable" class="btn btn-sm {% if request.GET.availability == 'unavailable' %}btn-warning{% else %}btn-outline-secondary{% endif %}">Unavailable</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipment List -->
+  {% if page_obj %}
+    <div class="row g-4">
+      {% for item in page_obj %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="position-relative">
+            {% if item.main_image %}
+            <img src="{{ item.main_image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+              <i class="fas fa-tools fa-3x text-muted"></i>
+            </div>
+            {% endif %}
+            <span class="position-absolute top-0 end-0 m-2 badge {% if item.is_available %}bg-success{% else %}bg-warning{% endif %}">
+              {% if item.is_available %}Available{% else %}Unavailable{% endif %}
+            </span>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title mb-1">{{ item.name }}</h5>
+            <p class="text-muted small mb-2">
+              <i class="fas fa-map-marker-alt me-1"></i>{{ item.city }}, {{ item.region }}
+            </p>
+            <p class="text-success fw-bold mb-3">
+              GHS {{ item.price_per_period|floatformat:2 }}/{{ item.get_rental_period_display }}
+            </p>
+            <div class="d-flex gap-2">
+              <a href="{% url 'rent:owner_equipment_detail' item.pk %}" class="btn btn-sm btn-outline-primary flex-fill">
+                <i class="fas fa-eye"></i> View
+              </a>
+              <a href="{% url 'rent:owner_equipment_update' item.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="{% url 'rent:owner_equipment_toggle' item.pk %}?next={{ request.path }}" class="btn btn-sm {% if item.is_available %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                <i class="fas fa-power-off"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}">Previous</a>
+        </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-tools fa-4x text-muted mb-3"></i>
+      <h4>No Equipment Yet</h4>
+      <p class="text-muted">Add your first equipment to get started</p>
+      <a href="{% url 'rent:owner_equipment_create' %}" class="btn btn-success">
+        <i class="fas fa-plus me-2"></i>Add Equipment
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

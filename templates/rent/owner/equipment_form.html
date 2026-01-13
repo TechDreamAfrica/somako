@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if action == 'Add' %}Add Equipment{% else %}Update {{ equipment.name }}{% endif %} - Soma Ko Rent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Header -->
+      <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-secondary me-3">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 class="h3 mb-0">{{ action }} Equipment</h1>
+          <p class="text-muted mb-0">{% if action == 'Add' %}List new equipment for rent{% else %}Update equipment details{% endif %}</p>
+        </div>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Basic Information -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Equipment Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" value="{{ form.name.value|default:'' }}" placeholder="e.g., Power Drill, Excavator" required>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Category <span class="text-danger">*</span></label>
+              <select name="category" class="form-select" required>
+                <option value="">Select Category</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Description <span class="text-danger">*</span></label>
+              <textarea name="description" class="form-control" rows="4" placeholder="Describe the equipment, its features, and usage..." required>{{ form.description.value|default:'' }}</textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Listing Type <span class="text-danger">*</span></label>
+              <select name="listing_type" class="form-select" required>
+                <option value="for_rent" {% if form.listing_type.value == 'for_rent' %}selected{% endif %}>For Rent</option>
+                <option value="for_sale" {% if form.listing_type.value == 'for_sale' %}selected{% endif %}>For Sale</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipment Details -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-tools text-success me-2"></i>Equipment Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Brand</label>
+                <input type="text" name="brand" class="form-control" value="{{ form.brand.value|default:'' }}" placeholder="e.g., Caterpillar">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Model</label>
+                <input type="text" name="model" class="form-control" value="{{ form.model.value|default:'' }}" placeholder="e.g., 320D">
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Condition <span class="text-danger">*</span></label>
+              <select name="condition" class="form-select" required>
+                <option value="new" {% if form.condition.value == 'new' %}selected{% endif %}>New</option>
+                <option value="excellent" {% if form.condition.value == 'excellent' %}selected{% endif %}>Excellent</option>
+                <option value="good" {% if form.condition.value == 'good' or not form.condition.value %}selected{% endif %}>Good</option>
+                <option value="fair" {% if form.condition.value == 'fair' %}selected{% endif %}>Fair</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Specifications</label>
+              <textarea name="specifications" class="form-control" rows="3" placeholder="Technical specifications, dimensions, power requirements...">{{ form.specifications.value|default:'' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-map-marker-alt text-danger me-2"></i>Location</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">City <span class="text-danger">*</span></label>
+                <input type="text" name="city" class="form-control" value="{{ form.city.value|default:'' }}" placeholder="e.g., Accra" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Region <span class="text-danger">*</span></label>
+                <input type="text" name="region" class="form-control" value="{{ form.region.value|default:'' }}" placeholder="e.g., Greater Accra" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-tag text-warning me-2"></i>Pricing</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Price (GHS) <span class="text-danger">*</span></label>
+                <input type="number" name="price_per_period" class="form-control" step="0.01" min="0.01" value="{{ form.price_per_period.value|default:'' }}" placeholder="0.00" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Rental Period <span class="text-danger">*</span></label>
+                <select name="rental_period" class="form-select" required>
+                  <option value="hourly" {% if form.rental_period.value == 'hourly' %}selected{% endif %}>Per Hour</option>
+                  <option value="daily" {% if form.rental_period.value == 'daily' or not form.rental_period.value %}selected{% endif %}>Per Day</option>
+                  <option value="weekly" {% if form.rental_period.value == 'weekly' %}selected{% endif %}>Per Week</option>
+                  <option value="monthly" {% if form.rental_period.value == 'monthly' %}selected{% endif %}>Per Month</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Security Deposit (GHS)</label>
+                <input type="number" name="security_deposit" class="form-control" step="0.01" min="0" value="{{ form.security_deposit.value|default:'' }}" placeholder="0.00">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Quantity Available <span class="text-danger">*</span></label>
+                <input type="number" name="quantity_available" class="form-control" min="1" value="{{ form.quantity_available.value|default:'1' }}" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="fas fa-image text-info me-2"></i>Equipment Image</h5>
+          </div>
+          <div class="card-body">
+            {% if equipment and equipment.main_image %}
+            <div class="mb-3">
+              <label class="form-label">Current Image</label>
+              <div class="d-flex align-items-center p-3 bg-light rounded">
+                <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                <div class="ms-3">
+                  <div class="fw-bold">Current Image</div>
+                  <div class="text-muted small">Upload new image to replace</div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+              <label class="form-label">{% if equipment %}Upload New Image{% else %}Upload Image{% endif %}</label>
+              <input type="file" name="main_image" class="form-control" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="form-check">
+              <input type="checkbox" name="is_available" class="form-check-input" id="is_available" {% if form.is_available.value != False %}checked{% endif %}>
+              <label class="form-check-label" for="is_available">Available for booking</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success btn-lg flex-fill">
+            <i class="fas fa-save me-2"></i>{{ action }} Equipment
+          </button>
+          <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Bookings - Soma Ko Rent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">Manage Bookings</h1>
+      <p class="text-muted mb-0">View and manage equipment rental bookings</p>
+    </div>
+    <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-primary">
+      <i class="fas fa-tools me-2"></i>My Equipment
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="h4 mb-0 text-primary">{{ total_bookings }}</div>
+          <div class="text-muted small">Total Bookings</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="h4 mb-0 text-warning">{{ pending_count }}</div>
+          <div class="text-muted small">Pending</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="h4 mb-0 text-info">{{ confirmed_count }}</div>
+          <div class="text-muted small">Confirmed</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="h4 mb-0 text-success">{{ active_count }}</div>
+          <div class="text-muted small">Active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-2">
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'rent:owner_booking_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-secondary{% endif %}">Pending</a>
+        <a href="?status=confirmed" class="btn btn-sm {% if status_filter == 'confirmed' %}btn-info{% else %}btn-outline-secondary{% endif %}">Confirmed</a>
+        <a href="?status=active" class="btn btn-sm {% if status_filter == 'active' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Active</a>
+        <a href="?status=completed" class="btn btn-sm {% if status_filter == 'completed' %}btn-success{% else %}btn-outline-secondary{% endif %}">Completed</a>
+        <a href="?status=cancelled" class="btn btn-sm {% if status_filter == 'cancelled' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Cancelled</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings List -->
+  {% if page_obj %}
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Equipment</th>
+            <th>Customer</th>
+            <th>Dates</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in page_obj %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                {% if booking.equipment.main_image %}
+                <img src="{{ booking.equipment.main_image.url }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                {% else %}
+                <div class="rounded bg-light me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                  <i class="fas fa-tools text-muted"></i>
+                </div>
+                {% endif %}
+                <span>{{ booking.equipment.name }}</span>
+              </div>
+            </td>
+            <td>
+              <div>{{ booking.customer.get_full_name|default:booking.customer.username }}</div>
+              <div class="text-muted small">{{ booking.customer.phone_number|default:booking.customer.email }}</div>
+            </td>
+            <td>
+              <div>{{ booking.start_date|date:"M d" }} - {{ booking.end_date|date:"M d, Y" }}</div>
+              <div class="text-muted small">{{ booking.duration_days }} day(s)</div>
+            </td>
+            <td class="text-success fw-bold">GHS {{ booking.total_amount|floatformat:2 }}</td>
+            <td>
+              <span class="badge 
+                {% if booking.status == 'pending' %}bg-warning
+                {% elif booking.status == 'confirmed' %}bg-info
+                {% elif booking.status == 'active' %}bg-primary
+                {% elif booking.status == 'completed' %}bg-success
+                {% else %}bg-secondary{% endif %}">
+                {{ booking.status|title }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'rent:owner_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+      </li>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+      <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+    <h4>No Bookings</h4>
+    <p class="text-muted">You don't have any bookings yet</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
