@@ -678,13 +678,13 @@ def dashboard_view(request):
 
     # Add service-specific data based on user's role
     if service_role == 'landlord':
-        from rent.models import Property, RentalBooking
-        properties = Property.objects.filter(owner=user)
-        context['my_properties'] = properties.order_by('-created_at')[:5]
-        context['properties_count'] = properties.count()
-        context['active_bookings'] = RentalBooking.objects.filter(property__owner=user, status='active').count()
-        context['pending_bookings'] = RentalBooking.objects.filter(property__owner=user, status='pending').count()
-        context['total_bookings'] = RentalBooking.objects.filter(property__owner=user).count()
+        from rent.models import Equipment, RentalBooking
+        equipment = Equipment.objects.filter(owner=user)
+        context['my_equipment'] = equipment.order_by('-created_at')[:5]
+        context['equipment_count'] = equipment.count()
+        context['active_bookings'] = RentalBooking.objects.filter(equipment__owner=user, status='active').count()
+        context['pending_bookings'] = RentalBooking.objects.filter(equipment__owner=user, status='pending').count()
+        context['total_bookings'] = RentalBooking.objects.filter(equipment__owner=user).count()
         context['service_name'] = 'Rent - Landlord'
 
     elif service_role == 'tenant':
@@ -846,13 +846,13 @@ def dashboard_view(request):
         # Fetch Rent activities
         try:
             from rent.models import RentalBooking
-            rent_bookings = RentalBooking.objects.filter(renter=user).select_related('property').order_by('-created_at')[:5]
+            rent_bookings = RentalBooking.objects.filter(renter=user).select_related('equipment').order_by('-created_at')[:5]
             rent_count = RentalBooking.objects.filter(renter=user).count()
             for booking in rent_bookings:
                 activities.append({
                     'type': 'rent_booking',
                     'icon': 'fa-home',
-                    'title': f'Booked: {booking.property.title}',
+                    'title': f'Booked: {booking.equipment.title}',
                     'date': booking.created_at,
                     'url': f'/rent/bookings/{booking.id}/',
                     'status': booking.status

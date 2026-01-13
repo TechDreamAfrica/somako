@@ -97,6 +97,61 @@
         <i class="fas fa-cart-plus"></i> Add to Cart
       </button>
     </form>
+
+    <!-- Pharmacy Contact Info -->
+    {% if medicine.pharmacy %}
+    <div style="background: #f9fafb; border-radius: 12px; padding: 1rem; margin-top: 1.5rem; border: 2px solid #e5e7eb;">
+      <h3 style="font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #1f2937;">
+        <i class="fas fa-store" style="color: #8b5cf6;"></i>Sold by
+      </h3>
+      
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+        {% if medicine.pharmacy.logo %}
+        <img src="{{ medicine.pharmacy.logo.url }}" alt="{{ medicine.pharmacy.name }}" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 2px solid #ede9fe;">
+        {% else %}
+        <div style="width: 50px; height: 50px; border-radius: 10px; background: #ede9fe; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-clinic-medical" style="font-size: 1.25rem; color: #8b5cf6;"></i>
+        </div>
+        {% endif %}
+        <div>
+          <h4 style="margin: 0 0 0.25rem 0; font-weight: 700; color: #1f2937; font-size: 1rem;">{{ medicine.pharmacy.name }}</h4>
+          <p style="margin: 0; font-size: 0.8125rem; color: #6b7280;">{{ medicine.pharmacy.city }}, {{ medicine.pharmacy.country }}</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <a href="tel:{{ medicine.pharmacy.phone }}" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #1f2937; padding: 0.625rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: #ecfdf5; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-phone-alt" style="color: #10b981; font-size: 0.75rem;"></i>
+          </div>
+          <div>
+            <p style="margin: 0; font-size: 0.6875rem; color: #6b7280;">Phone</p>
+            <p style="margin: 0; font-weight: 600; font-size: 0.875rem;">{{ medicine.pharmacy.phone }}</p>
+          </div>
+        </a>
+
+        <a href="mailto:{{ medicine.pharmacy.email }}" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #1f2937; padding: 0.625rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: #dbeafe; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-envelope" style="color: #3b82f6; font-size: 0.75rem;"></i>
+          </div>
+          <div style="overflow: hidden;">
+            <p style="margin: 0; font-size: 0.6875rem; color: #6b7280;">Email</p>
+            <p style="margin: 0; font-weight: 600; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ medicine.pharmacy.email }}</p>
+          </div>
+        </a>
+
+        <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.625rem; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: #fef3c7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-map-marker-alt" style="color: #f59e0b; font-size: 0.75rem;"></i>
+          </div>
+          <div>
+            <p style="margin: 0; font-size: 0.6875rem; color: #6b7280;">Address</p>
+            <p style="margin: 0; font-weight: 600; font-size: 0.875rem; color: #1f2937;">{{ medicine.pharmacy.address }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
