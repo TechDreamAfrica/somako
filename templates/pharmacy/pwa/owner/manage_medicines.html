@@ -1,0 +1,254 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Manage Medicines - Soma Ko Pharmacy{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 1rem;
+    margin: -1rem -1rem 1rem -1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .search-box {
+    padding: 0 1rem 1rem;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+  }
+  
+  .medicine-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .medicine-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .medicine-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .medicine-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .medicine-name {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .medicine-category {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+  
+  .medicine-price {
+    font-weight: 700;
+    color: #8b5cf6;
+  }
+  
+  .medicine-stock {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  
+  .stock-ok { background: #d1fae5; color: #065f46; }
+  .stock-low { background: #fef3c7; color: #92400e; }
+  .stock-out { background: #fee2e2; color: #991b1b; }
+  
+  .medicine-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+  
+  .action-edit { background: #ede9fe; color: #7c3aed; }
+  .action-toggle { background: #fef3c7; color: #d97706; }
+  .action-delete { background: #fee2e2; color: #dc2626; }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #d1d5db;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">My Medicines</h1>
+  <a href="{% url 'pharmacy_pwa:add_medicine' %}" class="add-btn">
+    <i class="fas fa-plus"></i>
+    Add New
+  </a>
+</div>
+
+<!-- Search -->
+<div class="search-box">
+  <div style="position: relative;">
+    <input type="text" class="search-input" placeholder="Search medicines..." id="searchInput">
+    <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+  </div>
+</div>
+
+<!-- Medicines List -->
+<div style="padding: 0 1rem; margin-bottom: 6rem;">
+  {% if medicines %}
+    {% for medicine in medicines %}
+    <div class="medicine-card" data-name="{{ medicine.name|lower }}">
+      <div class="medicine-image">
+        {% if medicine.image %}
+        <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}">
+        {% else %}
+        <i class="fas fa-pills" style="font-size: 1.5rem; color: #8b5cf6;"></i>
+        {% endif %}
+      </div>
+      
+      <div class="medicine-info">
+        <div class="medicine-name">{{ medicine.name }}</div>
+        <div class="medicine-category">{{ medicine.category.name|default:"Uncategorized" }}</div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="medicine-price">GHS {{ medicine.price|floatformat:2 }}</span>
+          <span class="medicine-stock {% if medicine.stock_quantity == 0 %}stock-out{% elif medicine.is_low_stock %}stock-low{% else %}stock-ok{% endif %}">
+            {% if medicine.stock_quantity == 0 %}Out of Stock{% elif medicine.is_low_stock %}Low: {{ medicine.stock_quantity }}{% else %}{{ medicine.stock_quantity }} in stock{% endif %}
+          </span>
+        </div>
+        {% if not medicine.is_active %}
+        <span style="font-size: 0.75rem; color: #6b7280;">(Inactive)</span>
+        {% endif %}
+      </div>
+      
+      <div class="medicine-actions">
+        <a href="{% url 'pharmacy_pwa:edit_medicine' medicine.id %}" class="action-btn action-edit" title="Edit">
+          <i class="fas fa-edit"></i>
+        </a>
+        <a href="{% url 'pharmacy_pwa:toggle_medicine' medicine.id %}" class="action-btn action-toggle" title="Toggle">
+          <i class="fas fa-power-off"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-pills"></i>
+      <h3>No Medicines Yet</h3>
+      <p>Add your first medicine to get started</p>
+      <a href="{% url 'pharmacy_pwa:add_medicine' %}" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: #8b5cf6; color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+        <i class="fas fa-plus me-2"></i>Add Medicine
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll('.medicine-card').forEach(card => {
+    const name = card.dataset.name;
+    card.style.display = name.includes(query) ? 'flex' : 'none';
+  });
+});
+</script>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:manage_medicines' %}" class="bottom-nav-item active">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:add_medicine' %}" class="bottom-nav-item">
+    <i class="fas fa-plus-circle"></i>
+    <span>Add</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}

@@ -589,28 +589,60 @@ def pwa_add_medicine(request):
     pharmacy = request.user.pharmacy_profile
 
     if request.method == 'POST':
-        # Process form - simplified version
+        # Get form data
         name = request.POST.get('name')
+        generic_name = request.POST.get('generic_name', '')
+        brand_name = request.POST.get('brand_name', '')
         description = request.POST.get('description')
         price = request.POST.get('price')
+        discount_price = request.POST.get('discount_price') or None
         category_id = request.POST.get('category')
+        dosage = request.POST.get('dosage', '')
+        dosage_form = request.POST.get('dosage_form', 'tablet')
+        usage = request.POST.get('usage', '')
+        active_ingredients = request.POST.get('active_ingredients', '')
+        side_effects = request.POST.get('side_effects', '')
+        warnings = request.POST.get('warnings', '')
+        requires_prescription = request.POST.get('requires_prescription') == 'on'
+        stock_quantity = request.POST.get('stock_quantity', 0)
+        low_stock_threshold = request.POST.get('low_stock_threshold', 10)
+        manufacturer = request.POST.get('manufacturer', '')
+        pack_size = request.POST.get('pack_size', '')
+        batch_number = request.POST.get('batch_number', '')
+        expiry_date = request.POST.get('expiry_date') or None
 
         # Get the category object
         category = get_object_or_404(MedicineCategory, pk=category_id)
 
-        Medicine.objects.create(
+        medicine = Medicine.objects.create(
             owner=request.user,
             name=name,
+            generic_name=generic_name,
+            brand_name=brand_name,
             description=description,
             price=price,
+            discount_price=discount_price,
             category=category,
+            dosage=dosage,
+            dosage_form=dosage_form,
+            usage=usage,
+            active_ingredients=active_ingredients,
+            side_effects=side_effects,
+            warnings=warnings,
+            requires_prescription=requires_prescription,
+            stock_quantity=stock_quantity,
+            low_stock_threshold=low_stock_threshold,
+            manufacturer=manufacturer,
+            pack_size=pack_size,
+            batch_number=batch_number,
+            expiry_date=expiry_date,
             is_active=True,
-            # Add required fields with defaults
-            usage='',
-            dosage='',
-            active_ingredients='',
-            manufacturer=''
         )
+
+        # Handle image upload
+        if 'image' in request.FILES:
+            medicine.image = request.FILES['image']
+            medicine.save()
 
         messages.success(request, 'Medicine added successfully!')
         return redirect('pharmacy_pwa:manage_medicines')
@@ -632,12 +664,36 @@ def pwa_edit_medicine(request, medicine_id):
     medicine = get_object_or_404(Medicine, pk=medicine_id, owner=request.user)
 
     if request.method == 'POST':
+        # Update all fields from form
         medicine.name = request.POST.get('name')
+        medicine.generic_name = request.POST.get('generic_name', '')
+        medicine.brand_name = request.POST.get('brand_name', '')
         medicine.description = request.POST.get('description')
         medicine.price = request.POST.get('price')
+        medicine.discount_price = request.POST.get('discount_price') or None
+        medicine.dosage = request.POST.get('dosage', '')
+        medicine.dosage_form = request.POST.get('dosage_form', 'tablet')
+        medicine.usage = request.POST.get('usage', '')
+        medicine.active_ingredients = request.POST.get('active_ingredients', '')
+        medicine.side_effects = request.POST.get('side_effects', '')
+        medicine.warnings = request.POST.get('warnings', '')
+        medicine.requires_prescription = request.POST.get('requires_prescription') == 'on'
+        medicine.stock_quantity = request.POST.get('stock_quantity', 0)
+        medicine.low_stock_threshold = request.POST.get('low_stock_threshold', 10)
+        medicine.manufacturer = request.POST.get('manufacturer', '')
+        medicine.pack_size = request.POST.get('pack_size', '')
+        medicine.batch_number = request.POST.get('batch_number', '')
+        medicine.expiry_date = request.POST.get('expiry_date') or None
+        medicine.is_active = request.POST.get('is_active') == 'on'
+        
         category_id = request.POST.get('category')
         if category_id:
             medicine.category = get_object_or_404(MedicineCategory, pk=category_id)
+        
+        # Handle image upload
+        if 'image' in request.FILES:
+            medicine.image = request.FILES['image']
+        
         medicine.save()
 
         messages.success(request, 'Medicine updated!')

@@ -1,0 +1,339 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}Add Medicine - Soma Ko Pharmacy{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 1rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #8b5cf6;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #8b5cf6;
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-check input {
+    width: 20px;
+    height: 20px;
+    accent-color: #8b5cf6;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 6rem;
+  }
+  
+  .submit-btn:active {
+    transform: scale(0.98);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-header">
+  <a href="{% url 'pharmacy_pwa:owner_dashboard' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <h1 class="form-title">Add New Medicine</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data" style="padding: 0 1rem;">
+  {% csrf_token %}
+  
+  <!-- Basic Information -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-info-circle"></i>
+      Basic Information
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Medicine Name</label>
+      <input type="text" name="name" class="form-control" placeholder="e.g., Paracetamol 500mg" required>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Generic Name</label>
+      <input type="text" name="generic_name" class="form-control" placeholder="e.g., Acetaminophen">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Brand Name</label>
+      <input type="text" name="brand_name" class="form-control" placeholder="e.g., Tylenol">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Category</label>
+      <select name="category" class="form-control" required>
+        <option value="">Select Category</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Description</label>
+      <textarea name="description" class="form-control" placeholder="Describe the medicine..." required></textarea>
+    </div>
+  </div>
+  
+  <!-- Medical Information -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-medkit"></i>
+      Medical Information
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Dosage</label>
+      <input type="text" name="dosage" class="form-control" placeholder="e.g., 500mg" required>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Dosage Form</label>
+      <select name="dosage_form" class="form-control">
+        <option value="tablet">Tablet</option>
+        <option value="capsule">Capsule</option>
+        <option value="syrup">Syrup</option>
+        <option value="injection">Injection</option>
+        <option value="cream">Cream</option>
+        <option value="drops">Drops</option>
+        <option value="inhaler">Inhaler</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Usage Instructions</label>
+      <textarea name="usage" class="form-control" placeholder="How to use this medicine..." required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Active Ingredients</label>
+      <textarea name="active_ingredients" class="form-control" placeholder="List the active ingredients..." required></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Side Effects</label>
+      <textarea name="side_effects" class="form-control" placeholder="Possible side effects..."></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Warnings</label>
+      <textarea name="warnings" class="form-control" placeholder="Important warnings..."></textarea>
+    </div>
+    
+    <div class="form-check">
+      <input type="checkbox" name="requires_prescription" id="requires_prescription">
+      <label for="requires_prescription">Requires Prescription</label>
+    </div>
+  </div>
+  
+  <!-- Pricing & Stock -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-tag"></i>
+      Pricing & Stock
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">Price (GHS)</label>
+        <input type="number" name="price" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Discount Price</label>
+        <input type="number" name="discount_price" class="form-control" step="0.01" min="0.01" placeholder="0.00">
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label required">Stock Quantity</label>
+        <input type="number" name="stock_quantity" class="form-control" min="0" value="0" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Low Stock Alert</label>
+        <input type="number" name="low_stock_threshold" class="form-control" min="0" value="10">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Product Details -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-box"></i>
+      Product Details
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label required">Manufacturer</label>
+      <input type="text" name="manufacturer" class="form-control" placeholder="e.g., Ghana Pharma Ltd" required>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Pack Size</label>
+        <input type="text" name="pack_size" class="form-control" placeholder="e.g., 10 tablets">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Expiry Date</label>
+        <input type="date" name="expiry_date" class="form-control">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Batch Number</label>
+      <input type="text" name="batch_number" class="form-control" placeholder="e.g., BATCH-2026-001">
+    </div>
+  </div>
+  
+  <!-- Image Upload -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-image"></i>
+      Medicine Image
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Upload Image</label>
+      <input type="file" name="image" class="form-control" accept="image/*">
+    </div>
+  </div>
+  
+  <button type="submit" class="submit-btn">
+    <i class="fas fa-plus-circle"></i>
+    Add Medicine
+  </button>
+</form>
+{% endblock %}
+
+{% block bottom_nav %}
+<div class="bottom-nav">
+  <a href="{% url 'pharmacy_pwa:owner_dashboard' %}" class="bottom-nav-item">
+    <i class="fas fa-home"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:manage_medicines' %}" class="bottom-nav-item">
+    <i class="fas fa-pills"></i>
+    <span>Medicines</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:add_medicine' %}" class="bottom-nav-item active">
+    <i class="fas fa-plus-circle"></i>
+    <span>Add</span>
+  </a>
+  <a href="{% url 'pharmacy_pwa:manage_orders' %}" class="bottom-nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{% url 'accounts:pwa_profile' %}" class="bottom-nav-item">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </a>
+</div>
+{% endblock %}
