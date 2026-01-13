@@ -30,7 +30,7 @@ def medicine_create(request):
             medicine.owner = request.user
             medicine.save()
             messages.success(request, 'Medicine created successfully!')
-            return redirect('pharmacy:medicine_detail', pk=medicine.pk)
+            return redirect('pharmacy:owner_medicine_detail', pk=medicine.pk)
     else:
         form = MedicineForm()
     return render(request, 'pharmacy/owner/medicine_form.html', {'form': form, 'action': 'Create'})
@@ -52,7 +52,7 @@ def medicine_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Medicine updated successfully!')
-            return redirect('pharmacy:medicine_detail', pk=medicine.pk)
+            return redirect('pharmacy:owner_medicine_detail', pk=medicine.pk)
     else:
         form = MedicineForm(instance=medicine)
     return render(request, 'pharmacy/owner/medicine_form.html', {'form': form, 'medicine': medicine, 'action': 'Update'})
@@ -66,7 +66,7 @@ def medicine_delete(request, pk):
         medicine_name = medicine.name
         medicine.delete()
         messages.success(request, f'Medicine "{medicine_name}" deleted successfully!')
-        return redirect('pharmacy:medicine_list')
+        return redirect('pharmacy:owner_medicine_list')
     return render(request, 'pharmacy/owner/medicine_confirm_delete.html', {'medicine': medicine})
 
 
@@ -78,4 +78,4 @@ def medicine_toggle_active(request, pk):
     medicine.save()
     status = 'active' if medicine.is_active else 'inactive'
     messages.success(request, f'Medicine marked as {status}!')
-    return redirect('pharmacy:medicine_detail', pk=medicine.pk)
+    return redirect('pharmacy:owner_medicine_detail', pk=medicine.pk)
