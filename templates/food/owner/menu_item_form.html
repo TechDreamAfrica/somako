@@ -1,146 +1,205 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-food{% endblock %}
 {% block title %}{{ action }} Menu Item - Soma Ko{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-outline-secondary me-3">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h2 class="mb-0">{{ action }} Menu Item</h2>
-                    <p class="text-muted mb-0">{{ restaurant.name }}</p>
-                </div>
-            </div>
+<!-- Hero Section -->
+<section style="position: relative; background: #ea580c; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        <!-- Basic Information -->
-                        <h5 class="mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-8">
-                                <label class="form-label">Item Name *</label>
-                                {{ form.name }}
-                                {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Category</label>
-                                {{ form.category }}
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Description</label>
-                                {{ form.description }}
-                            </div>
-                        </div>
-
-                        <!-- Pricing -->
-                        <h5 class="mb-3"><i class="fas fa-tag text-primary me-2"></i>Pricing</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Price (GHS) *</label>
-                                {{ form.price }}
-                                {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors.0 }}</div>{% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Discounted Price (GHS)</label>
-                                {{ form.discounted_price }}
-                                <small class="text-muted">Leave empty if no discount</small>
-                            </div>
-                        </div>
-
-                        <!-- Details -->
-                        <h5 class="mb-3"><i class="fas fa-list text-primary me-2"></i>Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label class="form-label">Preparation Time (mins)</label>
-                                {{ form.preparation_time }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Serving Size</label>
-                                {{ form.serving_size }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Calories</label>
-                                {{ form.calories }}
-                            </div>
-                        </div>
-
-                        <!-- Dietary Info -->
-                        <h5 class="mb-3"><i class="fas fa-leaf text-primary me-2"></i>Dietary Information</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    {{ form.is_vegetarian }}
-                                    <label class="form-check-label" for="id_is_vegetarian">
-                                        <i class="fas fa-seedling text-success me-1"></i>Vegetarian
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    {{ form.is_vegan }}
-                                    <label class="form-check-label" for="id_is_vegan">
-                                        <i class="fas fa-leaf text-success me-1"></i>Vegan
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    {{ form.is_gluten_free }}
-                                    <label class="form-check-label" for="id_is_gluten_free">
-                                        <i class="fas fa-bread-slice text-warning me-1"></i>Gluten Free
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Image -->
-                        <h5 class="mb-3"><i class="fas fa-image text-primary me-2"></i>Image</h5>
-                        <div class="mb-4">
-                            {{ form.image }}
-                            {% if menu_item and menu_item.image %}
-                            <div class="mt-2">
-                                <img src="{{ menu_item.get_image_url }}" alt="Current image" class="img-thumbnail" style="max-height: 150px;">
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Status -->
-                        <h5 class="mb-3"><i class="fas fa-toggle-on text-primary me-2"></i>Status</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    {{ form.is_available }}
-                                    <label class="form-check-label" for="id_is_available">Available for ordering</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    {{ form.is_featured }}
-                                    <label class="form-check-label" for="id_is_featured">Featured item</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>{{ action }} Menu Item
-                            </button>
-                            <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-outline-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ action }} Menu Item</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{{ restaurant.name }}</p>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- Form Section -->
+<section style="padding: 3rem 0; background: #f8fafc;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <!-- Basic Information -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Basic Information</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-8" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Item Name <span style="color: #ef4444;">*</span></label>
+                  {{ form.name }}
+                  {% if form.name.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Category</label>
+                  {{ form.category }}
+                </div>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Description</label>
+                {{ form.description }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #fff7ed; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-tag" style="color: #ea580c; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Pricing</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Price (GHS) <span style="color: #ef4444;">*</span></label>
+                  {{ form.price }}
+                  {% if form.price.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.price.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6" style="margin-bottom: 0;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Discounted Price (GHS)</label>
+                  {{ form.discounted_price }}
+                  <small style="color: #6b7280; font-size: 0.8125rem;">Leave empty if no discount</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-list" style="color: #22c55e; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Details</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-4" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Preparation Time (mins)</label>
+                  {{ form.preparation_time }}
+                </div>
+                <div class="col-md-4" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Serving Size</label>
+                  {{ form.serving_size }}
+                </div>
+                <div class="col-md-4" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Calories</label>
+                  {{ form.calories }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dietary Information -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-leaf" style="color: #22c55e; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Dietary Information</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-4">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                    {{ form.is_vegetarian }}
+                    <span style="font-weight: 600; color: #374151;">Vegetarian</span>
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                    {{ form.is_vegan }}
+                    <span style="font-weight: 600; color: #374151;">Vegan</span>
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                    {{ form.is_gluten_free }}
+                    <span style="font-weight: 600; color: #374151;">Gluten Free</span>
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; background: #fef3c7; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                    {{ form.is_spicy }}
+                    <span style="font-weight: 600; color: #374151;">Spicy</span>
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                    {{ form.is_halal }}
+                    <span style="font-weight: 600; color: #374151;">Halal</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image & Availability -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #e0e7ff; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="color: #6366f1; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Image & Availability</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              {% if menu_item and menu_item.image %}
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Current Image</label>
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+                  <img src="{{ menu_item.image.url }}" alt="{{ menu_item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                  <div>
+                    <div style="font-weight: 600; color: #1f2937;">Current Image</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Upload new image to replace</div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">{% if menu_item %}Upload New Image{% else %}Upload Image{% endif %}</label>
+                {{ form.image }}
+              </div>
+              <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                  {{ form.is_available }}
+                  <span style="font-weight: 600; color: #374151;">Available for ordering</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                  {{ form.is_featured }}
+                  <span style="font-weight: 600; color: #374151;">Featured item</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" style="flex: 1; min-width: 200px; padding: 1rem 2rem; background: #ea580c; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onmouseover="this.style.background='#c2410c'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#ea580c'; this.style.transform='translateY(0)'">
+              <i class="fas fa-save"></i>{{ action }} Menu Item
+            </button>
+            <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" style="padding: 1rem 2rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;" onmouseover="this.style.borderColor='#d1d5db'; this.style.color='#374151'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -1,46 +1,73 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-food{% endblock %}
 {% block title %}Delete Menu Item - Soma Ko{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Menu Item</h5>
-                </div>
-                <div class="card-body text-center py-4">
-                    {% if menu_item.image %}
-                    <img src="{{ menu_item.get_image_url }}" alt="{{ menu_item.name }}" class="rounded mb-3" style="max-height: 150px;">
-                    {% else %}
-                    <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
-                    {% endif %}
-                    
-                    <h4>{{ menu_item.name }}</h4>
-                    <p class="text-muted">{{ restaurant.name }}</p>
-                    <p class="fw-bold">GHS {{ menu_item.get_display_price }}</p>
-                    
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <strong>Warning:</strong> This action cannot be undone.
-                    </div>
-                    
-                    <p>Are you sure you want to delete this menu item?</p>
-                    
-                    <form method="post" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash me-2"></i>Yes, Delete Item
-                        </button>
-                        <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-secondary">
-                            Cancel
-                        </a>
-                    </form>
-                </div>
-            </div>
-        </div>
+<!-- Hero Section -->
+<section style="position: relative; background: #ef4444; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">Delete Menu Item</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{{ restaurant.name }}</p>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- Delete Confirmation Section -->
+<section style="padding: 3rem 0; background: #f8fafc;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #fecaca;">
+          <div style="padding: 2.5rem; text-align: center;">
+            <!-- Menu Item Preview -->
+            {% if menu_item.image %}
+            <img src="{{ menu_item.image.url }}" alt="{{ menu_item.name }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 1rem; margin-bottom: 1.5rem; border: 4px solid #fef2f2;">
+            {% else %}
+            <div style="width: 120px; height: 120px; background: #fef2f2; border-radius: 1rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+              <i class="fas fa-hamburger" style="font-size: 3rem; color: #ef4444; opacity: 0.5;"></i>
+            </div>
+            {% endif %}
+            
+            <h3 style="font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">{{ menu_item.name }}</h3>
+            <p style="color: #6b7280; margin-bottom: 0.5rem;">{{ menu_item.category.name|default:"Uncategorized" }}</p>
+            <p style="font-weight: 700; color: #ea580c; font-size: 1.25rem; margin-bottom: 1.5rem;">GHS {{ menu_item.price }}</p>
+            
+            <!-- Warning -->
+            <div style="padding: 1rem; background: #fef3c7; border-radius: 0.75rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; text-align: left;">
+              <i class="fas fa-exclamation-triangle" style="color: #f59e0b; margin-top: 0.125rem;"></i>
+              <div>
+                <strong style="color: #92400e;">Warning:</strong>
+                <span style="color: #92400e;"> This action cannot be undone. This menu item will be permanently deleted.</span>
+              </div>
+            </div>
+            
+            <p style="color: #4b5563; margin-bottom: 1.5rem;">Are you sure you want to delete this menu item?</p>
+            
+            <!-- Action Buttons -->
+            <form method="post" style="display: inline;">
+              {% csrf_token %}
+              <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ef4444; color: white; padding: 0.875rem 1.5rem; border-radius: 0.75rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)'">
+                  <i class="fas fa-trash"></i>Yes, Delete Item
+                </button>
+                <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #6b7280; padding: 0.875rem 1.5rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: 2px solid #e5e7eb; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1d5db'; this.style.color='#374151'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+                  Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

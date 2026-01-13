@@ -11,7 +11,7 @@ class EquipmentForm(forms.ModelForm):
     class Meta:
         model = Equipment
         fields = [
-            'category', 'name', 'description', 'brand', 'model', 'condition',
+            'category', 'name', 'description', 'listing_type', 'brand', 'model', 'condition',
             'city', 'region',
             'price_per_period', 'rental_period', 'currency', 'security_deposit',
             'specifications', 'is_available', 'quantity_available', 'main_image'

@@ -1,255 +1,246 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-pharmacy{% endblock %}
 {% block title %}{{ action }} Medicine - Soma Ko Pharmacy{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<!-- Hero Section -->
+<section style="position: relative; background: #7c3aed; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'pharmacy:owner_medicine_list' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ action }} Medicine</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{% if action == 'Create' %}Add a new medicine to your inventory{% else %}Update medicine information{% endif %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Form Section -->
+<section style="padding: 3rem 0; background: #f8fafc;">
+  <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{% url 'pharmacy:owner_medicine_list' %}" class="btn btn-outline-secondary me-3">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h2 class="mb-0">{{ action }} Medicine</h2>
-                    <p class="text-muted mb-0">{% if action == 'Create' %}Add a new medicine to your inventory{% else %}Update medicine information{% endif %}</p>
+      <div class="col-lg-10">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col-lg-8">
+              <!-- Basic Information -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Basic Information</h5>
                 </div>
+                <div style="padding: 1.5rem;">
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Medicine Name <span style="color: #ef4444;">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>{% endif %}
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Generic Name</label>
+                      {{ form.generic_name }}
+                    </div>
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Brand Name</label>
+                      {{ form.brand_name }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Category <span style="color: #ef4444;">*</span></label>
+                      {{ form.category }}
+                      {% if form.category.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.category.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Dosage Form <span style="color: #ef4444;">*</span></label>
+                      {{ form.dosage_form }}
+                    </div>
+                  </div>
+                  <div style="margin-bottom: 0;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Description <span style="color: #ef4444;">*</span></label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.description.errors.0 }}</div>{% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Medical Information -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-medkit" style="color: #22c55e; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Medical Information</h5>
+                </div>
+                <div style="padding: 1.5rem;">
+                  <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Dosage <span style="color: #ef4444;">*</span></label>
+                      {{ form.dosage }}
+                      <small style="color: #6b7280; font-size: 0.8125rem;">e.g., 500mg, 10ml</small>
+                    </div>
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Pack Size</label>
+                      {{ form.pack_size }}
+                      <small style="color: #6b7280; font-size: 0.8125rem;">e.g., 10 tablets, 100ml</small>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Manufacturer</label>
+                      {{ form.manufacturer }}
+                    </div>
+                    <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                      <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Country of Origin</label>
+                      {{ form.country_of_origin }}
+                    </div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Ingredients</label>
+                    {{ form.ingredients }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Usage Information -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book-medical" style="color: #f59e0b; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Usage Information</h5>
+                </div>
+                <div style="padding: 1.5rem;">
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Usage Instructions</label>
+                    {{ form.usage_instructions }}
+                  </div>
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Side Effects</label>
+                    {{ form.side_effects }}
+                  </div>
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Warnings</label>
+                    {{ form.warnings }}
+                  </div>
+                  <div>
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Storage Instructions</label>
+                    {{ form.storage_instructions }}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <div class="row">
-                    <div class="col-lg-8">
-                        <!-- Basic Information -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Medicine Name *</label>
-                                        {{ form.name }}
-                                        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Generic Name</label>
-                                        {{ form.generic_name }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Brand Name</label>
-                                        {{ form.brand_name }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Category *</label>
-                                        {{ form.category }}
-                                        {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Dosage Form *</label>
-                                        {{ form.dosage_form }}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Description *</label>
-                                        {{ form.description }}
-                                        {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors.0 }}</div>{% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Medical Information -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-medkit text-primary me-2"></i>Medical Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Dosage *</label>
-                                        {{ form.dosage }}
-                                        <small class="text-muted">e.g., 500mg, 10ml</small>
-                                        {% if form.dosage.errors %}<div class="text-danger small">{{ form.dosage.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Pack Size</label>
-                                        {{ form.pack_size }}
-                                        <small class="text-muted">e.g., 10 tablets, 100ml</small>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Usage Instructions *</label>
-                                        {{ form.usage }}
-                                        {% if form.usage.errors %}<div class="text-danger small">{{ form.usage.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Active Ingredients *</label>
-                                        {{ form.active_ingredients }}
-                                        {% if form.active_ingredients.errors %}<div class="text-danger small">{{ form.active_ingredients.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Side Effects</label>
-                                        {{ form.side_effects }}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Warnings</label>
-                                        {{ form.warnings }}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Storage Instructions</label>
-                                        {{ form.storage_instructions }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Prescription Requirements -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-file-prescription text-primary me-2"></i>Prescription Requirements</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            {{ form.requires_prescription }}
-                                            <label class="form-check-label" for="id_requires_prescription">
-                                                Requires Prescription
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Prescription Type</label>
-                                        {{ form.prescription_type }}
-                                        <small class="text-muted">e.g., Regular, Controlled substance</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Details -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-box text-primary me-2"></i>Product Details</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Manufacturer *</label>
-                                        {{ form.manufacturer }}
-                                        {% if form.manufacturer.errors %}<div class="text-danger small">{{ form.manufacturer.errors.0 }}</div>{% endif %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Country of Origin</label>
-                                        {{ form.country_of_origin }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Batch Number</label>
-                                        {{ form.batch_number }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Expiry Date</label>
-                                        {{ form.expiry_date }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <!-- Pricing & Stock -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-tag text-primary me-2"></i>Pricing & Stock</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Price (GHS) *</label>
-                                    {{ form.price }}
-                                    {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors.0 }}</div>{% endif %}
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Discount Price (GHS)</label>
-                                    {{ form.discount_price }}
-                                    <small class="text-muted">Leave empty if no discount</small>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Stock Quantity *</label>
-                                    {{ form.stock_quantity }}
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Low Stock Alert Threshold</label>
-                                    {{ form.low_stock_threshold }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Images -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-image text-primary me-2"></i>Images</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Main Image</label>
-                                    {{ form.image }}
-                                    {% if medicine and medicine.image %}
-                                    <div class="mt-2">
-                                        <img src="{{ medicine.image.url }}" alt="Current image" class="img-thumbnail" style="max-height: 100px;">
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Image 2</label>
-                                    {{ form.image_2 }}
-                                    {% if medicine and medicine.image_2 %}
-                                    <div class="mt-2">
-                                        <img src="{{ medicine.image_2.url }}" alt="Image 2" class="img-thumbnail" style="max-height: 100px;">
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Image 3</label>
-                                    {{ form.image_3 }}
-                                    {% if medicine and medicine.image_3 %}
-                                    <div class="mt-2">
-                                        <img src="{{ medicine.image_3.url }}" alt="Image 3" class="img-thumbnail" style="max-height: 100px;">
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Status -->
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-toggle-on text-primary me-2"></i>Status</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-check mb-3">
-                                    {{ form.is_active }}
-                                    <label class="form-check-label" for="id_is_active">Active (visible to customers)</label>
-                                </div>
-                                <div class="form-check">
-                                    {{ form.is_featured }}
-                                    <label class="form-check-label" for="id_is_featured">Featured medicine</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save me-2"></i>{{ action }} Medicine
-                            </button>
-                            <a href="{% url 'pharmacy:owner_medicine_list' %}" class="btn btn-outline-secondary">Cancel</a>
-                        </div>
-                    </div>
+            <div class="col-lg-4">
+              <!-- Pricing & Stock -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #ede9fe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-tag" style="color: #7c3aed; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Pricing & Stock</h5>
                 </div>
-            </form>
-        </div>
+                <div style="padding: 1.5rem;">
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Price (GHS) <span style="color: #ef4444;">*</span></label>
+                    {{ form.price }}
+                    {% if form.price.errors %}<div style="color: #ef4444; font-size: 0.8125rem; margin-top: 0.25rem;">{{ form.price.errors.0 }}</div>{% endif %}
+                  </div>
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Discount Price (GHS)</label>
+                    {{ form.discount_price }}
+                    <small style="color: #6b7280; font-size: 0.8125rem;">Leave empty if no discount</small>
+                  </div>
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Stock Quantity <span style="color: #ef4444;">*</span></label>
+                    {{ form.stock_quantity }}
+                  </div>
+                  <div>
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Low Stock Threshold</label>
+                    {{ form.low_stock_threshold }}
+                    <small style="color: #6b7280; font-size: 0.8125rem;">Alert when stock falls below</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Images -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #e0e7ff; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-image" style="color: #6366f1; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Images</h5>
+                </div>
+                <div style="padding: 1.5rem;">
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Main Image</label>
+                    {{ form.image }}
+                  </div>
+                  <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Additional Image 1</label>
+                    {{ form.image_2 }}
+                  </div>
+                  <div>
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Additional Image 2</label>
+                    {{ form.image_3 }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status & Options -->
+              <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; background: #fef2f2; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-cog" style="color: #ef4444; font-size: 1.125rem;"></i>
+                  </div>
+                  <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Status & Options</h5>
+                </div>
+                <div style="padding: 1.5rem;">
+                  <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                      {{ form.is_active }}
+                      <span style="font-weight: 600; color: #374151;">Active</span>
+                    </label>
+                  </div>
+                  <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                      {{ form.requires_prescription }}
+                      <span style="font-weight: 600; color: #374151;">Requires Prescription</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                      {{ form.is_featured }}
+                      <span style="font-weight: 600; color: #374151;">Featured</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button type="submit" style="width: 100%; padding: 1rem; background: #7c3aed; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onmouseover="this.style.background='#6d28d9'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#7c3aed'; this.style.transform='translateY(0)'">
+                  <i class="fas fa-save"></i>{{ action }} Medicine
+                </button>
+                <a href="{% url 'pharmacy:owner_medicine_list' %}" style="width: 100%; padding: 1rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; text-decoration: none; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1d5db'; this.style.color='#374151'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+                  Cancel
+                </a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

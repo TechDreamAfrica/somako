@@ -1,201 +1,205 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-food{% endblock %}
 {% block title %}{{ restaurant.name }} - Soma Ko{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div class="d-flex align-items-center">
-            <a href="{% url 'food:owner_restaurant_list' %}" class="btn btn-outline-secondary me-3">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <div>
-                <h2 class="mb-1">{{ restaurant.name }}</h2>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge {% if restaurant.status == 'active' %}bg-success{% elif restaurant.status == 'inactive' %}bg-secondary{% else %}bg-danger{% endif %}">
-                        {{ restaurant.get_status_display }}
-                    </span>
-                    <span class="text-muted">{{ restaurant.city }}, {{ restaurant.state }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="btn-group">
-            <a href="{% url 'food:owner_restaurant_update' pk=restaurant.pk %}" class="btn btn-outline-primary">
-                <i class="fas fa-edit me-2"></i>Edit
-            </a>
-            <a href="{% url 'food:owner_restaurant_toggle_status' pk=restaurant.pk %}" class="btn btn-outline-warning">
-                <i class="fas fa-power-off me-2"></i>Toggle Status
-            </a>
-            <a href="{% url 'food:owner_restaurant_delete' pk=restaurant.pk %}" class="btn btn-outline-danger">
-                <i class="fas fa-trash me-2"></i>Delete
-            </a>
-        </div>
-    </div>
+<!-- Hero Section -->
+<section style="position: relative; background: #ea580c; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
 
-    <!-- Restaurant Info Card -->
-    <div class="card mb-4">
-        <div class="row g-0">
-            <div class="col-md-4">
-                {% if restaurant.image %}
-                <img src="{{ restaurant.image.url }}" class="img-fluid rounded-start h-100" alt="{{ restaurant.name }}" style="object-fit: cover;">
-                {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
-                    <i class="fas fa-utensils fa-4x text-muted"></i>
-                </div>
-                {% endif %}
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-2"><strong><i class="fas fa-phone me-2"></i>Phone:</strong> {{ restaurant.phone }}</p>
-                            <p class="mb-2"><strong><i class="fas fa-envelope me-2"></i>Email:</strong> {{ restaurant.email }}</p>
-                            <p class="mb-2"><strong><i class="fas fa-map-marker-alt me-2"></i>Address:</strong> {{ restaurant.address|default:"Not set" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-2"><strong><i class="fas fa-clock me-2"></i>Delivery Time:</strong> {{ restaurant.delivery_time }} mins</p>
-                            <p class="mb-2"><strong><i class="fas fa-money-bill me-2"></i>Min Order:</strong> GHS {{ restaurant.minimum_order_amount }}</p>
-                            <p class="mb-2">
-                                <strong><i class="fas fa-star me-2 text-warning"></i>Rating:</strong> 
-                                {{ restaurant.average_rating|floatformat:1 }} ({{ restaurant.total_reviews }} reviews)
-                            </p>
-                        </div>
-                    </div>
-                    {% if restaurant.description %}
-                    <hr>
-                    <p class="mb-0">{{ restaurant.description }}</p>
-                    {% endif %}
-                </div>
-            </div>
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="{% url 'food:owner_restaurant_list' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">{{ restaurant.name }}</h1>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <span style="display: inline-block; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8125rem; font-weight: 700; {% if restaurant.status == 'active' %}background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3);{% elif restaurant.status == 'inactive' %}background: rgba(107, 114, 128, 0.2); color: #d1d5db; border: 1px solid rgba(107, 114, 128, 0.3);{% else %}background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);{% endif %}">
+              {{ restaurant.get_status_display }}
+            </span>
+            <span style="color: rgba(255, 255, 255, 0.9); font-size: 0.875rem;">{{ restaurant.city }}, {{ restaurant.state }}</span>
+          </div>
         </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'food:owner_restaurant_update' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #ea580c; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <i class="fas fa-edit"></i>Edit
+        </a>
+        <a href="{% url 'food:owner_restaurant_toggle_status' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+          <i class="fas fa-power-off"></i>Toggle
+        </a>
+        <a href="{% url 'food:owner_restaurant_delete' pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ef4444; color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+          <i class="fas fa-trash"></i>Delete
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section style="padding: 3rem 0; background: #f8fafc;">
+  <div class="container">
+    <!-- Restaurant Info Card -->
+    <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
+      <div class="row g-0">
+        <div class="col-md-4">
+          {% if restaurant.image %}
+          <img src="{{ restaurant.image.url }}" alt="{{ restaurant.name }}" style="width: 100%; height: 100%; min-height: 250px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 100%; min-height: 250px; background: #fff7ed; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-utensils" style="font-size: 4rem; color: #ea580c; opacity: 0.3;"></i>
+          </div>
+          {% endif %}
+        </div>
+        <div class="col-md-8">
+          <div style="padding: 1.5rem;">
+            <div class="row">
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #dcfce7; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-phone" style="color: #22c55e;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Phone</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ restaurant.phone }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-envelope" style="color: #3b82f6;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Email</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ restaurant.email|default:"-" }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #fee2e2; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-map-marker-alt" style="color: #ef4444;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Address</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ restaurant.address|default:"Not set" }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #fef3c7; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-clock" style="color: #f59e0b;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Delivery Time</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ restaurant.delivery_time }} mins</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #ede9fe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-money-bill" style="color: #7c3aed;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Min Order</div>
+                    <div style="color: #1f2937; font-weight: 600;">GHS {{ restaurant.minimum_order_amount }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div style="width: 36px; height: 36px; background: #fff7ed; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-star" style="color: #ea580c;"></i>
+                  </div>
+                  <div>
+                    <div style="color: #6b7280; font-size: 0.75rem; font-weight: 500;">Rating</div>
+                    <div style="color: #1f2937; font-weight: 600;">{{ restaurant.average_rating|floatformat:1 }} ({{ restaurant.total_reviews }} reviews)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% if restaurant.description %}
+            <div style="border-top: 2px solid #f3f4f6; padding-top: 1rem; margin-top: 0.5rem;">
+              <p style="color: #4b5563; line-height: 1.6; margin: 0;">{{ restaurant.description }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Menu Items Section -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0"><i class="fas fa-utensils me-2"></i>Menu Items ({{ total_items }})</h4>
-        <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Add Menu Item
-        </a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h3 style="font-weight: 800; color: #1f2937; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-utensils" style="color: #ea580c;"></i>Menu Items ({{ total_items }})
+      </h3>
+      <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ea580c; color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#c2410c'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#ea580c'; this.style.transform='translateY(0)'">
+        <i class="fas fa-plus"></i>Add Menu Item
+      </a>
     </div>
 
-    <!-- Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h4 class="mb-0">{{ total_items }}</h4>
-                    <small>Total Items</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h4 class="mb-0">{{ available_items }}</h4>
-                    <small>Available</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-white">
-                <div class="card-body text-center">
-                    <h4 class="mb-0">{{ total_items|add:"-"|add:available_items }}</h4>
-                    <small>Unavailable</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body text-center">
-                    <h4 class="mb-0">{{ menu_items|length }}</h4>
-                    <small>Featured</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Menu Items List -->
     {% if menu_items %}
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Rating</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in menu_items %}
-                <tr>
-                    <td>
-                        {% if item.image %}
-                        <img src="{{ item.get_image_url }}" alt="{{ item.name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                        {% else %}
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                            <i class="fas fa-image text-muted"></i>
-                        </div>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <strong>{{ item.name }}</strong>
-                        {% if item.is_featured %}<span class="badge bg-warning text-dark ms-1">Featured</span>{% endif %}
-                        <br>
-                        <small class="text-muted">{{ item.description|truncatechars:50 }}</small>
-                    </td>
-                    <td>{{ item.category.name|default:"-" }}</td>
-                    <td>
-                        {% if item.discounted_price %}
-                        <span class="text-decoration-line-through text-muted">GHS {{ item.price }}</span><br>
-                        <span class="text-success fw-bold">GHS {{ item.discounted_price }}</span>
-                        {% else %}
-                        <span class="fw-bold">GHS {{ item.price }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="badge {% if item.is_available %}bg-success{% else %}bg-secondary{% endif %}">
-                            {% if item.is_available %}Available{% else %}Unavailable{% endif %}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="text-warning"><i class="fas fa-star"></i></span>
-                        {{ item.average_rating|floatformat:1 }}
-                    </td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{% url 'food:owner_menu_item_update' pk=item.pk %}" class="btn btn-outline-primary" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="{% url 'food:owner_menu_item_toggle' pk=item.pk %}" class="btn btn-outline-warning" title="Toggle Availability">
-                                <i class="fas fa-power-off"></i>
-                            </a>
-                            <a href="{% url 'food:owner_menu_item_delete' pk=item.pk %}" class="btn btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="row g-4">
+      {% for item in menu_items %}
+      <div class="col-md-6 col-lg-4">
+        <div style="background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 25px rgba(0, 0, 0, 0.12)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.08)'">
+          {% if item.image %}
+          <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 100%; height: 150px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 150px; background: #fff7ed; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-hamburger" style="font-size: 2.5rem; color: #ea580c; opacity: 0.3;"></i>
+          </div>
+          {% endif %}
+          <div style="padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0; font-size: 1rem;">{{ item.name }}</h5>
+              <span style="display: inline-block; padding: 0.25rem 0.625rem; border-radius: 50px; font-size: 0.6875rem; font-weight: 700; {% if item.is_available %}background: #dcfce7; color: #22c55e;{% else %}background: #f3f4f6; color: #6b7280;{% endif %}">
+                {% if item.is_available %}Available{% else %}Unavailable{% endif %}
+              </span>
+            </div>
+            <p style="color: #6b7280; font-size: 0.8125rem; margin-bottom: 0.75rem;">{{ item.category.name|default:"Uncategorized" }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              {% if item.discounted_price %}
+              <div>
+                <span style="text-decoration: line-through; color: #9ca3af; font-size: 0.875rem;">GHS {{ item.price }}</span>
+                <span style="font-weight: 800; color: #ea580c; font-size: 1.125rem; margin-left: 0.5rem;">GHS {{ item.discounted_price }}</span>
+              </div>
+              {% else %}
+              <span style="font-weight: 800; color: #ea580c; font-size: 1.125rem;">GHS {{ item.price }}</span>
+              {% endif %}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{% url 'food:owner_menu_item_update' restaurant_pk=restaurant.pk pk=item.pk %}" style="flex: 1; padding: 0.5rem; background: #dbeafe; color: #3b82f6; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.8125rem; text-align: center; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 0.375rem;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='#dbeafe'; this.style.color='#3b82f6'">
+                <i class="fas fa-edit"></i>Edit
+              </a>
+              <a href="{% url 'food:owner_menu_item_delete' restaurant_pk=restaurant.pk pk=item.pk %}" style="flex: 1; padding: 0.5rem; background: #fef2f2; color: #ef4444; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.8125rem; text-align: center; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 0.375rem;" onmouseover="this.style.background='#ef4444'; this.style.color='white'" onmouseout="this.style.background='#fef2f2'; this.style.color='#ef4444'">
+                <i class="fas fa-trash"></i>Delete
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
     {% else %}
-    <div class="card">
-        <div class="card-body text-center py-5">
-            <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
-            <h4>No Menu Items Yet</h4>
-            <p class="text-muted">Start by adding your first menu item</p>
-            <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Add First Menu Item
-            </a>
-        </div>
+    <!-- Empty State -->
+    <div style="background: white; border-radius: 1.25rem; padding: 3rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+      <div style="width: 70px; height: 70px; background: #fff7ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-hamburger" style="font-size: 1.75rem; color: #ea580c;"></i>
+      </div>
+      <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">No Menu Items</h4>
+      <p style="color: #6b7280; margin-bottom: 1.25rem;">Add your first menu item to start selling</p>
+      <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #ea580c; color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">
+        <i class="fas fa-plus"></i>Add Menu Item
+      </a>
     </div>
     {% endif %}
-</div>
+  </div>
+</section>
 {% endblock %}
