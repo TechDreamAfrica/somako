@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Menu Item - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="mb-0">{{ action }} Menu Item</h2>
+                    <p class="text-muted mb-0">{{ restaurant.name }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Basic Information -->
+                        <h5 class="mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-8">
+                                <label class="form-label">Item Name *</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Category</label>
+                                {{ form.category }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Description</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+
+                        <!-- Pricing -->
+                        <h5 class="mb-3"><i class="fas fa-tag text-primary me-2"></i>Pricing</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Price (GHS) *</label>
+                                {{ form.price }}
+                                {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Discounted Price (GHS)</label>
+                                {{ form.discounted_price }}
+                                <small class="text-muted">Leave empty if no discount</small>
+                            </div>
+                        </div>
+
+                        <!-- Details -->
+                        <h5 class="mb-3"><i class="fas fa-list text-primary me-2"></i>Details</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Preparation Time (mins)</label>
+                                {{ form.preparation_time }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Serving Size</label>
+                                {{ form.serving_size }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Calories</label>
+                                {{ form.calories }}
+                            </div>
+                        </div>
+
+                        <!-- Dietary Info -->
+                        <h5 class="mb-3"><i class="fas fa-leaf text-primary me-2"></i>Dietary Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_vegetarian }}
+                                    <label class="form-check-label" for="id_is_vegetarian">
+                                        <i class="fas fa-seedling text-success me-1"></i>Vegetarian
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_vegan }}
+                                    <label class="form-check-label" for="id_is_vegan">
+                                        <i class="fas fa-leaf text-success me-1"></i>Vegan
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_gluten_free }}
+                                    <label class="form-check-label" for="id_is_gluten_free">
+                                        <i class="fas fa-bread-slice text-warning me-1"></i>Gluten Free
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image -->
+                        <h5 class="mb-3"><i class="fas fa-image text-primary me-2"></i>Image</h5>
+                        <div class="mb-4">
+                            {{ form.image }}
+                            {% if menu_item and menu_item.image %}
+                            <div class="mt-2">
+                                <img src="{{ menu_item.get_image_url }}" alt="Current image" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Status -->
+                        <h5 class="mb-3"><i class="fas fa-toggle-on text-primary me-2"></i>Status</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.is_available }}
+                                    <label class="form-check-label" for="id_is_available">Available for ordering</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.is_featured }}
+                                    <label class="form-check-label" for="id_is_featured">Featured item</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ action }} Menu Item
+                            </button>
+                            <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

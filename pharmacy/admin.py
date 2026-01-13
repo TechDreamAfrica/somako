@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    MedicineCategory, Medicine, Prescription, Cart, CartItem,
+    MedicineCategory, Pharmacy, Medicine, Prescription, Cart, CartItem,
     Order, OrderItem, OrderStatusHistory, Review, ReviewHelpful, Wishlist
 )
 
@@ -14,18 +14,73 @@ class MedicineCategoryAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-@admin.register(Medicine)
-class MedicineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'requires_prescription', 'price', 'discount_price', 'stock_quantity', 'is_in_stock', 'is_active', 'created_at')
-    list_filter = ('requires_prescription', 'dosage_form', 'is_active', 'is_featured', 'category', 'created_at')
-    search_fields = ('name', 'generic_name', 'brand_name', 'active_ingredients', 'manufacturer')
+@admin.register(Pharmacy)
+class PharmacyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'owner', 'city', 'status', 'is_verified', 'is_featured', 'license_number', 'created_at')
+    list_filter = ('status', 'is_verified', 'is_featured', 'license_type', 'city', 'delivery_available', 'is_24_hours')
+    search_fields = ('name', 'owner__username', 'owner__email', 'license_number', 'city', 'address')
     prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ('views_count', 'created_at', 'updated_at', 'average_rating', 'review_count')
+    readonly_fields = ('average_rating', 'total_reviews', 'created_at', 'updated_at', 'medicine_count')
     list_per_page = 25
+    raw_id_fields = ('owner',)
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'slug', 'generic_name', 'brand_name', 'category', 'owner')
+            'fields': ('name', 'slug', 'owner', 'description', 'logo', 'image')
+        }),
+        ('Contact Information', {
+            'fields': ('phone', 'email', 'website')
+        }),
+        ('Location', {
+            'fields': ('address', 'city', 'state', 'postal_code', 'country', 'latitude', 'longitude')
+        }),
+        ('License & Registration', {
+            'fields': ('license_number', 'license_type', 'license_expiry_date', 'registration_number', 'is_verified')
+        }),
+        ('Business Settings', {
+            'fields': ('status', 'is_featured', 'opening_hours', 'is_24_hours')
+        }),
+        ('Delivery Settings', {
+            'fields': ('delivery_available', 'minimum_order_amount', 'delivery_fee', 'free_delivery_threshold', 'estimated_delivery_time')
+        }),
+        ('Ratings & Stats', {
+            'fields': ('average_rating', 'total_reviews', 'medicine_count'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['mark_as_active', 'mark_as_verified', 'mark_as_featured']
+
+    def mark_as_active(self, request, queryset):
+        queryset.update(status='active')
+    mark_as_active.short_description = "Mark selected pharmacies as active"
+
+    def mark_as_verified(self, request, queryset):
+        queryset.update(is_verified=True)
+    mark_as_verified.short_description = "Mark selected pharmacies as verified"
+
+    def mark_as_featured(self, request, queryset):
+        queryset.update(is_featured=True)
+    mark_as_featured.short_description = "Mark selected pharmacies as featured"
+
+
+@admin.register(Medicine)
+class MedicineAdmin(admin.ModelAdmin):
+    list_display = ('name', 'pharmacy', 'category', 'requires_prescription', 'price', 'discount_price', 'stock_quantity', 'is_in_stock', 'is_active', 'created_at')
+    list_filter = ('requires_prescription', 'dosage_form', 'is_active', 'is_featured', 'category', 'pharmacy', 'created_at')
+    search_fields = ('name', 'generic_name', 'brand_name', 'active_ingredients', 'manufacturer', 'pharmacy__name')
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('views_count', 'created_at', 'updated_at', 'average_rating', 'review_count')
+    list_per_page = 25
+    raw_id_fields = ('owner', 'pharmacy')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'generic_name', 'brand_name', 'category', 'pharmacy', 'owner')
         }),
         ('Description', {
             'fields': ('description', 'usage', 'dosage', 'dosage_form')

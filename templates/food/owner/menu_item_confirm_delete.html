@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Menu Item - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Menu Item</h5>
+                </div>
+                <div class="card-body text-center py-4">
+                    {% if menu_item.image %}
+                    <img src="{{ menu_item.get_image_url }}" alt="{{ menu_item.name }}" class="rounded mb-3" style="max-height: 150px;">
+                    {% else %}
+                    <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
+                    {% endif %}
+                    
+                    <h4>{{ menu_item.name }}</h4>
+                    <p class="text-muted">{{ restaurant.name }}</p>
+                    <p class="fw-bold">GHS {{ menu_item.get_display_price }}</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p>Are you sure you want to delete this menu item?</p>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Yes, Delete Item
+                        </button>
+                        <a href="{% url 'food:owner_restaurant_detail' pk=restaurant.pk %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

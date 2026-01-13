@@ -726,22 +726,28 @@ def dashboard_view(request):
         context['service_name'] = 'Shop - Buyer'
 
     elif service_role == 'pharmacy_owner':
-        from pharmacy.models import Medicine, Order
+        from pharmacy.models import Pharmacy, Medicine, Order
+        # Get user's pharmacies
+        pharmacies = Pharmacy.objects.filter(owner=user)
+        context['my_pharmacies'] = pharmacies.order_by('-created_at')[:5]
+        context['pharmacies_count'] = pharmacies.count()
+        # Get medicines from user's pharmacies
         medicines = Medicine.objects.filter(pharmacy__owner=user)
         context['my_medicines'] = medicines.order_by('-created_at')[:5]
         context['medicines_count'] = medicines.count()
-        context['pending_orders'] = Order.objects.filter(medicine__pharmacy__owner=user, status='pending').count()
-        context['completed_orders'] = Order.objects.filter(medicine__pharmacy__owner=user, status='completed').count()
-        context['total_orders'] = Order.objects.filter(medicine__pharmacy__owner=user).count()
+        # Get orders for user's pharmacies
+        context['pending_orders'] = Order.objects.filter(pharmacy__owner=user, status='pending').count()
+        context['completed_orders'] = Order.objects.filter(pharmacy__owner=user, status='delivered').count()
+        context['total_orders'] = Order.objects.filter(pharmacy__owner=user).count()
         context['service_name'] = 'Pharmacy - Owner'
 
     elif service_role == 'patient':
         from pharmacy.models import Order
         try:
-            orders = Order.objects.filter(customer=user)
+            orders = Order.objects.filter(user=user)
             context['my_orders'] = orders.order_by('-created_at')[:5]
             context['pending_orders'] = orders.filter(status='pending').count()
-            context['completed_orders'] = orders.filter(status='completed').count()
+            context['completed_orders'] = orders.filter(status='delivered').count()
             context['cancelled_orders'] = orders.filter(status='cancelled').count()
             context['total_orders'] = orders.count()
         except Exception as e:
@@ -1967,12 +1973,81 @@ def pwa_login_view(request):
         
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
             # Debug: Log user roles
             import logging
             logger = logging.getLogger(__name__)
-            logger.info(f"User {user.username} logged in with roles: {user.service_roles}")
+            logger.info(f"User {user.username} attempting login with roles: {user.service_roles}")
             logger.info(f"User roles list: {user.get_roles_list()}")
+            
+            # Get the target app from next_url or app parameter
+            target_app = request.GET.get('app', '')
+            if not target_app:
+                if '/pwa/food/' in next_url:
+                    target_app = 'food'
+                elif '/pwa/pharmacy/' in next_url:
+                    target_app = 'pharmacy'
+                elif '/pwa/shop/' in next_url:
+                    target_app = 'shop'
+                elif '/pwa/rent/' in next_url:
+                    target_app = 'rent'
+                elif '/pwa/ride/' in next_url:
+                    target_app = 'ride'
+                elif '/pwa/express/' in next_url:
+                    target_app = 'express'
+            
+            # Check user type restrictions for specific apps
+            user_roles = user.get_roles_list()
+            is_general_user = user.has_role('general') or 'general' in user.service_roles
+            
+            # Food app restriction: only general users or restaurant owners
+            if target_app == 'food':
+                is_restaurant_owner = user.has_role('restaurant_owner') or 'restaurant_owner' in user.service_roles
+                if not (is_general_user or is_restaurant_owner):
+                    logger.warning(f"User {user.username} denied access to food app. Roles: {user.service_roles}")
+                    app_context['error'] = 'Access denied. Only general users or restaurant owners can access the Food app.'
+                    app_context['next'] = next_url or app_context['pwa_home_url']
+                    return render(request, 'pwa/login.html', app_context)
+            
+            # Pharmacy app restriction: only general users or pharmacy owners
+            if target_app == 'pharmacy':
+                is_pharmacy_owner = user.has_role('pharmacy_owner') or 'pharmacy_owner' in user.service_roles
+                if not (is_general_user or is_pharmacy_owner):
+                    logger.warning(f"User {user.username} denied access to pharmacy app. Roles: {user.service_roles}")
+                    app_context['error'] = 'Access denied. Only general users or pharmacy owners can access the Pharmacy app.'
+                    app_context['next'] = next_url or app_context['pwa_home_url']
+                    return render(request, 'pwa/login.html', app_context)
+            
+            # Ride app restriction: only general users or drivers
+            if target_app == 'ride':
+                is_driver = user.has_role('driver') or 'driver' in user.service_roles
+                if not (is_general_user or is_driver):
+                    logger.warning(f"User {user.username} denied access to ride app. Roles: {user.service_roles}")
+                    app_context['error'] = 'Access denied. Only general users or drivers can access the Ride app.'
+                    app_context['next'] = next_url or app_context['pwa_home_url']
+                    return render(request, 'pwa/login.html', app_context)
+            
+            # Shop app restriction: only general users or sellers
+            if target_app == 'shop':
+                is_seller = user.has_role('seller') or 'seller' in user.service_roles
+                if not (is_general_user or is_seller):
+                    logger.warning(f"User {user.username} denied access to shop app. Roles: {user.service_roles}")
+                    app_context['error'] = 'Access denied. Only general users or sellers can access the Shop app.'
+                    app_context['next'] = next_url or app_context['pwa_home_url']
+                    return render(request, 'pwa/login.html', app_context)
+            
+            # Rent app restriction: only general users, landlords, or equipment owners
+            if target_app == 'rent':
+                is_landlord = user.has_role('landlord') or 'landlord' in user.service_roles
+                is_equipment_owner = user.has_role('equipment_owner') or 'equipment_owner' in user.service_roles
+                if not (is_general_user or is_landlord or is_equipment_owner):
+                    logger.warning(f"User {user.username} denied access to rent app. Roles: {user.service_roles}")
+                    app_context['error'] = 'Access denied. Only general users, landlords, or equipment owners can access the Rent app.'
+                    app_context['next'] = next_url or app_context['pwa_home_url']
+                    return render(request, 'pwa/login.html', app_context)
+            
+            # User passed all checks, proceed with login
+            login(request, user)
+            logger.info(f"User {user.username} logged in successfully with roles: {user.service_roles}")
             logger.info(f"Has rider role: {user.has_role('rider')}")
             
             # Check if user is a delivery driver and redirect to rider dashboard

@@ -35,6 +35,168 @@ class MedicineCategory(models.Model):
         return self.name
 
 
+class Pharmacy(models.Model):
+    """Pharmacy model for managing pharmacy establishments"""
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended'),
+        ('pending_verification', 'Pending Verification'),
+    ]
+
+    LICENSE_TYPE_CHOICES = [
+        ('retail', 'Retail Pharmacy'),
+        ('hospital', 'Hospital Pharmacy'),
+        ('community', 'Community Pharmacy'),
+        ('online', 'Online Pharmacy'),
+        ('compounding', 'Compounding Pharmacy'),
+    ]
+
+    # Owner
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='pharmacies',
+        help_text='Pharmacy owner/manager'
+    )
+
+    # Basic Information
+    name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
+    description = models.TextField(blank=True)
+    logo = models.ImageField(
+        upload_to='pharmacies/logos/',
+        blank=True,
+        null=True,
+        help_text="Pharmacy logo image"
+    )
+    image = models.ImageField(
+        upload_to='pharmacies/images/',
+        blank=True,
+        null=True,
+        help_text="Main pharmacy image"
+    )
+
+    # Contact Information
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    website = models.URLField(blank=True, null=True)
+
+    # Location Information
+    address = models.TextField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20, blank=True)
+    country = models.CharField(max_length=100, default='Ghana')
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text='Latitude coordinate for map location'
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text='Longitude coordinate for map location'
+    )
+
+    # License & Registration
+    license_number = models.CharField(max_length=100, unique=True)
+    license_type = models.CharField(max_length=20, choices=LICENSE_TYPE_CHOICES, default='retail')
+    license_expiry_date = models.DateField(blank=True, null=True)
+    registration_number = models.CharField(max_length=100, blank=True)
+    is_verified = models.BooleanField(default=False, help_text='Pharmacy verification status')
+
+    # Business Information
+    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='pending_verification')
+    is_featured = models.BooleanField(default=False)
+    opening_hours = models.TextField(
+        blank=True,
+        help_text='Opening hours text (e.g., "Mon-Fri: 8AM-9PM, Sat: 9AM-6PM")'
+    )
+    is_24_hours = models.BooleanField(default=False)
+    delivery_available = models.BooleanField(default=True)
+    minimum_order_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    delivery_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('5.00'),
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    free_delivery_threshold = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text='Order amount above which delivery is free'
+    )
+    estimated_delivery_time = models.PositiveIntegerField(
+        default=60,
+        help_text='Estimated delivery time in minutes'
+    )
+
+    # Ratings
+    average_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))]
+    )
+    total_reviews = models.PositiveIntegerField(default=0)
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Pharmacy'
+        verbose_name_plural = 'Pharmacies'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['city', 'status']),
+            models.Index(fields=['owner']),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Pharmacy.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_open(self):
+        """Check if pharmacy is currently open (simplified - just checks status)"""
+        return self.status == 'active'
+
+    @property
+    def medicine_count(self):
+        return self.medicines.filter(is_active=True).count()
+
+    @property
+    def is_license_valid(self):
+        if self.license_expiry_date:
+            return self.license_expiry_date >= timezone.now().date()
+        return True
+
+
 class Medicine(models.Model):
     """Main medicine/drug model with detailed information"""
 
@@ -58,6 +220,14 @@ class Medicine(models.Model):
     generic_name = models.CharField(max_length=200, blank=True, help_text="Generic/scientific name")
     brand_name = models.CharField(max_length=200, blank=True)
     category = models.ForeignKey(MedicineCategory, on_delete=models.PROTECT, related_name='medicines')
+    pharmacy = models.ForeignKey(
+        'Pharmacy',
+        on_delete=models.CASCADE,
+        related_name='medicines',
+        null=True,
+        blank=True,
+        help_text='The pharmacy that sells this medicine'
+    )
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='medicines', null=True)
 
     # Description and Usage
@@ -367,6 +537,14 @@ class Order(models.Model):
     # Order Information
     order_number = models.CharField(max_length=100, unique=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pharmacy_orders')
+    pharmacy = models.ForeignKey(
+        Pharmacy,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        null=True,
+        blank=True,
+        help_text='The pharmacy fulfilling this order'
+    )
 
     # Pricing
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)

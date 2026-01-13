@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ restaurant.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex align-items-center">
+            <a href="{% url 'food:owner_restaurant_list' %}" class="btn btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1">{{ restaurant.name }}</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge {% if restaurant.status == 'active' %}bg-success{% elif restaurant.status == 'inactive' %}bg-secondary{% else %}bg-danger{% endif %}">
+                        {{ restaurant.get_status_display }}
+                    </span>
+                    <span class="text-muted">{{ restaurant.city }}, {{ restaurant.state }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <a href="{% url 'food:owner_restaurant_update' pk=restaurant.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'food:owner_restaurant_toggle_status' pk=restaurant.pk %}" class="btn btn-outline-warning">
+                <i class="fas fa-power-off me-2"></i>Toggle Status
+            </a>
+            <a href="{% url 'food:owner_restaurant_delete' pk=restaurant.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- Restaurant Info Card -->
+    <div class="card mb-4">
+        <div class="row g-0">
+            <div class="col-md-4">
+                {% if restaurant.image %}
+                <img src="{{ restaurant.image.url }}" class="img-fluid rounded-start h-100" alt="{{ restaurant.name }}" style="object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 200px;">
+                    <i class="fas fa-utensils fa-4x text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong><i class="fas fa-phone me-2"></i>Phone:</strong> {{ restaurant.phone }}</p>
+                            <p class="mb-2"><strong><i class="fas fa-envelope me-2"></i>Email:</strong> {{ restaurant.email }}</p>
+                            <p class="mb-2"><strong><i class="fas fa-map-marker-alt me-2"></i>Address:</strong> {{ restaurant.address|default:"Not set" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong><i class="fas fa-clock me-2"></i>Delivery Time:</strong> {{ restaurant.delivery_time }} mins</p>
+                            <p class="mb-2"><strong><i class="fas fa-money-bill me-2"></i>Min Order:</strong> GHS {{ restaurant.minimum_order_amount }}</p>
+                            <p class="mb-2">
+                                <strong><i class="fas fa-star me-2 text-warning"></i>Rating:</strong> 
+                                {{ restaurant.average_rating|floatformat:1 }} ({{ restaurant.total_reviews }} reviews)
+                            </p>
+                        </div>
+                    </div>
+                    {% if restaurant.description %}
+                    <hr>
+                    <p class="mb-0">{{ restaurant.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Items Section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="fas fa-utensils me-2"></i>Menu Items ({{ total_items }})</h4>
+        <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Menu Item
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ total_items }}</h4>
+                    <small>Total Items</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ available_items }}</h4>
+                    <small>Available</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ total_items|add:"-"|add:available_items }}</h4>
+                    <small>Unavailable</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ menu_items|length }}</h4>
+                    <small>Featured</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Items List -->
+    {% if menu_items %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in menu_items %}
+                <tr>
+                    <td>
+                        {% if item.image %}
+                        <img src="{{ item.get_image_url }}" alt="{{ item.name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="fas fa-image text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ item.name }}</strong>
+                        {% if item.is_featured %}<span class="badge bg-warning text-dark ms-1">Featured</span>{% endif %}
+                        <br>
+                        <small class="text-muted">{{ item.description|truncatechars:50 }}</small>
+                    </td>
+                    <td>{{ item.category.name|default:"-" }}</td>
+                    <td>
+                        {% if item.discounted_price %}
+                        <span class="text-decoration-line-through text-muted">GHS {{ item.price }}</span><br>
+                        <span class="text-success fw-bold">GHS {{ item.discounted_price }}</span>
+                        {% else %}
+                        <span class="fw-bold">GHS {{ item.price }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if item.is_available %}bg-success{% else %}bg-secondary{% endif %}">
+                            {% if item.is_available %}Available{% else %}Unavailable{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-warning"><i class="fas fa-star"></i></span>
+                        {{ item.average_rating|floatformat:1 }}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'food:owner_menu_item_update' pk=item.pk %}" class="btn btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'food:owner_menu_item_toggle' pk=item.pk %}" class="btn btn-outline-warning" title="Toggle Availability">
+                                <i class="fas fa-power-off"></i>
+                            </a>
+                            <a href="{% url 'food:owner_menu_item_delete' pk=item.pk %}" class="btn btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
+            <h4>No Menu Items Yet</h4>
+            <p class="text-muted">Start by adding your first menu item</p>
+            <a href="{% url 'food:owner_menu_item_create' restaurant_pk=restaurant.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add First Menu Item
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

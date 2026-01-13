@@ -2,6 +2,7 @@
 Forms for Food app
 """
 from django import forms
+from django.utils.text import slugify
 from .models import Restaurant, MenuItem
 
 
@@ -35,6 +36,21 @@ class RestaurantForm(forms.ModelForm):
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Auto-generate slug from name if not set
+        if not instance.slug:
+            base_slug = slugify(instance.name)
+            slug = base_slug
+            counter = 1
+            while Restaurant.objects.filter(slug=slug).exclude(pk=instance.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            instance.slug = slug
+        if commit:
+            instance.save()
+        return instance
+
 
 class MenuItemForm(forms.ModelForm):
     """Form for creating/updating menu items"""
@@ -64,3 +80,19 @@ class MenuItemForm(forms.ModelForm):
             'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Auto-generate slug from name if not set
+        if not instance.slug:
+            base_slug = slugify(instance.name)
+            slug = base_slug
+            counter = 1
+            # Check for uniqueness within the restaurant
+            while MenuItem.objects.filter(restaurant=instance.restaurant, slug=slug).exclude(pk=instance.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            instance.slug = slug
+        if commit:
+            instance.save()
+        return instance
