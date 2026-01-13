@@ -1,160 +1,190 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-rent{% endblock %}
 {% block title %}Manage Bookings - Soma Ko Rent{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-1">Manage Bookings</h1>
-      <p class="text-muted mb-0">View and manage equipment rental bookings</p>
-    </div>
-    <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-primary">
-      <i class="fas fa-tools me-2"></i>My Equipment
-    </a>
-  </div>
+<!-- Hero Section -->
+<section style="position: relative; background: #059669; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
 
-  <!-- Stats -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center">
-          <div class="h4 mb-0 text-primary">{{ total_bookings }}</div>
-          <div class="text-muted small">Total Bookings</div>
-        </div>
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; color: white; margin-bottom: 1rem; border: 2px solid rgba(255, 255, 255, 0.3);">
+          <i class="fas fa-calendar-alt"></i>Booking Management
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 900; color: white; margin-bottom: 0.5rem;">Manage Bookings</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">View and manage equipment rental bookings</p>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center">
-          <div class="h4 mb-0 text-warning">{{ pending_count }}</div>
-          <div class="text-muted small">Pending</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center">
-          <div class="h4 mb-0 text-info">{{ confirmed_count }}</div>
-          <div class="text-muted small">Confirmed</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center">
-          <div class="h4 mb-0 text-success">{{ active_count }}</div>
-          <div class="text-muted small">Active</div>
-        </div>
-      </div>
+      <a href="{% url 'rent:owner_equipment_list' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.3);" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-tools"></i>My Equipment
+      </a>
     </div>
   </div>
+</section>
 
-  <!-- Filter -->
-  <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body py-2">
-      <div class="d-flex gap-2 flex-wrap">
-        <a href="{% url 'rent:owner_booking_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
-        <a href="?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-secondary{% endif %}">Pending</a>
-        <a href="?status=confirmed" class="btn btn-sm {% if status_filter == 'confirmed' %}btn-info{% else %}btn-outline-secondary{% endif %}">Confirmed</a>
-        <a href="?status=active" class="btn btn-sm {% if status_filter == 'active' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Active</a>
-        <a href="?status=completed" class="btn btn-sm {% if status_filter == 'completed' %}btn-success{% else %}btn-outline-secondary{% endif %}">Completed</a>
-        <a href="?status=cancelled" class="btn btn-sm {% if status_filter == 'cancelled' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Cancelled</a>
+<!-- Stats Cards -->
+<section style="padding: 2rem 0; margin-top: -1rem; position: relative; z-index: 10;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; text-align: center;">
+          <div style="font-size: 2rem; font-weight: 800; color: #3b82f6; margin-bottom: 0.25rem;">{{ total_bookings }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem; font-weight: 500;">Total Bookings</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; text-align: center;">
+          <div style="font-size: 2rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.25rem;">{{ pending_count }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem; font-weight: 500;">Pending</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; text-align: center;">
+          <div style="font-size: 2rem; font-weight: 800; color: #6366f1; margin-bottom: 0.25rem;">{{ confirmed_count }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem; font-weight: 500;">Confirmed</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; text-align: center;">
+          <div style="font-size: 2rem; font-weight: 800; color: #22c55e; margin-bottom: 0.25rem;">{{ active_count }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem; font-weight: 500;">Active</div>
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- Bookings List -->
-  {% if page_obj %}
-  <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Equipment</th>
-            <th>Customer</th>
-            <th>Dates</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in page_obj %}
-          <tr>
-            <td>
-              <div class="d-flex align-items-center">
-                {% if booking.equipment.main_image %}
-                <img src="{{ booking.equipment.main_image.url }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                {% else %}
-                <div class="rounded bg-light me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <i class="fas fa-tools text-muted"></i>
+<!-- Filter Section -->
+<section style="background: white; padding: 1.5rem 0; border-bottom: 1px solid #e5e7eb;">
+  <div class="container">
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="{% url 'rent:owner_booking_list' %}" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if not status_filter %}background: #059669; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">All</a>
+      <a href="?status=pending" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if status_filter == 'pending' %}background: #f59e0b; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">Pending</a>
+      <a href="?status=confirmed" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if status_filter == 'confirmed' %}background: #6366f1; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">Confirmed</a>
+      <a href="?status=active" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if status_filter == 'active' %}background: #3b82f6; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">Active</a>
+      <a href="?status=completed" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if status_filter == 'completed' %}background: #22c55e; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">Completed</a>
+      <a href="?status=cancelled" style="padding: 0.625rem 1.25rem; border-radius: 50px; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease; {% if status_filter == 'cancelled' %}background: #ef4444; color: white;{% else %}background: #f3f4f6; color: #4b5563;{% endif %}">Cancelled</a>
+    </div>
+  </div>
+</section>
+
+<!-- Bookings List -->
+<section style="padding: 3rem 0;">
+  <div class="container">
+    {% if page_obj %}
+    <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+              <th style="padding: 1rem 1.5rem; text-align: left; font-weight: 700; color: #374151; font-size: 0.875rem;">Equipment</th>
+              <th style="padding: 1rem 1.5rem; text-align: left; font-weight: 700; color: #374151; font-size: 0.875rem;">Customer</th>
+              <th style="padding: 1rem 1.5rem; text-align: left; font-weight: 700; color: #374151; font-size: 0.875rem;">Dates</th>
+              <th style="padding: 1rem 1.5rem; text-align: left; font-weight: 700; color: #374151; font-size: 0.875rem;">Amount</th>
+              <th style="padding: 1rem 1.5rem; text-align: left; font-weight: 700; color: #374151; font-size: 0.875rem;">Status</th>
+              <th style="padding: 1rem 1.5rem; text-align: center; font-weight: 700; color: #374151; font-size: 0.875rem;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in page_obj %}
+            <tr style="border-bottom: 1px solid #f3f4f6; transition: background 0.2s ease;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+              <td style="padding: 1rem 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  {% if booking.equipment.main_image %}
+                  <img src="{{ booking.equipment.main_image.url }}" alt="{{ booking.equipment.name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem;">
+                  {% else %}
+                  <div style="width: 48px; height: 48px; background: #ecfdf5; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-tools" style="color: #059669;"></i>
+                  </div>
+                  {% endif %}
+                  <span style="font-weight: 600; color: #1f2937;">{{ booking.equipment.name|truncatechars:25 }}</span>
                 </div>
-                {% endif %}
-                <span>{{ booking.equipment.name }}</span>
-              </div>
-            </td>
-            <td>
-              <div>{{ booking.customer.get_full_name|default:booking.customer.username }}</div>
-              <div class="text-muted small">{{ booking.customer.phone_number|default:booking.customer.email }}</div>
-            </td>
-            <td>
-              <div>{{ booking.start_date|date:"M d" }} - {{ booking.end_date|date:"M d, Y" }}</div>
-              <div class="text-muted small">{{ booking.duration_days }} day(s)</div>
-            </td>
-            <td class="text-success fw-bold">GHS {{ booking.total_amount|floatformat:2 }}</td>
-            <td>
-              <span class="badge 
-                {% if booking.status == 'pending' %}bg-warning
-                {% elif booking.status == 'confirmed' %}bg-info
-                {% elif booking.status == 'active' %}bg-primary
-                {% elif booking.status == 'completed' %}bg-success
-                {% else %}bg-secondary{% endif %}">
-                {{ booking.status|title }}
-              </span>
-            </td>
-            <td>
-              <a href="{% url 'rent:owner_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-eye"></i>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              </td>
+              <td style="padding: 1rem 1.5rem;">
+                <div style="font-weight: 600; color: #1f2937;">{{ booking.customer.get_full_name|default:booking.customer.username }}</div>
+                <div style="color: #6b7280; font-size: 0.8125rem;">{{ booking.customer.email|truncatechars:25 }}</div>
+              </td>
+              <td style="padding: 1rem 1.5rem;">
+                <div style="font-weight: 600; color: #1f2937;">{{ booking.start_date|date:"M d" }} - {{ booking.end_date|date:"M d" }}</div>
+                <div style="color: #6b7280; font-size: 0.8125rem;">{{ booking.duration_days }} day(s)</div>
+              </td>
+              <td style="padding: 1rem 1.5rem;">
+                <span style="font-weight: 700; color: #059669; font-size: 1rem;">GHS {{ booking.total_amount|floatformat:2 }}</span>
+              </td>
+              <td style="padding: 1rem 1.5rem;">
+                <span style="padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+                  {% if booking.status == 'pending' %}background: #fef3c7; color: #92400e;
+                  {% elif booking.status == 'confirmed' %}background: #e0e7ff; color: #4338ca;
+                  {% elif booking.status == 'active' %}background: #dbeafe; color: #1e40af;
+                  {% elif booking.status == 'completed' %}background: #dcfce7; color: #166534;
+                  {% else %}background: #fee2e2; color: #b91c1c;{% endif %}">
+                  {{ booking.status|title }}
+                </span>
+              </td>
+              <td style="padding: 1rem 1.5rem; text-align: center;">
+                <a href="{% url 'rent:owner_booking_detail' booking.pk %}" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ecfdf5; color: #059669; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#ecfdf5'" title="View Details">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
 
-  <!-- Pagination -->
-  {% if page_obj.has_other_pages %}
-  <nav class="mt-4">
-    <ul class="pagination justify-content-center">
-      {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
-      </li>
-      {% endif %}
-      {% for num in page_obj.paginator.page_range %}
-      <li class="page-item {% if num == page_obj.number %}active{% endif %}">
-        <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
-      </li>
-      {% endfor %}
-      {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
-      </li>
-      {% endif %}
-    </ul>
-  </nav>
-  {% endif %}
-  {% else %}
-  <div class="text-center py-5">
-    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
-    <h4>No Bookings</h4>
-    <p class="text-muted">You don't have any bookings yet</p>
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="margin-top: 3rem;">
+      <nav>
+        <ul style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap; list-style: none; padding: 0; margin: 0;">
+          {% if page_obj.has_previous %}
+          <li>
+            <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='white'">
+              <i class="fas fa-chevron-left"></i>Previous
+            </a>
+          </li>
+          {% endif %}
+          
+          {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+          <li>
+            <span style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: #059669; color: white; border-radius: 0.75rem; font-weight: 700; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);">{{ num }}</span>
+          </li>
+          {% else %}
+          <li>
+            <a href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}" style="display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'; this.style.borderColor='#d1fae5'; this.style.color='#059669'" onmouseout="this.style.background='white'; this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+          
+          {% if page_obj.has_next %}
+          <li>
+            <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: white; color: #059669; border: 2px solid #d1fae5; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='white'">
+              Next<i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6;">
+      <div style="width: 100px; height: 100px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+        <i class="fas fa-calendar-times" style="font-size: 3rem; color: #059669; opacity: 0.5;"></i>
+      </div>
+      <h4 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">No Bookings Found</h4>
+      <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 2rem;">{% if status_filter %}No {{ status_filter }} bookings at the moment{% else %}You haven't received any bookings yet{% endif %}</p>
+      <a href="{% url 'rent:owner_equipment_list' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 0.875rem 1.5rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='#047857'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'">
+        <i class="fas fa-tools"></i>View Equipment
+      </a>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
-</div>
+</section>
 {% endblock %}

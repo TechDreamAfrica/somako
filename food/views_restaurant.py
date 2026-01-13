@@ -254,7 +254,7 @@ def manage_orders(request):
 
     if not restaurants.exists():
         messages.error(request, 'No restaurants found.')
-        return redirect('food:restaurant_dashboard')
+        return redirect('food:dashboard')
 
     restaurant_id = request.GET.get('restaurant_id')
     if restaurant_id:
@@ -412,7 +412,7 @@ def manage_menu(request):
 
     if not restaurants.exists():
         messages.error(request, 'No restaurants found.')
-        return redirect('food:restaurant_dashboard')
+        return redirect('food:dashboard')
 
     restaurant_id = request.GET.get('restaurant_id')
     if restaurant_id:
@@ -513,7 +513,7 @@ def restaurant_analytics(request):
 
     if not restaurants.exists():
         messages.error(request, 'No restaurants found.')
-        return redirect('food:restaurant_dashboard')
+        return redirect('food:dashboard')
 
     restaurant_id = request.GET.get('restaurant_id')
     if restaurant_id:

@@ -1,28 +1,59 @@
 {% extends 'base.html' %}
-
+{% block content_class %}app-rent{% endblock %}
 {% block title %}Delete {{ equipment.name }} - Soma Ko Rent{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center py-5">
-          <div class="mb-4">
-            <i class="fas fa-exclamation-triangle text-danger fa-4x"></i>
+<!-- Hero Section -->
+<section style="position: relative; background: #059669; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'rent:owner_equipment_detail' equipment.pk %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">Delete Equipment</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">Confirm equipment deletion</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Confirmation Section -->
+<section style="padding: 4rem 0;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; text-align: center; padding: 3rem 2rem;">
+          <!-- Warning Icon -->
+          <div style="width: 100px; height: 100px; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444;"></i>
           </div>
-          <h3 class="mb-3">Delete Equipment?</h3>
-          <p class="text-muted mb-4">
-            Are you sure you want to delete <strong>{{ equipment.name }}</strong>?<br>
-            This action cannot be undone.
+          
+          <h3 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem;">Delete Equipment?</h3>
+          <p style="color: #6b7280; font-size: 1.0625rem; margin-bottom: 0.5rem;">
+            Are you sure you want to delete
           </p>
+          <p style="color: #1f2937; font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">
+            "{{ equipment.name }}"
+          </p>
+          
+          <!-- Warning Box -->
+          <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 0.75rem; padding: 1rem; margin-bottom: 2rem;">
+            <p style="color: #b91c1c; font-weight: 600; margin: 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <i class="fas fa-info-circle"></i>This action cannot be undone
+            </p>
+          </div>
           
           <form method="post">
             {% csrf_token %}
-            <div class="d-flex gap-2 justify-content-center">
-              <a href="{% url 'rent:owner_equipment_detail' equipment.pk %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
-              <button type="submit" class="btn btn-danger btn-lg">
-                <i class="fas fa-trash me-2"></i>Delete
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+              <a href="{% url 'rent:owner_equipment_detail' equipment.pk %}" style="padding: 0.875rem 2rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1d5db'; this.style.color='#374151'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+                Cancel
+              </a>
+              <button type="submit" style="padding: 0.875rem 2rem; background: #ef4444; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-trash"></i>Delete Equipment
               </button>
             </div>
           </form>
@@ -30,5 +61,5 @@
       </div>
     </div>
   </div>
-</div>
+</section>
 {% endblock %}

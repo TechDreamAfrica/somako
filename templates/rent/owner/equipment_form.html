@@ -1,195 +1,221 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block content_class %}app-rent{% endblock %}
 {% block title %}{% if action == 'Add' %}Add Equipment{% else %}Update {{ equipment.name }}{% endif %} - Soma Ko Rent{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <!-- Header -->
-      <div class="d-flex align-items-center mb-4">
-        <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-secondary me-3">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-        <div>
-          <h1 class="h3 mb-0">{{ action }} Equipment</h1>
-          <p class="text-muted mb-0">{% if action == 'Add' %}List new equipment for rent{% else %}Update equipment details{% endif %}</p>
-        </div>
+<!-- Hero Section -->
+<section style="position: relative; background: #059669; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'rent:owner_equipment_list' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ action }} Equipment</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{% if action == 'Add' %}List new equipment for rent{% else %}Update equipment details{% endif %}</p>
       </div>
+    </div>
+  </div>
+</section>
 
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <!-- Basic Information -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Basic Information</h5>
-          </div>
-          <div class="card-body">
-            <div class="mb-3">
-              <label class="form-label">Equipment Name <span class="text-danger">*</span></label>
-              <input type="text" name="name" class="form-control" value="{{ form.name.value|default:'' }}" placeholder="e.g., Power Drill, Excavator" required>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Category <span class="text-danger">*</span></label>
-              <select name="category" class="form-select" required>
-                <option value="">Select Category</option>
-                {% for category in categories %}
-                <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Description <span class="text-danger">*</span></label>
-              <textarea name="description" class="form-control" rows="4" placeholder="Describe the equipment, its features, and usage..." required>{{ form.description.value|default:'' }}</textarea>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Listing Type <span class="text-danger">*</span></label>
-              <select name="listing_type" class="form-select" required>
-                <option value="for_rent" {% if form.listing_type.value == 'for_rent' %}selected{% endif %}>For Rent</option>
-                <option value="for_sale" {% if form.listing_type.value == 'for_sale' %}selected{% endif %}>For Sale</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Equipment Details -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0"><i class="fas fa-tools text-success me-2"></i>Equipment Details</h5>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Brand</label>
-                <input type="text" name="brand" class="form-control" value="{{ form.brand.value|default:'' }}" placeholder="e.g., Caterpillar">
+<!-- Form Section -->
+<section style="padding: 3rem 0;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <!-- Basic Information Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.125rem;"></i>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Model</label>
-                <input type="text" name="model" class="form-control" value="{{ form.model.value|default:'' }}" placeholder="e.g., 320D">
-              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Basic Information</h5>
             </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Condition <span class="text-danger">*</span></label>
-              <select name="condition" class="form-select" required>
-                <option value="new" {% if form.condition.value == 'new' %}selected{% endif %}>New</option>
-                <option value="excellent" {% if form.condition.value == 'excellent' %}selected{% endif %}>Excellent</option>
-                <option value="good" {% if form.condition.value == 'good' or not form.condition.value %}selected{% endif %}>Good</option>
-                <option value="fair" {% if form.condition.value == 'fair' %}selected{% endif %}>Fair</option>
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Specifications</label>
-              <textarea name="specifications" class="form-control" rows="3" placeholder="Technical specifications, dimensions, power requirements...">{{ form.specifications.value|default:'' }}</textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Location -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0"><i class="fas fa-map-marker-alt text-danger me-2"></i>Location</h5>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">City <span class="text-danger">*</span></label>
-                <input type="text" name="city" class="form-control" value="{{ form.city.value|default:'' }}" placeholder="e.g., Accra" required>
+            <div style="padding: 1.5rem;">
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Equipment Name <span style="color: #ef4444;">*</span></label>
+                <input type="text" name="name" value="{{ form.name.value|default:'' }}" placeholder="e.g., Power Drill, Excavator" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'; this.style.boxShadow='none'">
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Region <span class="text-danger">*</span></label>
-                <input type="text" name="region" class="form-control" value="{{ form.region.value|default:'' }}" placeholder="e.g., Greater Accra" required>
+              
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Category <span style="color: #ef4444;">*</span></label>
+                <select name="category" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  <option value="">Select Category</option>
+                  {% for category in categories %}
+                  <option value="{{ category.id }}" {% if form.category.value == category.id %}selected{% endif %}>{{ category.name }}</option>
+                  {% endfor %}
+                </select>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pricing -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0"><i class="fas fa-tag text-warning me-2"></i>Pricing</h5>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Price (GHS) <span class="text-danger">*</span></label>
-                <input type="number" name="price_per_period" class="form-control" step="0.01" min="0.01" value="{{ form.price_per_period.value|default:'' }}" placeholder="0.00" required>
+              
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Description <span style="color: #ef4444;">*</span></label>
+                <textarea name="description" rows="4" placeholder="Describe the equipment, its features, and usage..." required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; resize: vertical;" onfocus="this.style.borderColor='#059669'; this.style.background='white'; this.style.boxShadow='0 0 0 3px rgba(5, 150, 105, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'; this.style.boxShadow='none'">{{ form.description.value|default:'' }}</textarea>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Rental Period <span class="text-danger">*</span></label>
-                <select name="rental_period" class="form-select" required>
-                  <option value="hourly" {% if form.rental_period.value == 'hourly' %}selected{% endif %}>Per Hour</option>
-                  <option value="daily" {% if form.rental_period.value == 'daily' or not form.rental_period.value %}selected{% endif %}>Per Day</option>
-                  <option value="weekly" {% if form.rental_period.value == 'weekly' %}selected{% endif %}>Per Week</option>
-                  <option value="monthly" {% if form.rental_period.value == 'monthly' %}selected{% endif %}>Per Month</option>
+              
+              <div>
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Listing Type <span style="color: #ef4444;">*</span></label>
+                <select name="listing_type" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  <option value="for_rent" {% if form.listing_type.value == 'for_rent' %}selected{% endif %}>For Rent</option>
+                  <option value="for_sale" {% if form.listing_type.value == 'for_sale' %}selected{% endif %}>For Sale</option>
                 </select>
               </div>
             </div>
-            
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Security Deposit (GHS)</label>
-                <input type="number" name="security_deposit" class="form-control" step="0.01" min="0" value="{{ form.security_deposit.value|default:'' }}" placeholder="0.00">
+          </div>
+
+          <!-- Equipment Details Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-tools" style="color: #22c55e; font-size: 1.125rem;"></i>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Quantity Available <span class="text-danger">*</span></label>
-                <input type="number" name="quantity_available" class="form-control" min="1" value="{{ form.quantity_available.value|default:'1' }}" required>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Equipment Details</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Brand</label>
+                  <input type="text" name="brand" value="{{ form.brand.value|default:'' }}" placeholder="e.g., Caterpillar" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Model</label>
+                  <input type="text" name="model" value="{{ form.model.value|default:'' }}" placeholder="e.g., 320D" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Condition <span style="color: #ef4444;">*</span></label>
+                <select name="condition" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  <option value="new" {% if form.condition.value == 'new' %}selected{% endif %}>New</option>
+                  <option value="excellent" {% if form.condition.value == 'excellent' %}selected{% endif %}>Excellent</option>
+                  <option value="good" {% if form.condition.value == 'good' or not form.condition.value %}selected{% endif %}>Good</option>
+                  <option value="fair" {% if form.condition.value == 'fair' %}selected{% endif %}>Fair</option>
+                </select>
+              </div>
+              
+              <div>
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Specifications</label>
+                <textarea name="specifications" rows="3" placeholder="Technical specifications, dimensions, power requirements..." style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; resize: vertical;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">{{ form.specifications.value|default:'' }}</textarea>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Image -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0"><i class="fas fa-image text-info me-2"></i>Equipment Image</h5>
-          </div>
-          <div class="card-body">
-            {% if equipment and equipment.main_image %}
-            <div class="mb-3">
-              <label class="form-label">Current Image</label>
-              <div class="d-flex align-items-center p-3 bg-light rounded">
-                <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
-                <div class="ms-3">
-                  <div class="fw-bold">Current Image</div>
-                  <div class="text-muted small">Upload new image to replace</div>
+          <!-- Location Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #fee2e2; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-map-marker-alt" style="color: #ef4444; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Location</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">City <span style="color: #ef4444;">*</span></label>
+                  <input type="text" name="city" value="{{ form.city.value|default:'' }}" placeholder="e.g., Accra" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Region <span style="color: #ef4444;">*</span></label>
+                  <input type="text" name="region" value="{{ form.region.value|default:'' }}" placeholder="e.g., Greater Accra" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
                 </div>
               </div>
             </div>
-            {% endif %}
-            
-            <div class="mb-3">
-              <label class="form-label">{% if equipment %}Upload New Image{% else %}Upload Image{% endif %}</label>
-              <input type="file" name="main_image" class="form-control" accept="image/*">
+          </div>
+
+          <!-- Pricing Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-tag" style="color: #f59e0b; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Pricing</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              <div class="row">
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Price (GHS) <span style="color: #ef4444;">*</span></label>
+                  <input type="number" name="price_per_period" step="0.01" min="0.01" value="{{ form.price_per_period.value|default:'' }}" placeholder="0.00" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Rental Period <span style="color: #ef4444;">*</span></label>
+                  <select name="rental_period" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                    <option value="hourly" {% if form.rental_period.value == 'hourly' %}selected{% endif %}>Per Hour</option>
+                    <option value="daily" {% if form.rental_period.value == 'daily' or not form.rental_period.value %}selected{% endif %}>Per Day</option>
+                    <option value="weekly" {% if form.rental_period.value == 'weekly' %}selected{% endif %}>Per Week</option>
+                    <option value="monthly" {% if form.rental_period.value == 'monthly' %}selected{% endif %}>Per Month</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Security Deposit (GHS)</label>
+                  <input type="number" name="security_deposit" step="0.01" min="0" value="{{ form.security_deposit.value|default:'' }}" placeholder="0.00" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+                <div class="col-md-6" style="margin-bottom: 1.25rem;">
+                  <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Quantity Available <span style="color: #ef4444;">*</span></label>
+                  <input type="number" name="quantity_available" min="1" value="{{ form.quantity_available.value|default:'1' }}" required style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#059669'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Availability -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <div class="form-check">
-              <input type="checkbox" name="is_available" class="form-check-input" id="is_available" {% if form.is_available.value != False %}checked{% endif %}>
-              <label class="form-check-label" for="is_available">Available for booking</label>
+          <!-- Image Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 2px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="width: 40px; height: 40px; background: #e0e7ff; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="color: #6366f1; font-size: 1.125rem;"></i>
+              </div>
+              <h5 style="font-weight: 700; color: #1f2937; margin: 0;">Equipment Image</h5>
+            </div>
+            <div style="padding: 1.5rem;">
+              {% if equipment and equipment.main_image %}
+              <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">Current Image</label>
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 2px solid #e5e7eb;">
+                  <img src="{{ equipment.main_image.url }}" alt="{{ equipment.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                  <div>
+                    <div style="font-weight: 600; color: #1f2937;">Current Image</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Upload new image to replace</div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              
+              <div>
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.9375rem;">{% if equipment %}Upload New Image{% else %}Upload Image{% endif %}</label>
+                <input type="file" name="main_image" accept="image/*" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; background: #f9fafb;">
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Submit -->
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-success btn-lg flex-fill">
-            <i class="fas fa-save me-2"></i>{{ action }} Equipment
-          </button>
-          <a href="{% url 'rent:owner_equipment_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
-        </div>
-      </form>
+          <!-- Availability Card -->
+          <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <div style="padding: 1.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                <input type="checkbox" name="is_available" {% if form.is_available.value != False %}checked{% endif %} style="width: 20px; height: 20px; accent-color: #059669;">
+                <span style="font-weight: 600; color: #374151; font-size: 1rem;">Available for booking</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" style="flex: 1; min-width: 200px; padding: 1rem 2rem; background: #059669; color: white; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onmouseover="this.style.background='#047857'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(5, 150, 105, 0.3)'" onmouseout="this.style.background='#059669'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+              <i class="fas fa-save"></i>{{ action }} Equipment
+            </button>
+            <a href="{% url 'rent:owner_equipment_list' %}" style="padding: 1rem 2rem; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;" onmouseover="this.style.borderColor='#d1d5db'; this.style.color='#374151'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#6b7280'">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+</section>
 {% endblock %}
