@@ -3,8 +3,9 @@ from django.urls import path
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import (
-    Category, Product, ProductImage, ProductVariant, Order,
-    Payment, Review
+    Category, Shop, Product, ProductImage, ProductVariant, InventoryLog,
+    Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, 
+    OrderStatusHistory, Payment, Review, ReviewImage, ReviewHelpful
 )
 from .scrapers import MockAliExpressScraper
 
@@ -205,6 +206,20 @@ class ProductVariantAdmin(admin.ModelAdmin):
     search_fields = ('product__name', 'sku', 'name')
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    fields = ['product_name', 'variant_name', 'quantity', 'unit_price', 'total_price']
+    readonly_fields = ['product_name', 'variant_name', 'unit_price', 'total_price']
+
+
+class OrderStatusHistoryInline(admin.TabularInline):
+    model = OrderStatusHistory
+    extra = 0
+    fields = ['status', 'notes', 'changed_by', 'created_at']
+    readonly_fields = ['status', 'notes', 'changed_by', 'created_at']
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'user', 'status', 'total_amount', 'created_at')
@@ -212,6 +227,7 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('order_number', 'user__username', 'user__email')
     readonly_fields = ('order_number', 'created_at', 'updated_at')
     list_per_page = 25
+    inlines = [OrderItemInline, OrderStatusHistoryInline]
 
 
 @admin.register(Payment)
@@ -229,4 +245,140 @@ class ReviewAdmin(admin.ModelAdmin):
     list_filter = ('rating', 'is_approved', 'is_verified_purchase', 'created_at')
     search_fields = ('product__name', 'user__username', 'title', 'comment')
     readonly_fields = ('created_at', 'updated_at')
+    list_per_page = 25
+
+
+@admin.register(Shop)
+class ShopAdmin(admin.ModelAdmin):
+    list_display = ('name', 'owner', 'city', 'status', 'is_verified', 'is_featured', 'average_rating', 'created_at')
+    list_filter = ('status', 'is_verified', 'is_featured', 'city', 'country', 'created_at')
+    search_fields = ('name', 'owner__username', 'owner__email', 'city', 'address', 'phone', 'email')
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('created_at', 'updated_at', 'average_rating')
+    list_per_page = 25
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('owner', 'name', 'slug', 'description', 'logo', 'image')
+        }),
+        ('Contact Information', {
+            'fields': ('phone', 'email', 'website')
+        }),
+        ('Location', {
+            'fields': ('address', 'city', 'state', 'postal_code', 'country', 'latitude', 'longitude')
+        }),
+        ('Business Settings', {
+            'fields': ('status', 'is_verified', 'is_featured', 'business_type', 'opening_hours')
+        }),
+        ('Delivery Settings', {
+            'fields': ('delivery_available', 'delivery_fee', 'minimum_order_amount', 'estimated_delivery_time')
+        }),
+        ('Ratings & Timestamps', {
+            'fields': ('average_rating', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(InventoryLog)
+class InventoryLogAdmin(admin.ModelAdmin):
+    list_display = ('variant', 'transaction_type', 'quantity_change', 'quantity_after', 'created_by', 'created_at')
+    list_filter = ('transaction_type', 'created_at')
+    search_fields = ('variant__product__name', 'variant__name', 'notes')
+    readonly_fields = ('created_at',)
+    list_per_page = 25
+
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
+    fields = ['variant', 'quantity']
+    readonly_fields = ['variant']
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'session_key', 'item_count', 'created_at', 'updated_at')
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('user__username', 'user__email', 'session_key')
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [CartItemInline]
+    list_per_page = 25
+
+    def item_count(self, obj):
+        return obj.items.count()
+    item_count.short_description = 'Items'
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('cart', 'variant', 'quantity', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('cart__user__username', 'variant__product__name')
+    list_per_page = 25
+
+
+class WishlistItemInline(admin.TabularInline):
+    model = WishlistItem
+    extra = 0
+    fields = ['product', 'variant', 'created_at']
+    readonly_fields = ['product', 'variant', 'created_at']
+
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'item_count', 'created_at', 'updated_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [WishlistItemInline]
+    list_per_page = 25
+
+    def item_count(self, obj):
+        return obj.items.count()
+    item_count.short_description = 'Items'
+
+
+@admin.register(WishlistItem)
+class WishlistItemAdmin(admin.ModelAdmin):
+    list_display = ('wishlist', 'product', 'variant', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('wishlist__user__username', 'product__name')
+    list_per_page = 25
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('order', 'product_name', 'variant_name', 'quantity', 'unit_price', 'total_price')
+    list_filter = ('created_at',)
+    search_fields = ('order__order_number', 'product_name')
+    readonly_fields = ('created_at',)
+    list_per_page = 25
+
+
+@admin.register(OrderStatusHistory)
+class OrderStatusHistoryAdmin(admin.ModelAdmin):
+    list_display = ('order', 'status', 'changed_by', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('order__order_number', 'notes')
+    readonly_fields = ('created_at',)
+    list_per_page = 25
+
+
+@admin.register(ReviewImage)
+class ReviewImageAdmin(admin.ModelAdmin):
+    list_display = ('review', 'image', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('review__product__name', 'review__user__username')
+    readonly_fields = ('created_at',)
+    list_per_page = 25
+
+
+@admin.register(ReviewHelpful)
+class ReviewHelpfulAdmin(admin.ModelAdmin):
+    list_display = ('review', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('review__product__name', 'user__username')
+    readonly_fields = ('created_at',)
+    list_per_page = 25
+    readonly_fields = ('created_at',)
     list_per_page = 25
