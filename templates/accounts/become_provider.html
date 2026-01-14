@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Become a Provider - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+  <div class="container mx-auto px-4">
+    <!-- Header Section -->
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <div class="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+        <i class="fas fa-handshake"></i>
+        <span>Partner With Us</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+        Become a <span class="text-primary-600">Provider</span>
+      </h1>
+      <p class="text-xl text-gray-600">
+        Join thousands of providers on Soma Ko and grow your business. Choose the category that best describes your service.
+      </p>
+    </div>
+
+    {% if not user.is_authenticated %}
+    <!-- Login Prompt -->
+    <div class="max-w-2xl mx-auto mb-8">
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
+        <i class="fas fa-info-circle text-yellow-500 text-2xl mb-3"></i>
+        <h3 class="text-lg font-bold text-yellow-800 mb-2">Account Required</h3>
+        <p class="text-yellow-700 mb-4">You'll need to create an account or log in to apply as a provider.</p>
+        <div class="flex gap-3 justify-center flex-wrap">
+          <a href="{% url 'accounts:signup' %}" class="px-6 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors">
+            <i class="fas fa-user-plus mr-2"></i>Create Account
+          </a>
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors">
+            <i class="fas fa-sign-in-alt mr-2"></i>Log In
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if provider_types %}
+    <!-- Provider Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      {% for provider in provider_types %}
+      <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1">
+        <!-- Card Header -->
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center 
+              {% if provider.color == 'orange' %}bg-orange-100 text-orange-600
+              {% elif provider.color == 'blue' %}bg-blue-100 text-blue-600
+              {% elif provider.color == 'red' %}bg-red-100 text-red-600
+              {% elif provider.color == 'green' %}bg-green-100 text-green-600
+              {% elif provider.color == 'purple' %}bg-purple-100 text-purple-600
+              {% elif provider.color == 'indigo' %}bg-indigo-100 text-indigo-600
+              {% elif provider.color == 'teal' %}bg-teal-100 text-teal-600
+              {% else %}bg-gray-100 text-gray-600{% endif %}">
+              <i class="fas {{ provider.icon }} text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">{{ provider.title }}</h3>
+          </div>
+          <p class="text-gray-600 leading-relaxed">{{ provider.description }}</p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="p-6 bg-gray-50">
+          <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Benefits</h4>
+          <ul class="space-y-2 mb-6">
+            {% for benefit in provider.benefits %}
+            <li class="flex items-center gap-2 text-gray-700">
+              <i class="fas fa-check-circle text-green-500 text-sm"></i>
+              <span>{{ benefit }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <!-- Apply Button -->
+          {% if user.is_authenticated %}
+          <a href="{% url 'accounts:provider_application' provider.role %}" 
+             class="block w-full py-3 text-center font-bold rounded-xl transition-all duration-300
+             {% if provider.color == 'orange' %}bg-orange-600 hover:bg-orange-700 text-white
+             {% elif provider.color == 'blue' %}bg-blue-600 hover:bg-blue-700 text-white
+             {% elif provider.color == 'red' %}bg-red-600 hover:bg-red-700 text-white
+             {% elif provider.color == 'green' %}bg-green-600 hover:bg-green-700 text-white
+             {% elif provider.color == 'purple' %}bg-purple-600 hover:bg-purple-700 text-white
+             {% elif provider.color == 'indigo' %}bg-indigo-600 hover:bg-indigo-700 text-white
+             {% elif provider.color == 'teal' %}bg-teal-600 hover:bg-teal-700 text-white
+             {% else %}bg-primary-600 hover:bg-primary-700 text-white{% endif %}">
+            <i class="fas fa-arrow-right mr-2"></i>Apply Now
+          </a>
+          {% else %}
+          <a href="{% url 'accounts:login' %}?next={% url 'accounts:provider_application' provider.role %}" 
+             class="block w-full py-3 text-center font-bold rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+            <i class="fas fa-sign-in-alt mr-2"></i>Login to Apply
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Available Roles -->
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
+        <i class="fas fa-check-circle text-green-500 text-4xl mb-4"></i>
+        <h3 class="text-xl font-bold text-green-800 mb-2">You're All Set!</h3>
+        <p class="text-green-700 mb-6">You already have all available provider roles or have pending applications.</p>
+        <div class="flex gap-3 justify-center flex-wrap">
+          <a href="{% url 'accounts:my_role_applications' %}" class="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors">
+            <i class="fas fa-clipboard-list mr-2"></i>View Applications
+          </a>
+          <a href="{% url 'accounts:subscription_plans' %}" class="px-6 py-3 bg-white border-2 border-green-300 text-green-700 font-bold rounded-xl hover:bg-green-50 transition-colors">
+            <i class="fas fa-crown mr-2"></i>Manage Subscription
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Why Join Section -->
+    <div class="max-w-4xl mx-auto mt-16">
+      <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">Why Partner With Soma Ko?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-users text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Reach More Customers</h3>
+          <p class="text-gray-600">Access our growing customer base and expand your market reach.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-chart-line text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Grow Your Business</h3>
+          <p class="text-gray-600">Use our tools and analytics to scale your operations efficiently.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-headset text-2xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Dedicated Support</h3>
+          <p class="text-gray-600">Get priority support and guidance from our provider success team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

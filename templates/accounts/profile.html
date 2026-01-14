@@ -60,6 +60,64 @@
     </div>
 </div>
 
+<!-- Quick Actions Section -->
+<div class="container-fluid px-3 px-md-4 px-lg-5 mb-4">
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <a href="{% url 'accounts:my_role_applications' %}" class="card h-100 text-decoration-none" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); transition: all 0.3s ease;" onmouseover="this.style.borderColor='#059669'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.15)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'; this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-clipboard-list" style="color: #d97706; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="font-weight: 600; color: #111827; margin-bottom: 0.25rem; font-size: 0.9375rem;">Role Applications</h6>
+                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">Check status</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'accounts:become_provider' %}" class="card h-100 text-decoration-none" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); transition: all 0.3s ease;" onmouseover="this.style.borderColor='#059669'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.15)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'; this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-handshake" style="color: #2563eb; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="font-weight: 600; color: #111827; margin-bottom: 0.25rem; font-size: 0.9375rem;">Become Provider</h6>
+                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">Start earning</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'accounts:subscription_plans' %}" class="card h-100 text-decoration-none" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); transition: all 0.3s ease;" onmouseover="this.style.borderColor='#059669'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.15)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'; this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 48px; height: 48px; background: #fce7f3; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-crown" style="color: #db2777; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="font-weight: 600; color: #111827; margin-bottom: 0.25rem; font-size: 0.9375rem;">Subscription</h6>
+                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">Manage plans</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'accounts:notifications' %}" class="card h-100 text-decoration-none" style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); transition: all 0.3s ease;" onmouseover="this.style.borderColor='#059669'; this.style.boxShadow='0 4px 12px rgba(5, 150, 105, 0.15)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'; this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 48px; height: 48px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bell" style="color: #16a34a; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="font-weight: 600; color: #111827; margin-bottom: 0.25rem; font-size: 0.9375rem;">Notifications</h6>
+                        <p style="font-size: 0.8125rem; color: #6b7280; margin: 0;">View updates</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid px-3 px-md-4 px-lg-5">
     <div class="row">
         <div class="col-12">

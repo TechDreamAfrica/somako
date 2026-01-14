@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Applications - Soma Ko{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+  <div class="container mx-auto px-4">
+    <!-- Header -->
+    <div class="max-w-4xl mx-auto mb-8">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">My Provider Applications</h1>
+          <p class="text-gray-600 mt-1">Track the status of your provider applications</p>
+        </div>
+        <a href="{% url 'accounts:become_provider' %}" 
+           class="px-6 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors flex items-center gap-2">
+          <i class="fas fa-plus"></i>
+          New Application
+        </a>
+      </div>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="max-w-4xl mx-auto mb-6">
+      <div class="flex gap-4 flex-wrap">
+        <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold flex items-center gap-2">
+          <i class="fas fa-clock"></i>
+          Pending: {{ pending.count }}
+        </div>
+        <div class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold flex items-center gap-2">
+          <i class="fas fa-check-circle"></i>
+          Approved: {{ approved.count }}
+        </div>
+        <div class="bg-red-100 text-red-800 px-4 py-2 rounded-full font-semibold flex items-center gap-2">
+          <i class="fas fa-times-circle"></i>
+          Rejected: {{ rejected.count }}
+        </div>
+      </div>
+    </div>
+
+    {% if applications %}
+    <!-- Applications List -->
+    <div class="max-w-4xl mx-auto space-y-4">
+      {% for application in applications %}
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-start justify-between gap-4">
+            <!-- Role Info -->
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center
+                {% if application.role == 'restaurant_owner' %}bg-orange-100 text-orange-600
+                {% elif application.role == 'seller' %}bg-blue-100 text-blue-600
+                {% elif application.role == 'pharmacy_owner' %}bg-red-100 text-red-600
+                {% elif application.role == 'landlord' %}bg-green-100 text-green-600
+                {% elif application.role == 'equipment_owner' %}bg-purple-100 text-purple-600
+                {% elif application.role == 'driver' %}bg-indigo-100 text-indigo-600
+                {% elif application.role == 'delivery_driver' %}bg-teal-100 text-teal-600
+                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                <i class="fas 
+                  {% if application.role == 'restaurant_owner' %}fa-utensils
+                  {% elif application.role == 'seller' %}fa-store
+                  {% elif application.role == 'pharmacy_owner' %}fa-pills
+                  {% elif application.role == 'landlord' %}fa-home
+                  {% elif application.role == 'equipment_owner' %}fa-tools
+                  {% elif application.role == 'driver' %}fa-car
+                  {% elif application.role == 'delivery_driver' %}fa-shipping-fast
+                  {% else %}fa-user{% endif %} text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-900">{{ application.get_role_display }}</h3>
+                {% if application.business_name %}
+                <p class="text-gray-600">{{ application.business_name }}</p>
+                {% endif %}
+                <p class="text-sm text-gray-500">Applied {{ application.created_at|timesince }} ago</p>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="flex-shrink-0">
+              {% if application.status == 'pending' %}
+              <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full font-semibold text-sm flex items-center gap-2">
+                <i class="fas fa-clock"></i>
+                Pending Review
+              </span>
+              {% elif application.status == 'approved' %}
+              <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full font-semibold text-sm flex items-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                Approved
+              </span>
+              {% elif application.status == 'rejected' %}
+              <span class="px-4 py-2 bg-red-100 text-red-800 rounded-full font-semibold text-sm flex items-center gap-2">
+                <i class="fas fa-times-circle"></i>
+                Rejected
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Application Details (Collapsed) -->
+          {% if application.business_address or application.city or application.business_phone %}
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              {% if application.city %}
+              <div>
+                <span class="text-gray-500">City:</span>
+                <span class="font-semibold text-gray-900 ml-1">{{ application.city }}</span>
+              </div>
+              {% endif %}
+              {% if application.business_phone %}
+              <div>
+                <span class="text-gray-500">Phone:</span>
+                <span class="font-semibold text-gray-900 ml-1">{{ application.business_phone }}</span>
+              </div>
+              {% endif %}
+              {% if application.business_type %}
+              <div>
+                <span class="text-gray-500">Type:</span>
+                <span class="font-semibold text-gray-900 ml-1">{{ application.business_type }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Review Note (if any) -->
+          {% if application.review_note %}
+          <div class="mt-4 p-4 rounded-xl 
+            {% if application.status == 'approved' %}bg-green-50 border border-green-200
+            {% elif application.status == 'rejected' %}bg-red-50 border border-red-200
+            {% else %}bg-gray-50 border border-gray-200{% endif %}">
+            <p class="text-sm font-semibold mb-1">
+              {% if application.status == 'approved' %}Approval Note:
+              {% elif application.status == 'rejected' %}Rejection Reason:
+              {% else %}Review Note:{% endif %}
+            </p>
+            <p class="text-gray-700">{{ application.review_note }}</p>
+            {% if application.reviewed_at %}
+            <p class="text-xs text-gray-500 mt-2">
+              Reviewed on {{ application.reviewed_at|date:"F j, Y" }}
+              {% if application.reviewed_by %} by {{ application.reviewed_by.get_full_name|default:application.reviewed_by.username }}{% endif %}
+            </p>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Action Buttons -->
+          {% if application.status == 'approved' %}
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <a href="{% url 'accounts:subscription_plans' %}?service={{ application.role }}" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors">
+              <i class="fas fa-crown"></i>
+              Choose Subscription Plan
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Applications -->
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-clipboard-list text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No Applications Yet</h3>
+        <p class="text-gray-600 mb-6">You haven't submitted any provider applications. Start by choosing a provider type.</p>
+        <a href="{% url 'accounts:become_provider' %}" 
+           class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors">
+          <i class="fas fa-handshake"></i>
+          Become a Provider
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

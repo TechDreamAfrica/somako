@@ -7,6 +7,12 @@ class Notification(models.Model):
     """General notification model for all apps"""
 
     NOTIFICATION_TYPES = [
+        # General notification types
+        ('info', 'Information'),
+        ('success', 'Success'),
+        ('warning', 'Warning'),
+        ('error', 'Error'),
+        
         # Ride notifications
         ('ride_requested', 'Ride Requested'),
         ('ride_accepted', 'Ride Accepted'),
@@ -48,6 +54,11 @@ class Notification(models.Model):
         ('subscription_expiring', 'Subscription Expiring Soon'),
         ('subscription_expired', 'Subscription Expired'),
         ('subscription_cancelled', 'Subscription Cancelled'),
+        
+        # Role application notifications
+        ('role_application_submitted', 'Role Application Submitted'),
+        ('role_application_approved', 'Role Application Approved'),
+        ('role_application_rejected', 'Role Application Rejected'),
 
         # General notifications
         ('payment_received', 'Payment Received'),
@@ -76,6 +87,7 @@ class Notification(models.Model):
 
     title = models.CharField(max_length=200)
     message = models.TextField()
+    link = models.CharField(max_length=500, blank=True, help_text="URL to redirect when notification is clicked")
 
     # Optional reference to related objects
     reference_id = models.CharField(max_length=100, blank=True, help_text="ID of related object (order, ride, etc.)")

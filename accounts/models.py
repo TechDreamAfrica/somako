@@ -152,12 +152,30 @@ class RoleApplication(models.Model):
         blank=True
     )
 
+    # Business Information (for providers)
+    business_name = models.CharField(max_length=200, blank=True, help_text="Name of your business")
+    business_address = models.TextField(blank=True, help_text="Business address")
+    business_phone = models.CharField(max_length=20, blank=True, help_text="Business phone number")
+    business_email = models.EmailField(blank=True, help_text="Business email address")
+    city = models.CharField(max_length=100, blank=True, help_text="City of operation")
+    
+    # Role-specific fields
+    business_type = models.CharField(max_length=100, blank=True, help_text="Type of business (e.g., Restaurant type, Shop category)")
+    license_number = models.CharField(max_length=100, blank=True, help_text="Business license or registration number")
+    years_in_business = models.PositiveIntegerField(null=True, blank=True, help_text="Years of experience in this business")
+    
     # Supporting documents
     document = models.FileField(
         upload_to='role_applications/',
         blank=True,
         null=True,
         help_text="Supporting document (license, certificate, etc.)"
+    )
+    business_license = models.FileField(
+        upload_to='role_applications/licenses/',
+        blank=True,
+        null=True,
+        help_text="Business license or registration certificate"
     )
 
     # Status and review
@@ -200,6 +218,20 @@ class RoleApplication(models.Model):
         # Add role to user
         self.user.add_role(self.role)
         self.user.save()
+        
+        # Create notification for user
+        try:
+            from .notification_models import Notification
+            Notification.objects.create(
+                user=self.user,
+                title='Application Approved! 🎉',
+                message=f'Your application for {self.get_role_display()} has been approved! '
+                       f'Please select a subscription plan to activate your provider account.',
+                notification_type='success',
+                link=f'/accounts/subscription/plans/?service={self.role}'
+            )
+        except Exception:
+            pass  # Silently fail if notifications aren't set up
 
     def reject(self, admin_user, note=''):
         """Reject the role application"""
@@ -209,6 +241,21 @@ class RoleApplication(models.Model):
         self.review_note = note
         self.reviewed_at = timezone.now()
         self.save()
+        
+        # Create notification for user
+        try:
+            from .notification_models import Notification
+            reason_text = f' Reason: {note}' if note else ''
+            Notification.objects.create(
+                user=self.user,
+                title='Application Update',
+                message=f'Your application for {self.get_role_display()} was not approved.{reason_text} '
+                       f'You can submit a new application with updated information.',
+                notification_type='warning',
+                link='/accounts/become-provider/'
+            )
+        except Exception:
+            pass  # Silently fail if notifications aren't set up
 
     def get_role_display(self):
         """Get human-readable role name"""

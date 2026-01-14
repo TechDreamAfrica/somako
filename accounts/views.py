@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.db import models
 import logging
-from .forms import CustomUserCreationForm, RoleApplicationForm
+from .forms import CustomUserCreationForm, RoleApplicationForm, ProviderApplicationForm
 from .models import User, RoleApplication, VerificationCode
 from utils.sms_utils import send_user_verification_code
 from utils.email_utils import (
@@ -1781,6 +1781,191 @@ def browse_profiles_view(request):
 # ============================================
 # Role Application Views
 # ============================================
+
+def become_provider(request):
+    """Landing page for users to select which provider type they want to become"""
+    # Define provider types with their details
+    provider_types = [
+        {
+            'role': 'restaurant_owner',
+            'title': 'Restaurant Owner',
+            'description': 'List your restaurant and start receiving food orders from customers in your area.',
+            'icon': 'fa-utensils',
+            'color': 'orange',
+            'benefits': ['Reach more customers', 'Easy order management', 'Real-time analytics'],
+        },
+        {
+            'role': 'seller',
+            'title': 'Shop Owner',
+            'description': 'Open your online store and sell products to customers across Ghana.',
+            'icon': 'fa-store',
+            'color': 'blue',
+            'benefits': ['Unlimited product listings', 'Secure payments', 'Delivery integration'],
+        },
+        {
+            'role': 'pharmacy_owner',
+            'title': 'Pharmacy Owner',
+            'description': 'Register your pharmacy and help customers order medicines online.',
+            'icon': 'fa-pills',
+            'color': 'red',
+            'benefits': ['Prescription management', 'Inventory tracking', 'Home delivery'],
+        },
+        {
+            'role': 'landlord',
+            'title': 'Property Owner',
+            'description': 'List your properties for rent and connect with potential tenants.',
+            'icon': 'fa-home',
+            'color': 'green',
+            'benefits': ['Property listings', 'Tenant screening', 'Rent collection'],
+        },
+        {
+            'role': 'equipment_owner',
+            'title': 'Equipment Rental',
+            'description': 'Rent out your equipment and earn money from your idle assets.',
+            'icon': 'fa-tools',
+            'color': 'purple',
+            'benefits': ['Equipment catalog', 'Booking management', 'Secure deposits'],
+        },
+        {
+            'role': 'driver',
+            'title': 'Ride Driver',
+            'description': 'Become a driver and earn money by providing rides to passengers.',
+            'icon': 'fa-car',
+            'color': 'indigo',
+            'benefits': ['Flexible hours', 'Keep most earnings', 'Easy navigation'],
+        },
+        {
+            'role': 'delivery_driver',
+            'title': 'Delivery Driver',
+            'description': 'Join our express delivery team and earn by delivering packages.',
+            'icon': 'fa-shipping-fast',
+            'color': 'teal',
+            'benefits': ['Quick deliveries', 'Bonus incentives', 'Flexible schedule'],
+        },
+    ]
+    
+    # If user is authenticated, filter out roles they already have or have pending applications for
+    if request.user.is_authenticated:
+        current_roles = request.user.get_roles_list()
+        pending_roles = list(RoleApplication.objects.filter(
+            user=request.user,
+            status='pending'
+        ).values_list('role', flat=True))
+        
+        excluded_roles = set(current_roles + pending_roles)
+        provider_types = [p for p in provider_types if p['role'] not in excluded_roles]
+    
+    context = {
+        'provider_types': provider_types,
+    }
+    
+    return render(request, 'accounts/become_provider.html', context)
+
+
+@login_required
+def provider_application(request, role):
+    """Form for applying as a specific provider type"""
+    # Valid provider roles
+    valid_roles = ['restaurant_owner', 'seller', 'pharmacy_owner', 'landlord', 'equipment_owner', 'driver', 'delivery_driver']
+    
+    if role not in valid_roles:
+        messages.error(request, 'Invalid provider type selected.')
+        return redirect('accounts:become_provider')
+    
+    # Check if user already has this role
+    if request.user.has_role(role):
+        messages.info(request, f'You already have the {dict(User.SERVICE_ROLE_CHOICES).get(role)} role.')
+        return redirect('accounts:subscription_plans')
+    
+    # Check for pending application
+    pending = RoleApplication.objects.filter(
+        user=request.user,
+        role=role,
+        status='pending'
+    ).exists()
+    
+    if pending:
+        messages.info(request, 'You already have a pending application for this role.')
+        return redirect('accounts:my_role_applications')
+    
+    # Role display info
+    role_info = {
+        'restaurant_owner': {
+            'title': 'Restaurant Owner Application',
+            'icon': 'fa-utensils',
+            'color': 'orange',
+            'description': 'Complete the form below to register your restaurant on Soma Ko.',
+        },
+        'seller': {
+            'title': 'Shop Owner Application',
+            'icon': 'fa-store',
+            'color': 'blue',
+            'description': 'Complete the form below to open your online store on Soma Ko.',
+        },
+        'pharmacy_owner': {
+            'title': 'Pharmacy Owner Application',
+            'icon': 'fa-pills',
+            'color': 'red',
+            'description': 'Complete the form below to register your pharmacy on Soma Ko.',
+        },
+        'landlord': {
+            'title': 'Property Owner Application',
+            'icon': 'fa-home',
+            'color': 'green',
+            'description': 'Complete the form below to list your properties on Soma Ko.',
+        },
+        'equipment_owner': {
+            'title': 'Equipment Rental Application',
+            'icon': 'fa-tools',
+            'color': 'purple',
+            'description': 'Complete the form below to start renting out your equipment.',
+        },
+        'driver': {
+            'title': 'Ride Driver Application',
+            'icon': 'fa-car',
+            'color': 'indigo',
+            'description': 'Complete the form below to become a ride driver on Soma Ko.',
+        },
+        'delivery_driver': {
+            'title': 'Delivery Driver Application',
+            'icon': 'fa-shipping-fast',
+            'color': 'teal',
+            'description': 'Complete the form below to join our express delivery team.',
+        },
+    }
+    
+    info = role_info.get(role, {})
+    
+    if request.method == 'POST':
+        form = ProviderApplicationForm(request.POST, request.FILES, role=role, user=request.user)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.user = request.user
+            application.role = role
+            application.save()
+            
+            messages.success(
+                request,
+                f'Your application has been submitted successfully! '
+                'We will review it and get back to you within 24-48 hours.'
+            )
+            
+            # Store the role in session for subscription redirect after approval
+            request.session['pending_provider_role'] = role
+            
+            return redirect('accounts:my_role_applications')
+    else:
+        form = ProviderApplicationForm(role=role, user=request.user)
+    
+    context = {
+        'form': form,
+        'role': role,
+        'role_display': dict(User.SERVICE_ROLE_CHOICES).get(role, role),
+        'info': info,
+    }
+    
+    return render(request, 'accounts/provider_application.html', context)
+
 
 @login_required
 def apply_for_role(request):

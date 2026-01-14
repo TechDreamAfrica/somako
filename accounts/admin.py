@@ -40,9 +40,9 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(RoleApplication)
 class RoleApplicationAdmin(admin.ModelAdmin):
-    list_display = ['user', 'role_display', 'status_badge', 'created_at', 'reviewed_by', 'action_buttons']
-    list_filter = ['status', 'role', 'created_at']
-    search_fields = ['user__username', 'user__email', 'role', 'reason']
+    list_display = ['user', 'role_display', 'business_name', 'city', 'status_badge', 'created_at', 'reviewed_by', 'action_buttons']
+    list_filter = ['status', 'role', 'city', 'created_at']
+    search_fields = ['user__username', 'user__email', 'role', 'reason', 'business_name', 'city']
     readonly_fields = ['created_at', 'updated_at', 'reviewed_at']
     ordering = ['-created_at']
 
@@ -50,8 +50,12 @@ class RoleApplicationAdmin(admin.ModelAdmin):
         ('Application Info', {
             'fields': ('user', 'role', 'status')
         }),
+        ('Business Information', {
+            'fields': ('business_name', 'business_type', 'business_address', 'city', 
+                      'business_phone', 'business_email', 'license_number', 'years_in_business')
+        }),
         ('Application Details', {
-            'fields': ('reason', 'experience', 'document')
+            'fields': ('reason', 'experience', 'document', 'business_license')
         }),
         ('Review', {
             'fields': ('reviewed_by', 'review_note', 'reviewed_at')

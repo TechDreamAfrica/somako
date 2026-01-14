@@ -24,6 +24,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
 
     # Role Application URLs
+    path('become-provider/', views.become_provider, name='become_provider'),
+    path('become-provider/apply/<str:role>/', views.provider_application, name='provider_application'),
     path('roles/apply/', views.apply_for_role, name='apply_for_role'),
     path('roles/my-applications/', views.my_role_applications, name='my_role_applications'),
     path('roles/dashboard-redirect/', views.role_dashboard_redirect, name='role_dashboard_redirect'),

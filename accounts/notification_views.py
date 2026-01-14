@@ -9,8 +9,7 @@ from .notification_models import Notification, NotificationPreference
 def notifications_list(request):
     """View all notifications for the logged-in user"""
     notifications = Notification.objects.filter(
-        user=request.user,
-        channel='in_app'
+        user=request.user
     ).order_by('-created_at')
 
     # Separate unread and read notifications
