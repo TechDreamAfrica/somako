@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% load content_type_tags %}
+{% block title %}{{ pharmacy.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Back Button -->
+<section style="position: relative; background: #a855f7; padding: 3rem 0 2rem; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <a href="{% url 'pharmacy:pharmacy_list' %}" style="display: inline-flex; align-items: center; gap: 0.625rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 0.75rem 1.5rem; border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 0.9375rem; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; margin-bottom: 1.5rem;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'; this.style.transform='translateX(-5px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.transform='translateX(0)'">
+      <i class="fas fa-arrow-left"></i>Back to Pharmacies
+    </a>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section style="padding: 3rem 0; margin-top: -2rem; position: relative; z-index: 10;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column - Pharmacy Info -->
+      <div class="col-lg-8">
+        <!-- Header Card -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
+          <div class="row g-4">
+            <div class="col-md-5">
+              {% if pharmacy.image or pharmacy.logo %}
+              <div style="background: #f9fafb; border-radius: 1.25rem; overflow: hidden; height: 350px; border: 2px solid #e9d5ff; position: relative;">
+                {% if pharmacy.image %}
+                <img src="{{ pharmacy.image.url }}" alt="{{ pharmacy.name }} banner" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.style.background='#f3e8ff'; this.parentElement.innerHTML='<i class=\'fas fa-clinic-medical\' style=\'font-size: 6rem; color: #a855f7; opacity: 0.3; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\'></i>';">
+                {% elif pharmacy.logo %}
+                <img src="{{ pharmacy.logo.url }}" alt="{{ pharmacy.name }} banner" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.style.background='#f3e8ff'; this.parentElement.innerHTML='<i class=\'fas fa-clinic-medical\' style=\'font-size: 6rem; color: #a855f7; opacity: 0.3; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\'></i>';">
+                {% endif %}
+                <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);"></div>
+                {% if pharmacy.logo and pharmacy.image %}
+                <div style="position: absolute; bottom: 1.5rem; left: 1.5rem;">
+                  <img src="{{ pharmacy.logo.url }}" alt="{{ pharmacy.name }} logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" onerror="this.style.display='none';">
+                </div>
+                {% endif %}
+              </div>
+              {% else %}
+              <div style="height: 350px; background: #f3e8ff; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; position: relative;">
+                <i class="fas fa-clinic-medical" style="font-size: 6rem; color: #a855f7; opacity: 0.3;"></i>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-7">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                {% if pharmacy.is_verified %}
+                <span style="background: #d1fae5; color: #065f46; padding: 0.5rem 1.125rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; border: 2px solid #6ee7b7;">
+                  <i class="fas fa-check-circle"></i> Verified
+                </span>
+                {% endif %}
+                {% if pharmacy.is_24_hours %}
+                <span style="background: #fef3c7; color: #92400e; padding: 0.5rem 1.125rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; border: 2px solid #fcd34d;">24 Hours</span>
+                {% endif %}
+                {% if pharmacy.average_rating %}
+                <span style="display: flex; align-items: center; gap: 0.5rem; background: #f3e8ff; padding: 0.5rem 1.125rem; border-radius: 50px; font-weight: 700; font-size: 0.875rem; color: #7c3aed; border: 2px solid #c4b5fd;">
+                  <i class="fas fa-star" style="color: #a855f7;"></i>{{ pharmacy.average_rating|floatformat:1 }}
+                </span>
+                {% endif %}
+              </div>
+
+              <h1 style="font-size: 2.25rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem; line-height: 1.2;">{{ pharmacy.name }}</h1>
+
+              <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 2rem;">
+                <i class="fas fa-map-marker-alt" style="color: #a855f7; font-size: 1.125rem;"></i>
+                <p style="margin: 0; color: #6b7280; font-size: 1.0625rem; font-weight: 600;">{{ pharmacy.address }}, {{ pharmacy.city }}</p>
+              </div>
+
+              <div style="background: #f9fafb; padding: 1.5rem; border-radius: 1rem; border: 2px solid #e9d5ff; margin-bottom: 1.5rem;">
+                <h5 style="font-size: 1.125rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.625rem;">
+                  <i class="fas fa-info-circle" style="color: #a855f7;"></i>About
+                </h5>
+                <p style="color: #4b5563; line-height: 1.7; margin: 0;">{{ pharmacy.description|default:"A trusted pharmacy providing quality medicines and healthcare products." }}</p>
+              </div>
+
+              <div style="background: #f3e8ff; padding: 1.5rem; border-radius: 1rem; border: 2px solid #c4b5fd;">
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  {% if pharmacy.delivery_available %}
+                  <div style="display: flex; align-items: center; gap: 0.625rem;">
+                    <div style="width: 45px; height: 45px; background: #e9d5ff; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-shipping-fast" style="color: #7c3aed; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                      <p style="margin: 0; color: #1f2937; font-size: 0.875rem; font-weight: 700;">Delivery Available</p>
+                      <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">{{ pharmacy.estimated_delivery_time }} mins</p>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <div style="display: flex; align-items: center; gap: 0.625rem;">
+                    <div style="width: 45px; height: 45px; background: #d1fae5; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-pills" style="color: #065f46; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                      <p style="margin: 0; color: #1f2937; font-size: 0.875rem; font-weight: 700;">{{ pharmacy.medicine_count }} Products</p>
+                      <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">In stock</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Medicines -->
+        <div style="background: white; border-radius: 1.5rem; padding: 1.5rem 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 2rem;">
+          <form method="get">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-6">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <i class="fas fa-search" style="color: #a855f7;"></i>Search Medicines
+                </label>
+                <input type="text" name="q" placeholder="Search medicines..." value="{{ search_query }}" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; background: #f9fafb;" onfocus="this.style.borderColor='#a855f7'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+              </div>
+              <div class="col-md-4">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                  <i class="fas fa-tag" style="color: #a855f7;"></i>Category
+                </label>
+                <select name="category" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; transition: all 0.3s ease; background: #f9fafb; cursor: pointer;">
+                  <option value="">All Categories</option>
+                  {% for cat in categories %}
+                  <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" style="width: 100%; padding: 0.75rem 1rem; background: #a855f7; color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Medicines Section -->
+        <div style="background: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+          <h3 style="font-size: 1.875rem; font-weight: 900; color: #1f2937; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-pills" style="color: #a855f7;"></i>Medicines
+          </h3>
+
+          {% if medicines %}
+          <div class="row g-3">
+            {% for medicine in medicines %}
+            <div class="col-md-6">
+              <div style="background: #f9fafb; border-radius: 1rem; padding: 1.5rem; border: 2px solid #f3f4f6; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#e9d5ff'; this.style.boxShadow='0 8px 20px rgba(168, 85, 247, 0.15)'" onmouseout="this.style.borderColor='#f3f4f6'; this.style.boxShadow='none'">
+                <div style="display: flex; gap: 1rem;">
+                  {% if medicine.image %}
+                  <div style="width: 80px; height: 80px; border-radius: 0.75rem; overflow: hidden; flex-shrink: 0; background: white; border: 1px solid #e5e7eb;">
+                    <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}" style="width: 100%; height: 100%; object-fit: contain;">
+                  </div>
+                  {% else %}
+                  <div style="width: 80px; height: 80px; border-radius: 0.75rem; flex-shrink: 0; background: #f3e8ff; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-pills" style="font-size: 1.5rem; color: #a855f7; opacity: 0.5;"></i>
+                  </div>
+                  {% endif %}
+                  <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                      <span style="background: #f3e8ff; color: #7c3aed; padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.6875rem; font-weight: 600;">{{ medicine.category.name }}</span>
+                      {% if medicine.requires_prescription %}
+                      <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.6875rem; font-weight: 700;">
+                        <i class="fas fa-prescription" style="font-size: 0.5rem;"></i> Rx
+                      </span>
+                      {% endif %}
+                    </div>
+                    <h5 style="font-size: 1rem; font-weight: 800; color: #1f2937; margin-bottom: 0.25rem; line-height: 1.3;">{{ medicine.name|truncatechars:30 }}</h5>
+                    <p style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.5rem;">{{ medicine.manufacturer }}</p>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-size: 1.25rem; font-weight: 800; color: #a855f7;">GHS {{ medicine.price }}</span>
+                      <a href="{% url 'pharmacy:medicine_detail' medicine.slug %}" style="background: #a855f7; color: white; padding: 0.5rem 1rem; border-radius: 0.625rem; font-weight: 600; font-size: 0.75rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                        View <i class="fas fa-arrow-right" style="font-size: 0.625rem;"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Pagination -->
+          {% if medicines.has_other_pages %}
+          <div style="margin-top: 2rem; display: flex; justify-content: center;">
+            <nav>
+              <ul style="display: flex; align-items: center; gap: 0.5rem; list-style: none; padding: 0; margin: 0;">
+                {% if medicines.has_previous %}
+                <li>
+                  <a href="?page={{ medicines.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; color: #a855f7; border: 2px solid #e9d5ff; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s ease;">
+                    <i class="fas fa-chevron-left"></i>
+                  </a>
+                </li>
+                {% endif %}
+
+                {% for num in medicines.paginator.page_range %}
+                <li>
+                  {% if num == medicines.number %}
+                  <span style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #a855f7; color: white; border-radius: 0.5rem; font-weight: 700;">{{ num }}</span>
+                  {% else %}
+                  <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s ease;">{{ num }}</a>
+                  {% endif %}
+                </li>
+                {% endfor %}
+
+                {% if medicines.has_next %}
+                <li>
+                  <a href="?page={{ medicines.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; color: #a855f7; border: 2px solid #e9d5ff; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s ease;">
+                    <i class="fas fa-chevron-right"></i>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+          {% endif %}
+          {% else %}
+          <div style="background: #f9fafb; border-radius: 1rem; padding: 3rem 2rem; text-align: center; border: 2px solid #f3f4f6;">
+            <div style="width: 80px; height: 80px; background: #f3e8ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+              <i class="fas fa-pills" style="font-size: 2.5rem; color: #a855f7; opacity: 0.5;"></i>
+            </div>
+            <h5 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 0.75rem;">No Medicines Available</h5>
+            <p style="color: #6b7280; font-size: 0.9375rem;">Check back later for available medicines</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Column - Quick Info -->
+      <div class="col-lg-4">
+        <div style="position: sticky; top: 2rem;">
+          <!-- Contact Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-phone" style="color: #a855f7;"></i>Contact
+            </h4>
+
+            {% if pharmacy.phone %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
+              <div style="width: 40px; height: 40px; background: #f3e8ff; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-phone-alt" style="color: #a855f7; font-size: 1rem;"></i>
+              </div>
+              <div>
+                <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">Phone</p>
+                <p style="margin: 0; color: #1f2937; font-size: 0.9375rem; font-weight: 700;">{{ pharmacy.phone }}</p>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if pharmacy.email %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem; background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
+              <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-envelope" style="color: #3b82f6; font-size: 1rem;"></i>
+              </div>
+              <div style="overflow: hidden;">
+                <p style="margin: 0; color: #6b7280; font-size: 0.75rem; font-weight: 600;">Email</p>
+                <p style="margin: 0; color: #1f2937; font-size: 0.9375rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pharmacy.email }}</p>
+              </div>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <a href="tel:{{ pharmacy.phone }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #a855f7; color: white; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-phone-alt"></i>Call Now
+              </a>
+
+              {% if user.is_authenticated and user != pharmacy.owner %}
+              <button onclick="document.getElementById('messageModal').style.display='flex'" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-comment"></i>Send Message
+              </button>
+              {% elif not user.is_authenticated %}
+              <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem; background: #3b82f6; color: white; border-radius: 0.875rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 24px rgba(59, 130, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fas fa-comment"></i>Send Message
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Business Hours Card -->
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6; margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-clock" style="color: #a855f7;"></i>Business Hours
+            </h4>
+
+            {% if pharmacy.is_24_hours %}
+            <div style="background: #d1fae5; padding: 1rem; border-radius: 0.75rem; text-align: center; border: 2px solid #6ee7b7;">
+              <i class="fas fa-door-open" style="color: #059669; font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+              <p style="margin: 0; color: #065f46; font-weight: 700; font-size: 1rem;">Open 24 Hours</p>
+              <p style="margin: 0; color: #059669; font-size: 0.875rem;">7 Days a Week</p>
+            </div>
+            {% elif pharmacy.opening_hours %}
+            <div style="color: #4b5563; font-size: 0.9375rem; line-height: 1.8; white-space: pre-line;">{{ pharmacy.opening_hours }}</div>
+            {% else %}
+            <p style="color: #6b7280; font-size: 0.9375rem;">Contact pharmacy for business hours</p>
+            {% endif %}
+          </div>
+
+          <!-- Delivery Info Card -->
+          {% if pharmacy.delivery_available %}
+          <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); border: 2px solid #f3f4f6;">
+            <h4 style="font-size: 1.375rem; font-weight: 800; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.625rem;">
+              <i class="fas fa-truck" style="color: #a855f7;"></i>Delivery Info
+            </h4>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Delivery Fee</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">GHS {{ pharmacy.delivery_fee }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Est. Time</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">{{ pharmacy.estimated_delivery_time }} mins</span>
+              </div>
+              {% if pharmacy.minimum_order_amount > 0 %}
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #f3f4f6;">
+                <span style="color: #6b7280; font-size: 0.9375rem;">Min. Order</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">GHS {{ pharmacy.minimum_order_amount }}</span>
+              </div>
+              {% endif %}
+              {% if pharmacy.free_delivery_threshold %}
+              <div style="background: #d1fae5; padding: 0.75rem 1rem; border-radius: 0.5rem; text-align: center;">
+                <span style="color: #065f46; font-weight: 600; font-size: 0.875rem;">
+                  <i class="fas fa-gift" style="margin-right: 0.5rem;"></i>Free delivery on orders above GHS {{ pharmacy.free_delivery_threshold }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

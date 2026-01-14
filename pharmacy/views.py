@@ -1,12 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
-from django.core.paginator import Paginator
+from django.db.models import Q, Prefetch
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from decimal import Decimal
 from .models import (
     Medicine, MedicineCategory, Prescription, Cart, CartItem,
-    Order, OrderItem, Wishlist
+    Order, OrderItem, Wishlist, Pharmacy
 )
 
 
@@ -411,3 +411,151 @@ def toggle_wishlist(request, medicine_id):
         messages.success(request, f'{medicine.name} added to wishlist.')
 
     return redirect(request.META.get('HTTP_REFERER', 'pharmacy:medicine_list'))
+
+
+# ========================
+# Pharmacy Views
+# ========================
+
+def pharmacy_list(request):
+    """
+    Display list of pharmacies with search, filters, and pagination.
+    Similar to restaurant_list for food.
+    """
+    pharmacies = Pharmacy.objects.filter(status='active').select_related('owner')
+
+    # Search functionality
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        pharmacies = pharmacies.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(city__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+
+    # Filter by city
+    city = request.GET.get('city', '').strip()
+    if city:
+        pharmacies = pharmacies.filter(city__iexact=city)
+
+    # Filter by minimum rating
+    min_rating = request.GET.get('min_rating', '').strip()
+    if min_rating:
+        try:
+            min_rating = float(min_rating)
+            pharmacies = pharmacies.filter(average_rating__gte=min_rating)
+        except ValueError:
+            pass
+
+    # Filter by featured
+    featured = request.GET.get('featured', '').strip()
+    if featured == 'true':
+        pharmacies = pharmacies.filter(is_featured=True)
+
+    # Filter by 24 hours
+    is_24_hours = request.GET.get('24hours', '').strip()
+    if is_24_hours == 'true':
+        pharmacies = pharmacies.filter(is_24_hours=True)
+
+    # Sorting
+    sort_by = request.GET.get('sort', '-is_featured')
+    valid_sorts = {
+        'rating': '-average_rating',
+        'name': 'name',
+        'featured': '-is_featured',
+        'newest': '-created_at'
+    }
+    sort_field = valid_sorts.get(sort_by, '-is_featured')
+    pharmacies = pharmacies.order_by(sort_field, '-average_rating')
+
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(pharmacies, 12)  # 12 pharmacies per page
+
+    try:
+        pharmacies_page = paginator.page(page)
+    except PageNotAnInteger:
+        pharmacies_page = paginator.page(1)
+    except EmptyPage:
+        pharmacies_page = paginator.page(paginator.num_pages)
+
+    # Get all cities for filter dropdown
+    cities = Pharmacy.objects.filter(status='active').values_list('city', flat=True).distinct().order_by('city')
+
+    context = {
+        'pharmacies': pharmacies_page,
+        'cities': cities,
+        'search_query': search_query,
+        'selected_city': city,
+        'min_rating': min_rating,
+        'featured': featured,
+        'sort_by': sort_by,
+    }
+
+    return render(request, 'pharmacy/pharmacy_list.html', context)
+
+
+def pharmacy_detail(request, slug):
+    """
+    Display detailed pharmacy information including medicines and reviews.
+    Similar to restaurant_detail for food.
+    """
+    pharmacy = get_object_or_404(
+        Pharmacy.objects.select_related('owner').prefetch_related(
+            Prefetch(
+                'medicines',
+                queryset=Medicine.objects.filter(is_active=True).select_related('category')
+            )
+        ),
+        slug=slug,
+        status='active'
+    )
+
+    # Get medicines for this pharmacy grouped by category
+    medicines = Medicine.objects.filter(
+        pharmacy=pharmacy,
+        is_active=True
+    ).select_related('category').order_by('category__name', '-is_featured', 'name')
+
+    # Get categories for this pharmacy
+    categories = MedicineCategory.objects.filter(
+        medicines__pharmacy=pharmacy,
+        medicines__is_active=True,
+        is_active=True
+    ).distinct().order_by('name')
+
+    # Filter by category if specified
+    category_slug = request.GET.get('category', '').strip()
+    if category_slug:
+        medicines = medicines.filter(category__slug=category_slug)
+
+    # Search in medicines
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        medicines = medicines.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(generic_name__icontains=search_query)
+        )
+
+    # Pagination for medicines
+    page = request.GET.get('page', 1)
+    paginator = Paginator(medicines, 12)  # 12 medicines per page
+
+    try:
+        medicines_page = paginator.page(page)
+    except PageNotAnInteger:
+        medicines_page = paginator.page(1)
+    except EmptyPage:
+        medicines_page = paginator.page(paginator.num_pages)
+
+    context = {
+        'pharmacy': pharmacy,
+        'medicines': medicines_page,
+        'categories': categories,
+        'selected_category': category_slug,
+        'search_query': search_query,
+    }
+
+    return render(request, 'pharmacy/pharmacy_detail.html', context)

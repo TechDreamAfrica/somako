@@ -50,10 +50,164 @@ class Category(models.Model):
         return ' > '.join(path)
 
 
+class Shop(models.Model):
+    """Shop/Store model for managing retail establishments"""
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended'),
+        ('pending_verification', 'Pending Verification'),
+    ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='shops',
+        help_text='Shop owner/manager'
+    )
+    name = models.CharField(max_length=200, db_index=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    description = models.TextField(blank=True)
+    logo = models.ImageField(
+        upload_to='shops/logos/',
+        blank=True,
+        null=True,
+        help_text="Shop logo image"
+    )
+    image = models.ImageField(
+        upload_to='shops/images/',
+        blank=True,
+        null=True,
+        help_text="Main shop banner image"
+    )
+
+    # Contact Information
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    website = models.URLField(blank=True)
+
+    # Location Information
+    address = models.TextField(blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20, blank=True)
+    country = models.CharField(max_length=100, default='Ghana')
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text='Latitude coordinate for map location'
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text='Longitude coordinate for map location'
+    )
+
+    # Business Information
+    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='active')
+    is_verified = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    business_type = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text='Type of business (e.g., Electronics, Fashion, Grocery)'
+    )
+    opening_hours = models.TextField(
+        blank=True,
+        help_text='Opening hours (e.g., "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM")'
+    )
+    
+    # Delivery Settings
+    delivery_available = models.BooleanField(default=True)
+    delivery_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    minimum_order_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    estimated_delivery_time = models.PositiveIntegerField(
+        default=60,
+        help_text='Estimated delivery time in minutes'
+    )
+
+    # Ratings
+    average_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))]
+    )
+    total_reviews = models.PositiveIntegerField(default=0)
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Shop')
+        verbose_name_plural = _('Shops')
+        ordering = ['-is_featured', '-average_rating', 'name']
+        indexes = [
+            models.Index(fields=['status', '-is_featured']),
+            models.Index(fields=['city', 'status']),
+            models.Index(fields=['slug']),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            # Ensure unique slug
+            original_slug = self.slug
+            counter = 1
+            while Shop.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
+
+    def get_logo_url(self):
+        """Get logo URL"""
+        if self.logo:
+            return self.logo.url
+        return None
+
+    def get_image_url(self):
+        """Get image URL"""
+        if self.image:
+            return self.image.url
+        return None
+
+    @property
+    def product_count(self):
+        """Get total number of active products"""
+        return self.products.filter(is_active=True).count()
+
+
 class Product(models.Model):
     """Main product model"""
     name = models.CharField(max_length=300)
     slug = models.SlugField(max_length=300, unique=True, blank=True)
+    shop = models.ForeignKey(
+        Shop,
+        on_delete=models.CASCADE,
+        related_name='products',
+        null=True,
+        blank=True,
+        help_text='Shop this product belongs to'
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,

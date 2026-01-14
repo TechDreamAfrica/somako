@@ -7,11 +7,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Count, Sum, Avg
+from django.db.models import Q, Count, Sum, Avg, Prefetch
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import date
 from decimal import Decimal
 
-from pharmacy.models import Medicine, Cart, CartItem, Order, OrderItem, Prescription, MedicineCategory
+from pharmacy.models import Medicine, Cart, CartItem, Order, OrderItem, Prescription, MedicineCategory, Pharmacy
 
 
 # ============================================
@@ -47,6 +48,100 @@ def pwa_dashboard(request):
         'pending_prescriptions': Prescription.objects.filter(user=user, status='pending').count(),
     }
     return render(request, 'pharmacy/pwa/dashboard.html', context)
+
+
+@login_required
+def pwa_pharmacy_list(request):
+    """Browse all pharmacies - PWA version"""
+    pharmacies = Pharmacy.objects.filter(status='active').select_related('owner')
+
+    # Search functionality
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        pharmacies = pharmacies.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(city__icontains=search_query)
+        )
+
+    # Filter by city
+    city = request.GET.get('city', '').strip()
+    if city:
+        pharmacies = pharmacies.filter(city__iexact=city)
+
+    # Sorting
+    sort = request.GET.get('sort', 'featured')
+    if sort == 'rating':
+        pharmacies = pharmacies.order_by('-average_rating')
+    elif sort == 'name':
+        pharmacies = pharmacies.order_by('name')
+    elif sort == 'newest':
+        pharmacies = pharmacies.order_by('-created_at')
+    else:  # featured
+        pharmacies = pharmacies.order_by('-is_featured', '-average_rating')
+
+    # Get all cities for filter
+    cities = Pharmacy.objects.filter(status='active').values_list('city', flat=True).distinct().order_by('city')
+
+    context = {
+        'pharmacies': pharmacies,
+        'cities': cities,
+        'selected_city': city,
+        'selected_sort': sort,
+        'search_query': search_query,
+    }
+    return render(request, 'pharmacy/pwa/pharmacy_list.html', context)
+
+
+@login_required
+def pwa_pharmacy_detail(request, pk):
+    """Pharmacy details page - PWA version"""
+    pharmacy = get_object_or_404(
+        Pharmacy.objects.select_related('owner').prefetch_related(
+            Prefetch(
+                'medicines',
+                queryset=Medicine.objects.filter(is_active=True).select_related('category')
+            )
+        ),
+        pk=pk,
+        status='active'
+    )
+
+    # Get medicines for this pharmacy
+    medicines = Medicine.objects.filter(
+        pharmacy=pharmacy,
+        is_active=True
+    ).select_related('category').order_by('category__name', '-is_featured', 'name')
+
+    # Get categories for this pharmacy
+    categories = MedicineCategory.objects.filter(
+        medicines__pharmacy=pharmacy,
+        medicines__is_active=True,
+        is_active=True
+    ).distinct().order_by('name')
+
+    # Filter by category if specified
+    category_slug = request.GET.get('category', '').strip()
+    if category_slug:
+        medicines = medicines.filter(category__slug=category_slug)
+
+    # Search in medicines
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        medicines = medicines.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(generic_name__icontains=search_query)
+        )
+
+    context = {
+        'pharmacy': pharmacy,
+        'medicines': medicines,
+        'categories': categories,
+        'selected_category': category_slug,
+        'search_query': search_query,
+    }
+    return render(request, 'pharmacy/pwa/pharmacy_detail.html', context)
 
 
 @login_required

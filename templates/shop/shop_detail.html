@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}{{ shop.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Shop Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 0; overflow: hidden;">
+  <!-- Background Image -->
+  {% if shop.image %}
+  <div style="position: absolute; inset: 0;">
+    <img src="{{ shop.image.url }}" alt="{{ shop.name }}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;">
+  </div>
+  {% endif %}
+  <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(22, 163, 74, 0.6) 100%);"></div>
+
+  <div class="container" style="position: relative; z-index: 2; padding: 6rem 0 4rem;">
+    <div class="row align-items-end">
+      <div class="col-lg-8">
+        <div style="display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+          <!-- Shop Logo -->
+          {% if shop.logo %}
+          <div style="width: 120px; height: 120px; background: white; border-radius: 1.25rem; padding: 0.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); flex-shrink: 0;">
+            <img src="{{ shop.logo.url }}" alt="{{ shop.name }} logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.875rem;">
+          </div>
+          {% else %}
+          <div style="width: 120px; height: 120px; background: white; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); flex-shrink: 0;">
+            <i class="fas fa-store" style="font-size: 3rem; color: #22c55e;"></i>
+          </div>
+          {% endif %}
+
+          <!-- Shop Info -->
+          <div style="flex: 1; min-width: 280px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+              {% if shop.is_verified %}
+              <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.375rem; border: 1px solid rgba(255, 255, 255, 0.3);">
+                <i class="fas fa-check-circle"></i>Verified
+              </span>
+              {% endif %}
+              {% if shop.is_featured %}
+              <span style="background: rgba(245, 158, 11, 0.9); color: white; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.375rem;">
+                <i class="fas fa-star"></i>Featured
+              </span>
+              {% endif %}
+              {% if shop.business_type %}
+              <span style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: white; padding: 0.375rem 0.875rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500;">{{ shop.business_type }}</span>
+              {% endif %}
+            </div>
+
+            <h1 style="font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 900; color: white; margin-bottom: 0.75rem; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);">{{ shop.name }}</h1>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; color: rgba(255, 255, 255, 0.9); font-size: 0.9375rem;">
+              <!-- Rating -->
+              <div style="display: flex; align-items: center; gap: 0.375rem;">
+                <div style="display: flex; gap: 0.125rem;">
+                  {% for i in "12345" %}
+                  {% if forloop.counter <= shop.average_rating %}
+                  <i class="fas fa-star" style="color: #fbbf24; font-size: 0.875rem;"></i>
+                  {% else %}
+                  <i class="far fa-star" style="color: #fbbf24; font-size: 0.875rem;"></i>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+                <span style="font-weight: 700;">{{ shop.average_rating }}</span>
+                <span style="opacity: 0.8;">({{ shop.total_reviews }} reviews)</span>
+              </div>
+
+              <!-- Location -->
+              <div style="display: flex; align-items: center; gap: 0.375rem;">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ shop.city }}, {{ shop.state }}</span>
+              </div>
+
+              <!-- Products -->
+              <div style="display: flex; align-items: center; gap: 0.375rem;">
+                <i class="fas fa-box"></i>
+                <span>{{ shop.product_count }} products</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Card -->
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+          <h4 style="font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Contact Shop</h4>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <a href="tel:{{ shop.phone }}" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #f3f4f6; border-radius: 0.75rem; text-decoration: none; color: #374151; transition: all 0.3s ease;" onmouseover="this.style.background='#dcfce7'; this.style.color='#166534'" onmouseout="this.style.background='#f3f4f6'; this.style.color='#374151'">
+              <i class="fas fa-phone" style="color: #22c55e; font-size: 1rem;"></i>
+              <span style="font-size: 0.875rem; font-weight: 500;">{{ shop.phone }}</span>
+            </a>
+
+            <a href="mailto:{{ shop.email }}" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #f3f4f6; border-radius: 0.75rem; text-decoration: none; color: #374151; transition: all 0.3s ease;" onmouseover="this.style.background='#dcfce7'; this.style.color='#166534'" onmouseout="this.style.background='#f3f4f6'; this.style.color='#374151'">
+              <i class="fas fa-envelope" style="color: #22c55e; font-size: 1rem;"></i>
+              <span style="font-size: 0.875rem; font-weight: 500;">{{ shop.email }}</span>
+            </a>
+
+            {% if shop.address %}
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #f3f4f6; border-radius: 0.75rem;">
+              <i class="fas fa-location-dot" style="color: #22c55e; font-size: 1rem; margin-top: 0.125rem;"></i>
+              <span style="font-size: 0.875rem; color: #374151;">{{ shop.address }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Shop Info Bar -->
+<section style="background: white; border-bottom: 2px solid #f3f4f6; position: sticky; top: 0; z-index: 100;">
+  <div class="container">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0;">
+      <!-- Delivery Info -->
+      <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+        {% if shop.delivery_available %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-truck" style="color: #22c55e;"></i>
+          <span style="font-size: 0.875rem; color: #374151;">Delivery: {% if shop.delivery_fee > 0 %}₵{{ shop.delivery_fee }}{% else %}<strong style="color: #059669;">Free</strong>{% endif %}</span>
+        </div>
+        {% endif %}
+
+        {% if shop.estimated_delivery_time %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-clock" style="color: #22c55e;"></i>
+          <span style="font-size: 0.875rem; color: #374151;">~{{ shop.estimated_delivery_time }} min</span>
+        </div>
+        {% endif %}
+
+        {% if shop.minimum_order_amount > 0 %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-shopping-basket" style="color: #22c55e;"></i>
+          <span style="font-size: 0.875rem; color: #374151;">Min. order: ₵{{ shop.minimum_order_amount }}</span>
+        </div>
+        {% endif %}
+
+        {% if shop.opening_hours %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-calendar-alt" style="color: #22c55e;"></i>
+          <span style="font-size: 0.875rem; color: #374151;">{{ shop.opening_hours|truncatewords:5 }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Back Link -->
+      <a href="{% url 'shop:shop_list' %}" style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.3s ease;" onmouseover="this.style.color='#22c55e'" onmouseout="this.style.color='#6b7280'">
+        <i class="fas fa-arrow-left"></i>Back to Shops
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Shop Description -->
+{% if shop.description %}
+<section style="background: #f9fafb; padding: 2rem 0;">
+  <div class="container">
+    <div style="background: white; border-radius: 1rem; padding: 1.5rem; border: 1px solid #e5e7eb;">
+      <h3 style="font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-info-circle" style="color: #22c55e;"></i>About {{ shop.name }}
+      </h3>
+      <p style="color: #6b7280; font-size: 0.9375rem; line-height: 1.7; margin: 0;">{{ shop.description }}</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Products Section -->
+<section style="padding: 3rem 0 4rem; background: {% if shop.description %}white{% else %}#f9fafb{% endif %};">
+  <div class="container">
+    <!-- Section Header with Filters -->
+    <div style="margin-bottom: 2rem;">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-4">
+          <h2 style="font-size: 1.75rem; font-weight: 800; color: #1f2937; margin: 0;">
+            Products <span style="color: #22c55e;">({{ products.paginator.count }})</span>
+          </h2>
+        </div>
+        
+        <div class="col-lg-8">
+          <form method="get" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-end;">
+            <!-- Search -->
+            <div style="flex: 1; min-width: 200px; max-width: 300px;">
+              <input type="text" name="q" placeholder="Search products..." value="{{ search_query }}" style="width: 100%; padding: 0.625rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.875rem;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+            </div>
+
+            <!-- Category Filter -->
+            <select name="category" onchange="this.form.submit()" style="padding: 0.625rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.875rem; cursor: pointer; min-width: 150px;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+              <option value="">All Categories</option>
+              {% for category in categories %}
+              <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+              {% endfor %}
+            </select>
+
+            <!-- Sort -->
+            <select name="sort" onchange="this.form.submit()" style="padding: 0.625rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.875rem; cursor: pointer; min-width: 140px;" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#e5e7eb'">
+              <option value="featured" {% if selected_sort == 'featured' %}selected{% endif %}>Featured</option>
+              <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest</option>
+              <option value="price_low" {% if selected_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+              <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+            </select>
+
+            <button type="submit" style="padding: 0.625rem 1.25rem; background: #22c55e; color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% if products %}
+    <!-- Products Grid -->
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #f3f4f6; height: 100%;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(34, 197, 94, 0.15)'; this.style.borderColor='#bbf7d0'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#f3f4f6'">
+          <a href="{% url 'shop:product_detail' product.slug %}" style="text-decoration: none; display: block;">
+            <!-- Product Image -->
+            <div style="position: relative; height: 200px; overflow: hidden; background: #f9fafb;">
+              {% if product.get_primary_image_url %}
+              <img src="{{ product.get_primary_image_url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              {% else %}
+              <div style="width: 100%; height: 100%; background: #dcfce7; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: #22c55e; opacity: 0.3;"></i>
+              </div>
+              {% endif %}
+
+              <!-- Badges -->
+              <div style="position: absolute; top: 0.75rem; right: 0.75rem; display: flex; flex-direction: column; gap: 0.375rem;">
+                {% if product.discount_percentage > 0 %}
+                <span style="background: #ef4444; color: white; padding: 0.25rem 0.625rem; border-radius: 50px; font-weight: 700; font-size: 0.7rem;">
+                  -{{ product.discount_percentage|floatformat:0 }}%
+                </span>
+                {% endif %}
+                {% if product.is_featured %}
+                <span style="background: #f59e0b; color: white; padding: 0.25rem 0.625rem; border-radius: 50px; font-weight: 700; font-size: 0.7rem;">
+                  <i class="fas fa-star"></i>
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+
+          <!-- Product Info -->
+          <div style="padding: 1.25rem;">
+            <span style="display: inline-block; background: #dcfce7; color: #166534; padding: 0.2rem 0.625rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; margin-bottom: 0.625rem;">{{ product.category.name }}</span>
+            
+            <a href="{% url 'shop:product_detail' product.slug %}" style="text-decoration: none;">
+              <h3 style="font-size: 0.9375rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ product.name }}</h3>
+            </a>
+
+            {% if product.brand %}
+            <p style="color: #9ca3af; font-size: 0.75rem; margin-bottom: 0.625rem;">{{ product.brand }}</p>
+            {% endif %}
+
+            <!-- Rating -->
+            {% if product.avg_rating %}
+            <div style="display: flex; align-items: center; gap: 0.375rem; margin-bottom: 0.75rem;">
+              <i class="fas fa-star" style="color: #f59e0b; font-size: 0.75rem;"></i>
+              <span style="font-weight: 600; color: #374151; font-size: 0.8rem;">{{ product.avg_rating|floatformat:1 }}</span>
+              <span style="color: #9ca3af; font-size: 0.75rem;">({{ product.review_count }})</span>
+            </div>
+            {% endif %}
+
+            <!-- Price -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              {% if product.discount_percentage > 0 %}
+              <span style="font-size: 1.125rem; font-weight: 800; color: #22c55e;">₵{{ product.discounted_price|floatformat:2 }}</span>
+              <span style="font-size: 0.8rem; color: #9ca3af; text-decoration: line-through;">₵{{ product.base_price|floatformat:2 }}</span>
+              {% else %}
+              <span style="font-size: 1.125rem; font-weight: 800; color: #22c55e;">₵{{ product.base_price|floatformat:2 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Stock Status -->
+            <div style="margin-top: 0.75rem;">
+              {% if product.is_in_stock %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; color: #059669; font-size: 0.75rem; font-weight: 600;">
+                <span style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></span>In Stock
+              </span>
+              {% else %}
+              <span style="display: flex; align-items: center; gap: 0.375rem; color: #dc2626; font-size: 0.75rem; font-weight: 600;">
+                <span style="width: 6px; height: 6px; background: #dc2626; border-radius: 50%;"></span>Out of Stock
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+    <div style="display: flex; justify-content: center; margin-top: 3rem;">
+      <nav style="display: flex; gap: 0.5rem; align-items: center;">
+        {% if products.has_previous %}
+        <a href="?page={{ products.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" style="padding: 0.75rem 1rem; background: white; border: 2px solid #e5e7eb; border-radius: 0.75rem; color: #374151; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#22c55e'; this.style.color='#22c55e'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#374151'">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        <span style="padding: 0.75rem 1.25rem; background: #22c55e; color: white; border-radius: 0.75rem; font-weight: 600; font-size: 0.875rem;">
+          {{ products.number }} / {{ products.paginator.num_pages }}
+        </span>
+
+        {% if products.has_next %}
+        <a href="?page={{ products.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" style="padding: 0.75rem 1rem; background: white; border: 2px solid #e5e7eb; border-radius: 0.75rem; color: #374151; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#22c55e'; this.style.color='#22c55e'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#374151'">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Products -->
+    <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 1.5rem; border: 2px solid #f3f4f6;">
+      <div style="width: 100px; height: 100px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-box-open" style="font-size: 2.5rem; color: #22c55e;"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">No Products Found</h3>
+      <p style="color: #6b7280; margin-bottom: 1.5rem;">This shop hasn't listed any products yet or no products match your filters.</p>
+      {% if search_query or selected_category %}
+      <a href="{% url 'shop:shop_detail' shop.slug %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #22c55e; color: white; text-decoration: none; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+        <i class="fas fa-redo"></i>Clear Filters
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

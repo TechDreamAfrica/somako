@@ -11,6 +11,10 @@ urlpatterns = [
     # PWA Dashboard
     path('', views.pwa_dashboard, name='dashboard'),
 
+    # Browse Shops
+    path('shops/', views.pwa_shop_list, name='shop_list'),
+    path('shops/<int:pk>/', views.pwa_shop_detail, name='shop_detail'),
+
     # Browse Products
     path('products/', views.pwa_product_list, name='product_list'),
     path('products/<int:pk>/', views.pwa_product_detail, name='product_detail'),

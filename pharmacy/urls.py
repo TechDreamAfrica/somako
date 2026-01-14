@@ -5,8 +5,12 @@ from . import views_owner
 app_name = 'pharmacy'
 
 urlpatterns = [
+    # Pharmacies
+    path('', views.pharmacy_list, name='pharmacy_list'),
+    path('pharmacy/<slug:slug>/', views.pharmacy_detail, name='pharmacy_detail'),
+    
     # Medicines
-    path('', views.medicine_list, name='medicine_list'),
+    path('medicines/', views.medicine_list, name='medicine_list'),
     path('medicine/<slug:slug>/', views.medicine_detail, name='medicine_detail'),
 
     # Cart

@@ -27,16 +27,16 @@
     <!-- Content -->
     <div class="p-8">
       <p class="text-gray-600 text-lg leading-relaxed mb-7 text-center">
-        Welcome! We're excited to have you here. Discover everything you need in one platform - from renting properties to ordering food, shopping, and booking rides.
+        Welcome! We're excited to have you here. Discover everything you need in one platform - from renting equipments to ordering food, shopping, and booking rides.
       </p>
 
       <!-- Features Grid -->
       <div class="grid grid-cols-2 gap-4 mb-8">
         <div class="flex items-center gap-3 p-4 bg-primary-50 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-md group cursor-pointer">
           <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-            <i class="fas fa-home text-white text-lg"></i>
+            <i class="fas fa-tools text-white text-lg"></i>
           </div>
-          <span class="text-primary-800 font-bold text-sm">Rent Properties</span>
+          <span class="text-primary-800 font-bold text-sm">Rent Equipments</span>
         </div>
 
         <div class="flex items-center gap-3 p-4 bg-primary-50 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-md group cursor-pointer">
@@ -188,7 +188,7 @@
 
         <!-- Subheading -->
         <p class="text-xl text-gray-600 leading-relaxed mb-10 max-w-[700px] mx-auto animate-fadeInUp animation-delay-200">
-          Rent properties, order medicine, shop online, order food, and book rides - all in one platform
+          Rent equipments, order medicine, shop online, order food, and book rides - all in one platform
         </p>
 
         <!-- CTA Buttons -->
@@ -292,14 +292,14 @@
 
   <div class="container relative z-20">
     <div class="row g-4">
-      <!-- Properties -->
+      <!-- Equipments -->
       <div class="col-6 col-md-4 col-lg-2">
         <div class="stat-card group">
           <div class="stat-icon-wrapper group-hover:rotate-360">
-            <i class="fas fa-home text-3xl text-white"></i>
+            <i class="fas fa-tools text-3xl text-white"></i>
           </div>
           <div class="stat-number">{{ total_properties|default:"0" }}</div>
-          <div class="stat-label">Properties</div>
+          <div class="stat-label">Equipments</div>
         </div>
       </div>
 
@@ -372,7 +372,7 @@
       </div>
       <h2 class="text-[clamp(2.5rem,4vw,3.5rem)] font-black mb-5 text-gray-800 tracking-tight">Our Services</h2>
       <p class="text-lg text-gray-600 leading-relaxed max-w-[600px] mx-auto">
-        Everything you need in one convenient platform - from renting properties to ordering food, shopping, and more.
+        Everything you need in one convenient platform - from renting equipments to ordering food, shopping, and more.
       </p>
     </div>
 
@@ -381,14 +381,14 @@
       <div class="col-md-6 col-lg-4">
         <div class="content-section p-8 h-full group cursor-pointer hover:-translate-y-2 transition-all duration-500">
           <div class="flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-            <i class="fas fa-home text-2xl text-white"></i>
+            <i class="fas fa-tools text-2xl text-white"></i>
           </div>
-          <h4 class="text-2xl font-bold text-gray-800 mb-4">Rent Properties</h4>
+          <h4 class="text-2xl font-bold text-gray-800 mb-4">Rent Equipments</h4>
           <p class="text-gray-600 leading-relaxed mb-6">
-            Find and rent properties, houses, apartments, and equipment. Browse through {{ total_properties|default:"500+" }} available listings.
+            Find and rent equipments, tools, machinery, and more. Browse through {{ total_properties|default:"500+" }} available listings.
           </p>
           <a href="{% url 'rent:property_list' %}" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700 group/link">
-            Browse Properties <i class="fas fa-arrow-right group-hover/link:translate-x-1 transition-transform duration-300"></i>
+            Browse Equipments <i class="fas fa-arrow-right group-hover/link:translate-x-1 transition-transform duration-300"></i>
           </a>
         </div>
       </div>

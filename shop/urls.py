@@ -5,8 +5,12 @@ from . import views_seller
 app_name = 'shop'
 
 urlpatterns = [
+    # Shops
+    path('', views.shop_list, name='shop_list'),
+    path('shop/<slug:slug>/', views.shop_detail, name='shop_detail'),
+
     # Products
-    path('', views.product_list, name='product_list'),
+    path('products/', views.product_list, name='product_list'),
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
     path('category/<slug:slug>/', views.category_products, name='category_products'),
 

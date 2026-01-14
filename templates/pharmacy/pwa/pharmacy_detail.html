@@ -1,0 +1,538 @@
+{% extends 'pwa_base.html' %}
+{% load static %}
+
+{% block title %}{{ pharmacy.name }} - Pharmacy{% endblock %}
+{% block theme_color %}#8b5cf6{% endblock %}
+{% block pharmacy_active %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pwa-banner-styles.css' %}">
+<style>
+  .pharmacy-banner {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .pharmacy-hero-header {
+    background: white;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .pharmacy-profile {
+    padding: 0 1rem 1.5rem 1rem;
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .pharmacy-logo-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background: white;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pharmacy-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pharmacy-logo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #8b5cf6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pharmacy-logo-placeholder i {
+    font-size: 3rem;
+    color: white;
+  }
+
+  .pharmacy-name {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+  }
+
+  .pharmacy-description {
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .pharmacy-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .info-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .pharmacy-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge-verified {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .badge-24h {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .badge-rating {
+    background: #f3e8ff;
+    color: #7c3aed;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .pwa-banner-back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2937;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    transition: all 0.2s;
+  }
+
+  .pwa-banner-back-button:active {
+    transform: scale(0.95);
+  }
+
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .info-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-card-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+
+  .info-card-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem;
+    background: white;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: calc(4rem + env(safe-area-inset-top));
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-tab {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .category-tab.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+  }
+
+  .medicine-section {
+    padding: 1rem;
+  }
+
+  .medicine-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s;
+  }
+
+  .medicine-item:active {
+    transform: scale(0.98);
+  }
+
+  .medicine-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: contain;
+    background: #f9fafb;
+  }
+
+  .medicine-img-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    background: #f3e8ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .medicine-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .medicine-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .medicine-manufacturer {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .medicine-price {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: #8b5cf6;
+  }
+
+  .medicine-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .medicine-badge-category {
+    background: #f3e8ff;
+    color: #7c3aed;
+  }
+
+  .medicine-badge-rx {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .contact-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .contact-btn:active {
+    transform: scale(0.98);
+  }
+
+  .contact-btn-primary {
+    background: #8b5cf6;
+    color: white;
+  }
+
+  .contact-btn-secondary {
+    background: white;
+    color: #8b5cf6;
+    border: 2px solid #8b5cf6;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Pharmacy Hero Header -->
+<div class="pharmacy-hero-header">
+  <div class="banner-container">
+    <a href="{% url 'pharmacy_pwa:pharmacy_list' %}" class="pwa-banner-back-button">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+    
+    {% if pharmacy.image %}
+    <img src="{{ pharmacy.image.url }}" alt="{{ pharmacy.name }}" class="pharmacy-banner">
+    {% else %}
+    <div class="pharmacy-banner" style="background: #8b5cf6; display: flex; align-items: center; justify-content: center;">
+      <i class="fas fa-clinic-medical" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3);"></i>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="pharmacy-profile">
+    <div class="pharmacy-logo-container">
+      {% if pharmacy.logo %}
+      <img src="{{ pharmacy.logo.url }}" alt="{{ pharmacy.name }}" class="pharmacy-logo">
+      {% else %}
+      <div class="pharmacy-logo-placeholder">
+        <i class="fas fa-clinic-medical"></i>
+      </div>
+      {% endif %}
+    </div>
+
+    <h1 class="pharmacy-name">{{ pharmacy.name }}</h1>
+    
+    <p class="pharmacy-description">{{ pharmacy.description|truncatewords:20|default:"A trusted pharmacy providing quality medicines and healthcare products." }}</p>
+
+    <div class="pharmacy-info">
+      <span class="info-badge">
+        <i class="fas fa-map-marker-alt" style="color: #8b5cf6;"></i> {{ pharmacy.city }}
+      </span>
+      <span style="color: #d1d5db;">•</span>
+      <span class="info-badge">
+        <i class="fas fa-pills" style="color: #8b5cf6;"></i> {{ pharmacy.medicine_count }} products
+      </span>
+    </div>
+
+    <div class="pharmacy-badges">
+      {% if pharmacy.is_verified %}
+      <span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+      {% endif %}
+      {% if pharmacy.is_24_hours %}
+      <span class="badge-24h">24 Hours</span>
+      {% endif %}
+      {% if pharmacy.average_rating %}
+      <span class="badge-rating"><i class="fas fa-star"></i> {{ pharmacy.average_rating|floatformat:1 }}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Contact Actions -->
+<div class="contact-actions">
+  <a href="tel:{{ pharmacy.phone }}" class="contact-btn contact-btn-primary">
+    <i class="fas fa-phone-alt"></i> Call
+  </a>
+  <a href="mailto:{{ pharmacy.email }}" class="contact-btn contact-btn-secondary">
+    <i class="fas fa-envelope"></i> Email
+  </a>
+</div>
+
+<!-- Info Cards -->
+<div class="info-cards">
+  {% if pharmacy.delivery_available %}
+  <div class="info-card">
+    <div class="info-card-icon" style="background: #f3e8ff;">
+      <i class="fas fa-shipping-fast" style="color: #8b5cf6;"></i>
+    </div>
+    <div class="info-card-label">Delivery Time</div>
+    <div class="info-card-value">{{ pharmacy.estimated_delivery_time }} mins</div>
+  </div>
+  <div class="info-card">
+    <div class="info-card-icon" style="background: #d1fae5;">
+      <i class="fas fa-truck" style="color: #059669;"></i>
+    </div>
+    <div class="info-card-label">Delivery Fee</div>
+    <div class="info-card-value">GHS {{ pharmacy.delivery_fee }}</div>
+  </div>
+  {% endif %}
+  {% if pharmacy.minimum_order_amount > 0 %}
+  <div class="info-card">
+    <div class="info-card-icon" style="background: #fef3c7;">
+      <i class="fas fa-shopping-basket" style="color: #d97706;"></i>
+    </div>
+    <div class="info-card-label">Min. Order</div>
+    <div class="info-card-value">GHS {{ pharmacy.minimum_order_amount }}</div>
+  </div>
+  {% endif %}
+  <div class="info-card">
+    <div class="info-card-icon" style="background: {% if pharmacy.is_24_hours %}#d1fae5{% else %}#f3f4f6{% endif %};">
+      <i class="fas fa-clock" style="color: {% if pharmacy.is_24_hours %}#059669{% else %}#6b7280{% endif %};"></i>
+    </div>
+    <div class="info-card-label">Hours</div>
+    <div class="info-card-value">{% if pharmacy.is_24_hours %}24/7{% else %}Contact{% endif %}</div>
+  </div>
+</div>
+
+<!-- Search Bar -->
+<div style="padding: 0 1rem; margin-bottom: 0.5rem;">
+  <form method="GET">
+    <div style="position: relative;">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search medicines..."
+        value="{{ search_query }}"
+        style="width: 100%; padding: 0.875rem 1rem 0.875rem 3rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; transition: all 0.2s;"
+      >
+      <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+    </div>
+  </form>
+</div>
+
+<!-- Category Tabs -->
+{% if categories %}
+<div class="category-tabs">
+  <a href="{% url 'pharmacy_pwa:pharmacy_detail' pharmacy.pk %}" class="category-tab {% if not selected_category %}active{% endif %}">
+    All
+  </a>
+  {% for cat in categories %}
+  <a href="{% url 'pharmacy_pwa:pharmacy_detail' pharmacy.pk %}?category={{ cat.slug }}" class="category-tab {% if selected_category == cat.slug %}active{% endif %}">
+    {{ cat.name }}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Medicines Section -->
+<div class="medicine-section" style="padding-bottom: 6rem;">
+  <h3 style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fas fa-pills" style="color: #8b5cf6;"></i> Medicines
+  </h3>
+
+  {% for medicine in medicines %}
+  <a href="{% url 'pharmacy_pwa:medicine_detail' medicine.pk %}" class="medicine-item" style="text-decoration: none; color: inherit;">
+    {% if medicine.image %}
+    <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}" class="medicine-img">
+    {% else %}
+    <div class="medicine-img-placeholder">
+      <i class="fas fa-pills" style="font-size: 1.5rem; color: #8b5cf6; opacity: 0.5;"></i>
+    </div>
+    {% endif %}
+    
+    <div class="medicine-details">
+      <div style="margin-bottom: 0.375rem;">
+        <span class="medicine-badge medicine-badge-category">{{ medicine.category.name }}</span>
+        {% if medicine.requires_prescription %}
+        <span class="medicine-badge medicine-badge-rx"><i class="fas fa-prescription"></i> Rx</span>
+        {% endif %}
+      </div>
+      <h4 class="medicine-name">{{ medicine.name }}</h4>
+      <p class="medicine-manufacturer">{{ medicine.manufacturer }}</p>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span class="medicine-price">GHS {{ medicine.price }}</span>
+        <span style="background: #8b5cf6; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+          View <i class="fas fa-arrow-right" style="font-size: 0.5rem;"></i>
+        </span>
+      </div>
+    </div>
+  </a>
+  {% empty %}
+  <div style="text-align: center; padding: 3rem 1rem;">
+    <div style="width: 80px; height: 80px; background: #f3e8ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <i class="fas fa-pills" style="font-size: 2rem; color: #8b5cf6; opacity: 0.5;"></i>
+    </div>
+    <h4 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">No Medicines Available</h4>
+    <p style="color: #6b7280; font-size: 0.9375rem;">Check back later for available products</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

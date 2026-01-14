@@ -10,11 +10,178 @@ from decimal import Decimal
 import uuid
 
 from .models import (
-    Product, ProductVariant, ProductImage, Category,
+    Product, ProductVariant, ProductImage, Category, Shop,
     Cart, CartItem, Wishlist, WishlistItem,
     Order, OrderItem, OrderStatusHistory, Payment,
     Review
 )
+
+
+# ============================================================================
+# SHOP VIEWS
+# ============================================================================
+
+def shop_list(request):
+    """
+    Display list of shops with search, filters, and pagination.
+    """
+    shops = Shop.objects.filter(status='active').annotate(
+        product_count_annotated=Count('products', filter=Q(products__is_active=True))
+    ).select_related('owner')
+
+    # Search functionality
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        shops = shops.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(business_type__icontains=search_query) |
+            Q(city__icontains=search_query)
+        )
+
+    # Filter by city
+    city = request.GET.get('city', '').strip()
+    if city:
+        shops = shops.filter(city__iexact=city)
+
+    # Filter by business type
+    business_type = request.GET.get('type', '').strip()
+    if business_type:
+        shops = shops.filter(business_type__icontains=business_type)
+
+    # Filter by minimum rating
+    min_rating = request.GET.get('rating', '').strip()
+    if min_rating:
+        try:
+            shops = shops.filter(average_rating__gte=float(min_rating))
+        except ValueError:
+            pass
+
+    # Filter by featured
+    if request.GET.get('featured') == 'true':
+        shops = shops.filter(is_featured=True)
+
+    # Filter by verified
+    if request.GET.get('verified') == 'true':
+        shops = shops.filter(is_verified=True)
+
+    # Sorting
+    sort_by = request.GET.get('sort', 'featured')
+    if sort_by == 'rating':
+        shops = shops.order_by('-average_rating', '-is_featured')
+    elif sort_by == 'name':
+        shops = shops.order_by('name')
+    elif sort_by == 'newest':
+        shops = shops.order_by('-created_at')
+    else:
+        shops = shops.order_by('-is_featured', '-average_rating')
+
+    # Get unique cities for filter dropdown
+    cities = Shop.objects.filter(status='active').values_list('city', flat=True).distinct().order_by('city')
+
+    # Get unique business types for filter dropdown
+    business_types = Shop.objects.filter(status='active').exclude(
+        business_type=''
+    ).values_list('business_type', flat=True).distinct().order_by('business_type')
+
+    # Pagination
+    paginator = Paginator(shops, 12)
+    page = request.GET.get('page', 1)
+    try:
+        shops_page = paginator.page(page)
+    except PageNotAnInteger:
+        shops_page = paginator.page(1)
+    except EmptyPage:
+        shops_page = paginator.page(paginator.num_pages)
+
+    context = {
+        'shops': shops_page,
+        'cities': cities,
+        'business_types': business_types,
+        'search_query': search_query,
+        'selected_city': city,
+        'selected_type': business_type,
+        'selected_sort': sort_by,
+    }
+    return render(request, 'shop/shop_list.html', context)
+
+
+def shop_detail(request, slug):
+    """
+    Display shop details with products listing.
+    """
+    shop = get_object_or_404(Shop, slug=slug, status='active')
+
+    # Get products for this shop
+    products = Product.objects.filter(
+        shop=shop,
+        is_active=True
+    ).select_related('category').prefetch_related(
+        Prefetch('images', queryset=ProductImage.objects.filter(is_primary=True)),
+        Prefetch('variants', queryset=ProductVariant.objects.filter(is_active=True)),
+    ).annotate(
+        avg_rating=Avg('reviews__rating', filter=Q(reviews__is_approved=True)),
+        review_count=Count('reviews', filter=Q(reviews__is_approved=True))
+    )
+
+    # Search within shop
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(brand__icontains=search_query)
+        )
+
+    # Filter by category
+    category_slug = request.GET.get('category', '').strip()
+    selected_category = None
+    if category_slug:
+        try:
+            selected_category = Category.objects.get(slug=category_slug, is_active=True)
+            products = products.filter(category=selected_category)
+        except Category.DoesNotExist:
+            pass
+
+    # Sorting
+    sort_by = request.GET.get('sort', 'featured')
+    if sort_by == 'price_low':
+        products = products.order_by('base_price')
+    elif sort_by == 'price_high':
+        products = products.order_by('-base_price')
+    elif sort_by == 'rating':
+        products = products.order_by('-avg_rating')
+    elif sort_by == 'newest':
+        products = products.order_by('-created_at')
+    else:
+        products = products.order_by('-is_featured', '-created_at')
+
+    # Get categories with products in this shop
+    categories = Category.objects.filter(
+        products__shop=shop,
+        products__is_active=True,
+        is_active=True
+    ).distinct().order_by('name')
+
+    # Pagination
+    paginator = Paginator(products, 12)
+    page = request.GET.get('page', 1)
+    try:
+        products_page = paginator.page(page)
+    except PageNotAnInteger:
+        products_page = paginator.page(1)
+    except EmptyPage:
+        products_page = paginator.page(paginator.num_pages)
+
+    context = {
+        'shop': shop,
+        'products': products_page,
+        'categories': categories,
+        'search_query': search_query,
+        'selected_category': selected_category,
+        'selected_sort': sort_by,
+    }
+    return render(request, 'shop/shop_detail.html', context)
 
 
 # ============================================================================
