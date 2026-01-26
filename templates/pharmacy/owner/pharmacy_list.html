@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}My Pharmacies - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 2rem 0; overflow: hidden;">
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="{% url 'pharmacy:owner_dashboard' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem; color: white; text-decoration: none;">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">My Pharmacies</h1>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{{ total_pharmacies }} pharmacies, {{ active_pharmacies }} active</p>
+        </div>
+      </div>
+      <a href="{% url 'pharmacy:owner_pharmacy_create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #059669; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none;">
+        <i class="fas fa-plus"></i> Add Pharmacy
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Pharmacies List -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    {% if pharmacies %}
+    <div class="row g-4">
+      {% for pharmacy in pharmacies %}
+      <div class="col-md-6 col-lg-4">
+        <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+          {% if pharmacy.image %}
+          <img src="{{ pharmacy.image.url }}" alt="{{ pharmacy.name }}" style="width: 100%; height: 150px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-clinic-medical" style="font-size: 3rem; color: white;"></i>
+          </div>
+          {% endif %}
+          
+          <div style="padding: 1.25rem;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem;">
+              <div>
+                <h5 style="font-weight: 700; margin-bottom: 0.25rem; font-size: 1.125rem; color: #1f2937;">{{ pharmacy.name|truncatechars:25 }}</h5>
+                <p style="color: #6b7280; font-size: 0.875rem; margin: 0;"><i class="fas fa-map-marker-alt"></i> {{ pharmacy.city }}, {{ pharmacy.country }}</p>
+              </div>
+              {% if pharmacy.logo %}
+              <img src="{{ pharmacy.logo.url }}" alt="" style="width: 40px; height: 40px; border-radius: 0.5rem; object-fit: cover;">
+              {% endif %}
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              {% if pharmacy.status == 'active' %}
+              <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700;">Active</span>
+              {% else %}
+              <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700;">{{ pharmacy.get_status_display }}</span>
+              {% endif %}
+              <span style="color: #6b7280; font-size: 0.75rem;"><i class="fas fa-pills"></i> {{ pharmacy.medicines.count }} medicines</span>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{% url 'pharmacy:owner_pharmacy_detail' pk=pharmacy.pk %}" style="flex: 1; text-align: center; background: #059669; color: white; padding: 0.625rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+                <i class="fas fa-eye"></i> View
+              </a>
+              <a href="{% url 'pharmacy:owner_pharmacy_update' pk=pharmacy.pk %}" style="flex: 1; text-align: center; background: #f3f4f6; color: #374151; padding: 0.625rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a href="{% url 'pharmacy:owner_medicine_create_for_pharmacy' pharmacy_pk=pharmacy.pk %}" style="flex: 1; text-align: center; background: #3b82f6; color: white; padding: 0.625rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+                <i class="fas fa-plus"></i> Add
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: white; border-radius: 1.25rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+      <div style="width: 100px; height: 100px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-clinic-medical" style="font-size: 2.5rem; color: #9ca3af;"></i>
+      </div>
+      <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">No Pharmacies Yet</h3>
+      <p style="color: #6b7280; margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto;">Create your first pharmacy to start adding medicines and serving customers.</p>
+      <a href="{% url 'pharmacy:owner_pharmacy_create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 1rem 2rem; border-radius: 0.75rem; text-decoration: none; font-weight: 700; font-size: 1rem;">
+        <i class="fas fa-plus"></i> Create Your First Pharmacy
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

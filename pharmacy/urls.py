@@ -35,11 +35,26 @@ urlpatterns = [
     path('wishlist/toggle/<int:medicine_id>/', views.toggle_wishlist, name='toggle_wishlist'),
 
     # ============================================
-    # Pharmacy Owner CRUD URLs
+    # Pharmacy Owner Dashboard
     # ============================================
-    # Medicine Management
+    path('owner/', views_owner.owner_dashboard, name='owner_dashboard'),
+    
+    # ============================================
+    # Pharmacy CRUD URLs
+    # ============================================
+    path('owner/pharmacies/', views_owner.pharmacy_list, name='owner_pharmacy_list'),
+    path('owner/pharmacies/create/', views_owner.pharmacy_create, name='owner_pharmacy_create'),
+    path('owner/pharmacies/<int:pk>/', views_owner.pharmacy_detail, name='owner_pharmacy_detail'),
+    path('owner/pharmacies/<int:pk>/update/', views_owner.pharmacy_update, name='owner_pharmacy_update'),
+    path('owner/pharmacies/<int:pk>/delete/', views_owner.pharmacy_delete, name='owner_pharmacy_delete'),
+    path('owner/pharmacies/<int:pk>/toggle/', views_owner.pharmacy_toggle_status, name='owner_pharmacy_toggle'),
+    
+    # ============================================
+    # Medicine CRUD URLs
+    # ============================================
     path('owner/medicines/', views_owner.medicine_list, name='owner_medicine_list'),
     path('owner/medicines/create/', views_owner.medicine_create, name='owner_medicine_create'),
+    path('owner/medicines/create/<int:pharmacy_pk>/', views_owner.medicine_create, name='owner_medicine_create_for_pharmacy'),
     path('owner/medicines/<int:pk>/', views_owner.medicine_detail, name='owner_medicine_detail'),
     path('owner/medicines/<int:pk>/update/', views_owner.medicine_update, name='owner_medicine_update'),
     path('owner/medicines/<int:pk>/delete/', views_owner.medicine_delete, name='owner_medicine_delete'),

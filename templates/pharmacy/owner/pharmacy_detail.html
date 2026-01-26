@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}{{ pharmacy.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 2rem 0; overflow: hidden;">
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <a href="{% url 'pharmacy:owner_pharmacy_list' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem; color: white; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div style="flex-grow: 1;">
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ pharmacy.name }}</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">
+          <i class="fas fa-map-marker-alt"></i> {{ pharmacy.city }}, {{ pharmacy.state }}
+        </p>
+      </div>
+      <span style="background: {% if pharmacy.status == 'active' %}rgba(16, 185, 129, 0.2){% elif pharmacy.status == 'pending' %}rgba(245, 158, 11, 0.2){% else %}rgba(239, 68, 68, 0.2){% endif %}; color: white; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.875rem;">
+        {{ pharmacy.get_status_display }}
+      </span>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+      <a href="{% url 'pharmacy:owner_pharmacy_update' pharmacy.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); color: white; padding: 0.75rem 1.25rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9375rem;">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <a href="{% url 'pharmacy:owner_medicine_create_for_pharmacy' pharmacy.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #059669; padding: 0.75rem 1.25rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9375rem;">
+        <i class="fas fa-plus"></i> Add Medicine
+      </a>
+      <form action="{% url 'pharmacy:owner_pharmacy_toggle_status' pharmacy.pk %}" method="post" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); color: white; padding: 0.75rem 1.25rem; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 0.9375rem; cursor: pointer;">
+          {% if pharmacy.status == 'active' %}<i class="fas fa-pause"></i> Deactivate{% else %}<i class="fas fa-play"></i> Activate{% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Pharmacy Info -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Info -->
+      <div class="col-lg-8">
+        <!-- Images & Description -->
+        <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 1.5rem;">
+          {% if pharmacy.image %}
+          <div style="height: 250px; overflow: hidden;">
+            <img src="{{ pharmacy.image.url }}" alt="{{ pharmacy.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          {% endif %}
+          <div style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+              {% if pharmacy.logo %}
+              <img src="{{ pharmacy.logo.url }}" alt="{{ pharmacy.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.75rem;">
+              {% else %}
+              <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-clinic-medical"></i>
+              </div>
+              {% endif %}
+              <div>
+                <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">{{ pharmacy.name }}</h4>
+                <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; color: #6b7280;">
+                  {% if pharmacy.average_rating %}
+                  <span><i class="fas fa-star" style="color: #f59e0b;"></i> {{ pharmacy.average_rating }}</span>
+                  {% endif %}
+                  {% if pharmacy.is_24_hours %}
+                  <span><i class="fas fa-clock" style="color: #059669;"></i> 24 Hours</span>
+                  {% endif %}
+                  {% if pharmacy.delivery_available %}
+                  <span><i class="fas fa-truck" style="color: #059669;"></i> Delivery</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% if pharmacy.description %}
+            <p style="color: #4b5563; margin: 0; line-height: 1.6;">{{ pharmacy.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Medicines List -->
+        <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
+          <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-weight: 700; color: #1f2937; margin: 0;"><i class="fas fa-pills" style="color: #059669;"></i> Medicines ({{ medicines.count }})</h4>
+            <a href="{% url 'pharmacy:owner_medicine_create_for_pharmacy' pharmacy.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </div>
+          
+          {% if medicines %}
+          <div style="padding: 0;">
+            {% for medicine in medicines %}
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb;">
+              {% if medicine.image %}
+              <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.5rem;">
+              {% else %}
+              <div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+                <i class="fas fa-pills"></i>
+              </div>
+              {% endif %}
+              <div style="flex-grow: 1;">
+                <h6 style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">{{ medicine.name }}</h6>
+                <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">
+                  <span style="color: {% if medicine.stock_quantity <= 10 %}#dc2626{% else %}#059669{% endif %};">
+                    {{ medicine.stock_quantity }} in stock
+                  </span>
+                  {% if medicine.requires_prescription %}
+                  <span style="color: #f59e0b; margin-left: 0.5rem;"><i class="fas fa-prescription"></i> Rx</span>
+                  {% endif %}
+                </p>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-weight: 700; color: #059669;">GH₵{{ medicine.price }}</span>
+                <span style="display: block; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 50px; background: {% if medicine.is_active %}#d1fae5{% else %}#fee2e2{% endif %}; color: {% if medicine.is_active %}#059669{% else %}#dc2626{% endif %};">
+                  {% if medicine.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'pharmacy:owner_medicine_update' medicine.pk %}" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 0.5rem; color: #6b7280; text-decoration: none;">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <form action="{% url 'pharmacy:owner_medicine_toggle' medicine.pk %}" method="post" style="margin: 0;">
+                  {% csrf_token %}
+                  <button type="submit" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border: none; border-radius: 0.5rem; color: #6b7280; cursor: pointer;">
+                    <i class="fas {% if medicine.is_active %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div style="padding: 3rem 1.5rem; text-align: center;">
+            <i class="fas fa-pills" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+            <h5 style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">No medicines yet</h5>
+            <p style="color: #6b7280; margin-bottom: 1rem;">Add your first medicine to this pharmacy</p>
+            <a href="{% url 'pharmacy:owner_medicine_create_for_pharmacy' pharmacy.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600;">
+              <i class="fas fa-plus"></i> Add Medicine
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Contact Info -->
+        <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-address-book" style="color: #059669;"></i> Contact</h5>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563;">
+              <i class="fas fa-phone" style="width: 20px; color: #9ca3af;"></i>
+              <span>{{ pharmacy.phone }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563;">
+              <i class="fas fa-envelope" style="width: 20px; color: #9ca3af;"></i>
+              <span>{{ pharmacy.email }}</span>
+            </div>
+            {% if pharmacy.website %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: #4b5563;">
+              <i class="fas fa-globe" style="width: 20px; color: #9ca3af;"></i>
+              <a href="{{ pharmacy.website }}" target="_blank" style="color: #059669;">{{ pharmacy.website }}</a>
+            </div>
+            {% endif %}
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem; color: #4b5563;">
+              <i class="fas fa-map-marker-alt" style="width: 20px; color: #9ca3af; margin-top: 0.2rem;"></i>
+              <span>{{ pharmacy.address }}, {{ pharmacy.city }}, {{ pharmacy.state }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- License Info -->
+        <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-certificate" style="color: #059669;"></i> License</h5>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div>
+              <span style="font-size: 0.75rem; color: #9ca3af;">License Number</span>
+              <p style="font-weight: 600; color: #1f2937; margin: 0;">{{ pharmacy.license_number }}</p>
+            </div>
+            {% if pharmacy.license_type %}
+            <div>
+              <span style="font-size: 0.75rem; color: #9ca3af;">License Type</span>
+              <p style="font-weight: 600; color: #1f2937; margin: 0;">{{ pharmacy.license_type }}</p>
+            </div>
+            {% endif %}
+            {% if pharmacy.license_expiry_date %}
+            <div>
+              <span style="font-size: 0.75rem; color: #9ca3af;">Expiry Date</span>
+              <p style="font-weight: 600; color: #1f2937; margin: 0;">{{ pharmacy.license_expiry_date }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Delivery Settings -->
+        {% if pharmacy.delivery_available %}
+        <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 1.5rem;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-truck" style="color: #059669;"></i> Delivery</h5>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% if pharmacy.minimum_order_amount %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Min. Order</span>
+              <span style="font-weight: 600; color: #1f2937;">GH₵{{ pharmacy.minimum_order_amount }}</span>
+            </div>
+            {% endif %}
+            {% if pharmacy.delivery_fee %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Delivery Fee</span>
+              <span style="font-weight: 600; color: #1f2937;">GH₵{{ pharmacy.delivery_fee }}</span>
+            </div>
+            {% endif %}
+            {% if pharmacy.free_delivery_threshold %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Free Delivery</span>
+              <span style="font-weight: 600; color: #1f2937;">Orders over GH₵{{ pharmacy.free_delivery_threshold }}</span>
+            </div>
+            {% endif %}
+            {% if pharmacy.estimated_delivery_time %}
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Est. Time</span>
+              <span style="font-weight: 600; color: #1f2937;">{{ pharmacy.estimated_delivery_time }} mins</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

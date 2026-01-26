@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-pharmacy{% endblock %}
+{% block title %}{{ action }} Pharmacy - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 2rem 0; overflow: hidden;">
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'pharmacy:owner_pharmacy_list' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem; color: white; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ action }} Pharmacy</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">{% if action == 'Create' %}Add a new pharmacy{% else %}Update pharmacy details{% endif %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Form Section -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <form method="post" enctype="multipart/form-data" style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
+        {% csrf_token %}
+        
+        <!-- Basic Information -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-info-circle" style="color: #059669;"></i> Basic Information</h4>
+          
+          <div class="row g-3">
+            <div class="col-12">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Pharmacy Name *</label>
+              {{ form.name }}
+              {% if form.name.errors %}<div style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Description</label>
+              {{ form.description }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-phone" style="color: #059669;"></i> Contact Information</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Phone *</label>
+              {{ form.phone }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Email *</label>
+              {{ form.email }}
+            </div>
+            <div class="col-12">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Website</label>
+              {{ form.website }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-map-marker-alt" style="color: #059669;"></i> Location</h4>
+          
+          <div class="row g-3">
+            <div class="col-12">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Address *</label>
+              {{ form.address }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">City *</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">State/Region *</label>
+              {{ form.state }}
+            </div>
+            <div class="col-md-4">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Postal Code</label>
+              {{ form.postal_code }}
+            </div>
+            <div class="col-md-4">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Country</label>
+              {{ form.country }}
+            </div>
+            <div class="col-md-4">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Latitude</label>
+              {{ form.latitude }}
+            </div>
+            <div class="col-md-4">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Longitude</label>
+              {{ form.longitude }}
+            </div>
+          </div>
+        </div>
+
+        <!-- License & Registration -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-certificate" style="color: #059669;"></i> License & Registration</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">License Number *</label>
+              {{ form.license_number }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">License Type</label>
+              {{ form.license_type }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">License Expiry Date</label>
+              {{ form.license_expiry_date }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Registration Number</label>
+              {{ form.registration_number }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Settings -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-cog" style="color: #059669;"></i> Business Settings</h4>
+          
+          <div class="row g-3">
+            <div class="col-12">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Opening Hours</label>
+              {{ form.opening_hours }}
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                {{ form.is_24_hours }}
+                <label class="form-check-label" style="font-weight: 600; color: #374151;">Open 24 Hours</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                {{ form.delivery_available }}
+                <label class="form-check-label" style="font-weight: 600; color: #374151;">Delivery Available</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Settings -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-truck" style="color: #059669;"></i> Delivery Settings</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Minimum Order (GH₵)</label>
+              {{ form.minimum_order_amount }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Delivery Fee (GH₵)</label>
+              {{ form.delivery_fee }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Free Delivery Threshold (GH₵)</label>
+              {{ form.free_delivery_threshold }}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Est. Delivery Time (mins)</label>
+              {{ form.estimated_delivery_time }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-image" style="color: #059669;"></i> Images</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Logo</label>
+              {{ form.logo }}
+              {% if pharmacy.logo %}<img src="{{ pharmacy.logo.url }}" style="max-width: 100px; margin-top: 0.5rem; border-radius: 0.5rem;">{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Main Image</label>
+              {{ form.image }}
+              {% if pharmacy.image %}<img src="{{ pharmacy.image.url }}" style="max-width: 100px; margin-top: 0.5rem; border-radius: 0.5rem;">{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 1rem;"><i class="fas fa-toggle-on" style="color: #059669;"></i> Status</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Status</label>
+              {{ form.status }}
+            </div>
+            <div class="col-md-6">
+              <div class="form-check" style="padding-top: 2rem;">
+                {{ form.is_featured }}
+                <label class="form-check-label" style="font-weight: 600; color: #374151;">Featured Pharmacy</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div style="padding: 1.5rem; background: #f9fafb; display: flex; justify-content: space-between; align-items: center;">
+          <a href="{% url 'pharmacy:owner_pharmacy_list' %}" style="color: #6b7280; text-decoration: none; font-weight: 600;">
+            <i class="fas fa-times"></i> Cancel
+          </a>
+          <button type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #059669; color: white; padding: 0.875rem 2rem; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer;">
+            <i class="fas fa-save"></i> {{ action }} Pharmacy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
