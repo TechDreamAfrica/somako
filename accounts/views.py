@@ -163,6 +163,10 @@ class CustomLoginView(LoginView):
         return response
 
     def get_success_url(self):
+        # Check if user is a delivery driver and redirect to rider dashboard
+        if self.request.user.has_role('delivery_driver') or self.request.user.has_role('rider'):
+            return reverse_lazy('express_pwa:rider_dashboard')
+        
         # Check if user has a driver profile and redirect to driver dashboard
         try:
             from ride.models import DriverProfile
