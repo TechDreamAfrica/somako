@@ -723,15 +723,21 @@ def dashboard_view(request):
         from shop.models import Product, Order, Shop
         # Get products from shops owned by user OR created by user
         user_shops = Shop.objects.filter(owner=user)
+        shop_ids = list(user_shops.values_list('id', flat=True))
         products = Product.objects.filter(
-            models.Q(shop__in=user_shops) | models.Q(created_by=user)
+            models.Q(shop_id__in=shop_ids) | models.Q(created_by=user)
         ).distinct()
         context['my_products'] = products.order_by('-created_at')[:5]
         context['products_count'] = products.count()
         # Get orders for products in user's shops
-        context['pending_orders'] = Order.objects.filter(items__product__shop__in=user_shops, status='pending').distinct().count()
-        context['completed_orders'] = Order.objects.filter(items__product__shop__in=user_shops, status='delivered').distinct().count()
-        context['total_orders'] = Order.objects.filter(items__product__shop__in=user_shops).distinct().count()
+        if shop_ids:
+            context['pending_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids, status='pending').distinct().count()
+            context['completed_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids, status='delivered').distinct().count()
+            context['total_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids).distinct().count()
+        else:
+            context['pending_orders'] = 0
+            context['completed_orders'] = 0
+            context['total_orders'] = 0
         context['service_name'] = 'Shop - Seller'
 
     elif service_role == 'buyer':
