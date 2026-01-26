@@ -720,13 +720,18 @@ def dashboard_view(request):
         context['service_name'] = 'Rent - Tenant'
 
     elif service_role == 'seller':
-        from shop.models import Product, Order
-        products = Product.objects.filter(seller=user)
+        from shop.models import Product, Order, Shop
+        # Get products from shops owned by user OR created by user
+        user_shops = Shop.objects.filter(owner=user)
+        products = Product.objects.filter(
+            models.Q(shop__in=user_shops) | models.Q(created_by=user)
+        ).distinct()
         context['my_products'] = products.order_by('-created_at')[:5]
         context['products_count'] = products.count()
-        context['pending_orders'] = Order.objects.filter(product__seller=user, status='pending').count()
-        context['completed_orders'] = Order.objects.filter(product__seller=user, status='completed').count()
-        context['total_orders'] = Order.objects.filter(product__seller=user).count()
+        # Get orders for products in user's shops
+        context['pending_orders'] = Order.objects.filter(items__product__shop__in=user_shops, status='pending').distinct().count()
+        context['completed_orders'] = Order.objects.filter(items__product__shop__in=user_shops, status='delivered').distinct().count()
+        context['total_orders'] = Order.objects.filter(items__product__shop__in=user_shops).distinct().count()
         context['service_name'] = 'Shop - Seller'
 
     elif service_role == 'buyer':
