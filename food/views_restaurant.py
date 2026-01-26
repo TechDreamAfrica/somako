@@ -38,7 +38,7 @@ def restaurant_dashboard(request):
 
     if not restaurants.exists():
         messages.info(request, 'You don\'t have any restaurants yet. Create one to get started!')
-        return redirect('food:create_restaurant')
+        return redirect('food:owner_restaurant_create')
 
     # Get the active restaurant (first one or selected)
     restaurant_id = request.GET.get('restaurant_id')
