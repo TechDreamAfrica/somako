@@ -494,6 +494,15 @@ def pwa_confirm_order(request):
 
         # Clear cart
         cart_items.delete()
+        
+        # Send SMS notification to shop owner(s)
+        try:
+            from utils.sms_utils import send_shop_order_notification_to_seller
+            send_shop_order_notification_to_seller(order)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send shop order notification: {e}")
 
         messages.success(request, f'Order placed successfully! Order #{order.order_number}')
         return redirect('shop_pwa:order_detail', order_number=order.order_number)

@@ -880,3 +880,86 @@ def send_express_driver_assignment_notification(express_order, driver):
         }
         logger.error(f"Failed to send express order assignment notification to driver {driver.username}: {e}")
         return error_result
+
+
+def send_shop_order_notification_to_seller(order):
+    """
+    Send SMS notification to shop owner(s) when a new order is placed
+    
+    Args:
+        order: Order instance from shop.models
+        
+    Returns:
+        list: List of SMS send results for each shop owner notified
+    """
+    if not order:
+        return []
+    
+    sms = ArkeselSMS()
+    results = []
+    
+    # Get unique shops from order items
+    shops_notified = set()
+    
+    try:
+        for item in order.items.all():
+            # Get shop from variant -> product -> shop
+            shop = None
+            if item.variant and item.variant.product:
+                shop = item.variant.product.shop
+            
+            if not shop or shop.id in shops_notified:
+                continue
+            
+            shops_notified.add(shop.id)
+            
+            # Get shop owner's phone number
+            owner = shop.owner
+            owner_phone = getattr(owner, 'phone_number', None)
+            
+            if not owner_phone:
+                logger.warning(f"Shop owner {owner.username} has no phone number. Cannot send order notification.")
+                continue
+            
+            # Build order summary
+            shop_items = [i for i in order.items.all() if i.variant and i.variant.product and i.variant.product.shop_id == shop.id]
+            items_summary = ', '.join([f"{i.quantity}x {i.product_name[:20]}" for i in shop_items[:3]])
+            if len(shop_items) > 3:
+                items_summary += f" +{len(shop_items) - 3} more"
+            
+            # Calculate shop-specific total
+            shop_total = sum(i.total_price for i in shop_items)
+            
+            message = (
+                f"🛍️ NEW ORDER RECEIVED!\n\n"
+                f"Order #: {order.order_number}\n"
+                f"Shop: {shop.name}\n"
+                f"Items: {items_summary}\n"
+                f"Total: GHS {shop_total:.2f}\n"
+                f"Customer: {order.user.get_full_name() or order.user.username}\n"
+                f"Phone: {order.customer_phone or 'N/A'}\n\n"
+                f"Please log in to your seller dashboard to process this order.\n"
+                f"Dashboard: http://www.somako.org/shop/seller/\n"
+                f"- Soma Ko Team"
+            )
+            
+            try:
+                result = sms.send_sms(owner_phone, message)
+                result['shop'] = shop.name
+                result['owner'] = owner.username
+                results.append(result)
+                logger.info(f"Shop order notification sent to {owner.username} for shop {shop.name}")
+            except Exception as e:
+                error_result = {
+                    'success': False,
+                    'message': str(e),
+                    'shop': shop.name,
+                    'owner': owner.username
+                }
+                results.append(error_result)
+                logger.error(f"Failed to send order notification to {owner.username}: {e}")
+    
+    except Exception as e:
+        logger.error(f"Error in send_shop_order_notification_to_seller: {e}")
+    
+    return results

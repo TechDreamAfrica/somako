@@ -704,6 +704,15 @@ def checkout(request):
                 # Cash on delivery - no online payment needed
                 # Clear cart
                 cart.items.all().delete()
+                
+                # Send SMS notification to shop owner(s)
+                try:
+                    from utils.sms_utils import send_shop_order_notification_to_seller
+                    send_shop_order_notification_to_seller(order)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Failed to send shop order notification: {e}")
 
                 messages.success(
                     request,
@@ -1018,6 +1027,15 @@ def payment_verify(request, reference):
             cart = Cart.objects.filter(user=request.user).first()
             if cart:
                 cart.items.all().delete()
+            
+            # Send SMS notification to shop owner(s)
+            try:
+                from utils.sms_utils import send_shop_order_notification_to_seller
+                send_shop_order_notification_to_seller(order)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to send shop order notification: {e}")
 
             messages.success(
                 request,
