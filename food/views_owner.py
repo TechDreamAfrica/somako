@@ -34,7 +34,7 @@ def restaurant_create(request):
             restaurant.owner = request.user
             restaurant.save()
             messages.success(request, 'Restaurant created successfully!')
-            return redirect('food:restaurant_detail', pk=restaurant.pk)
+            return redirect('food:owner_restaurant_detail', pk=restaurant.pk)
     else:
         form = RestaurantForm()
 
@@ -67,7 +67,7 @@ def restaurant_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Restaurant updated successfully!')
-            return redirect('food:restaurant_detail', pk=restaurant.pk)
+            return redirect('food:owner_restaurant_detail', pk=restaurant.pk)
     else:
         form = RestaurantForm(instance=restaurant)
 
@@ -84,7 +84,7 @@ def restaurant_delete(request, pk):
         restaurant_name = restaurant.name
         restaurant.delete()
         messages.success(request, f'Restaurant "{restaurant_name}" deleted successfully!')
-        return redirect('food:restaurant_list')
+        return redirect('food:owner_restaurant_list')
 
     context = {'restaurant': restaurant}
     return render(request, 'food/owner/restaurant_confirm_delete.html', context)
@@ -102,7 +102,7 @@ def restaurant_toggle_status(request, pk):
 
     restaurant.save()
     messages.success(request, f'Restaurant status changed to {restaurant.status}!')
-    return redirect('food:restaurant_detail', pk=restaurant.pk)
+    return redirect('food:owner_restaurant_detail', pk=restaurant.pk)
 
 
 # ============================================
@@ -121,7 +121,7 @@ def menu_item_create(request, restaurant_pk):
             menu_item.restaurant = restaurant
             menu_item.save()
             messages.success(request, f'Menu item "{menu_item.name}" created successfully!')
-            return redirect('food:restaurant_detail', pk=restaurant.pk)
+            return redirect('food:owner_restaurant_detail', pk=restaurant.pk)
     else:
         form = MenuItemForm()
 
@@ -143,7 +143,7 @@ def menu_item_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, f'Menu item "{menu_item.name}" updated successfully!')
-            return redirect('food:restaurant_detail', pk=menu_item.restaurant.pk)
+            return redirect('food:owner_restaurant_detail', pk=menu_item.restaurant.pk)
     else:
         form = MenuItemForm(instance=menu_item)
 
@@ -166,7 +166,7 @@ def menu_item_delete(request, pk):
         menu_item_name = menu_item.name
         menu_item.delete()
         messages.success(request, f'Menu item "{menu_item_name}" deleted successfully!')
-        return redirect('food:restaurant_detail', pk=restaurant_pk)
+        return redirect('food:owner_restaurant_detail', pk=restaurant_pk)
 
     context = {'menu_item': menu_item, 'restaurant': menu_item.restaurant}
     return render(request, 'food/owner/menu_item_confirm_delete.html', context)
@@ -182,4 +182,4 @@ def menu_item_toggle_availability(request, pk):
     status = 'available' if menu_item.is_available else 'unavailable'
     messages.success(request, f'Menu item marked as {status}!')
 
-    return redirect('food:restaurant_detail', pk=menu_item.restaurant.pk)
+    return redirect('food:owner_restaurant_detail', pk=menu_item.restaurant.pk)
