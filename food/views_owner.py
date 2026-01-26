@@ -188,6 +188,17 @@ def menu_item_create(request, restaurant_pk):
         if form.is_valid():
             menu_item = form.save(commit=False)
             menu_item.restaurant = restaurant
+            
+            # Re-generate slug now that restaurant is set to ensure uniqueness
+            from django.utils.text import slugify
+            base_slug = slugify(menu_item.name)
+            slug = base_slug
+            counter = 1
+            while MenuItem.objects.filter(restaurant=restaurant, slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            menu_item.slug = slug
+            
             menu_item.save()
             messages.success(request, f'Menu item "{menu_item.name}" created successfully!')
             return redirect('food:owner_restaurant_detail', pk=restaurant.pk)

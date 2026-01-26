@@ -94,10 +94,11 @@ class MenuItemForm(forms.ModelForm):
             base_slug = slugify(instance.name)
             slug = base_slug
             counter = 1
-            # Check for uniqueness within the restaurant
-            while MenuItem.objects.filter(restaurant=instance.restaurant, slug=slug).exclude(pk=instance.pk).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
+            # Check for uniqueness within the restaurant (only if restaurant is set)
+            if instance.restaurant_id:
+                while MenuItem.objects.filter(restaurant=instance.restaurant, slug=slug).exclude(pk=instance.pk).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
             instance.slug = slug
         if commit:
             instance.save()
