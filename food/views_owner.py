@@ -8,6 +8,41 @@ from .models import Restaurant, MenuItem
 from .forms import RestaurantForm, MenuItemForm
 
 
+def get_user_subscription(user):
+    """Get user's active subscription or None"""
+    try:
+        subscription = user.subscription
+        if subscription.is_active():
+            return subscription
+    except:
+        pass
+    return None
+
+
+def can_create_restaurant(user):
+    """
+    Check if user can create a new restaurant based on subscription.
+    Returns (can_create, message, subscription)
+    """
+    subscription = get_user_subscription(user)
+    
+    if not subscription:
+        return False, "You need an active subscription to create a restaurant. Please subscribe to a plan first.", None
+    
+    # Get current restaurant count for this user
+    current_count = Restaurant.objects.filter(owner=user).count()
+    max_allowed = subscription.plan.max_listings
+    
+    # -1 means unlimited
+    if max_allowed == -1:
+        return True, None, subscription
+    
+    if current_count >= max_allowed:
+        return False, f"You have reached the maximum number of restaurants ({max_allowed}) allowed on your {subscription.plan.display_name} plan. Please upgrade to add more restaurants.", subscription
+    
+    return True, None, subscription
+
+
 # ============================================
 # Restaurant CRUD Operations
 # ============================================
@@ -16,10 +51,25 @@ from .forms import RestaurantForm, MenuItemForm
 def restaurant_list(request):
     """List all restaurants owned by the logged-in restaurant owner"""
     restaurants = Restaurant.objects.filter(owner=request.user).order_by('-created_at')
+    subscription = get_user_subscription(request.user)
+    
+    # Calculate remaining slots
+    max_allowed = 0
+    remaining_slots = 0
+    if subscription and subscription.plan:
+        max_allowed = subscription.plan.max_listings
+        if max_allowed == -1:
+            remaining_slots = -1  # Unlimited
+        else:
+            remaining_slots = max(0, max_allowed - restaurants.count())
+    
     context = {
         'restaurants': restaurants,
         'total_restaurants': restaurants.count(),
         'active_restaurants': restaurants.filter(status='active').count(),
+        'subscription': subscription,
+        'max_allowed': max_allowed,
+        'remaining_slots': remaining_slots,
     }
     return render(request, 'food/owner/restaurant_list.html', context)
 
@@ -27,18 +77,37 @@ def restaurant_list(request):
 @login_required
 def restaurant_create(request):
     """Create a new restaurant"""
+    # Check subscription limits
+    can_create, error_message, subscription = can_create_restaurant(request.user)
+    
+    if not can_create:
+        messages.error(request, error_message)
+        if not subscription:
+            return redirect('accounts:subscription_plans')
+        return redirect('food:owner_restaurant_list')
+    
     if request.method == 'POST':
         form = RestaurantForm(request.POST, request.FILES)
         if form.is_valid():
             restaurant = form.save(commit=False)
             restaurant.owner = request.user
             restaurant.save()
+            
+            # Update subscription listing count
+            if subscription:
+                subscription.current_listings_count = Restaurant.objects.filter(owner=request.user).count()
+                subscription.save()
+            
             messages.success(request, 'Restaurant created successfully!')
             return redirect('food:owner_restaurant_detail', pk=restaurant.pk)
     else:
         form = RestaurantForm()
 
-    context = {'form': form, 'action': 'Create'}
+    context = {
+        'form': form, 
+        'action': 'Create',
+        'subscription': subscription,
+    }
     return render(request, 'food/owner/restaurant_form.html', context)
 
 

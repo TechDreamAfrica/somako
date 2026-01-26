@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-food{% endblock %}
+{% block title %}Restaurant Dashboard - {{ restaurant.name }} - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%); padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        {% if restaurant.logo %}
+        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}" style="width: 64px; height: 64px; border-radius: 1rem; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">
+        {% else %}
+        <div style="width: 64px; height: 64px; border-radius: 1rem; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-utensils" style="font-size: 1.5rem; color: white;"></i>
+        </div>
+        {% endif %}
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">{{ restaurant.name }}</h1>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span style="padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; {% if restaurant.status == 'active' %}background: rgba(34, 197, 94, 0.2); color: #86efac;{% else %}background: rgba(239, 68, 68, 0.2); color: #fca5a5;{% endif %}">
+              {{ restaurant.get_status_display }}
+            </span>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">{{ restaurant.city }}</span>
+          </div>
+        </div>
+      </div>
+      {% if restaurants.count > 1 %}
+      <form method="get" style="display: flex; align-items: center; gap: 0.5rem;">
+        <select name="restaurant_id" onchange="this.form.submit()" style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-weight: 600;">
+          {% for r in restaurants %}
+          <option value="{{ r.id }}" {% if r.id == restaurant.id %}selected{% endif %} style="color: #1f2937;">{{ r.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Quick Stats -->
+<section style="padding: 2rem 0; background: #f8fafc;">
+  <div class="container">
+    <div class="row g-3">
+      <!-- Today's Orders -->
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 2px solid #f3f4f6;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div style="width: 40px; height: 40px; background: #fff7ed; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-shopping-bag" style="color: #ea580c;"></i>
+            </div>
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #1f2937;">{{ today_orders }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Today's Orders</div>
+        </div>
+      </div>
+
+      <!-- Today's Revenue -->
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 2px solid #f3f4f6;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div style="width: 40px; height: 40px; background: #dcfce7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-money-bill-wave" style="color: #22c55e;"></i>
+            </div>
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #1f2937;">GHS {{ today_revenue|floatformat:0 }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Today's Revenue</div>
+        </div>
+      </div>
+
+      <!-- Pending Orders -->
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 2px solid #f3f4f6;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div style="width: 40px; height: 40px; background: #fef3c7; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-clock" style="color: #f59e0b;"></i>
+            </div>
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #1f2937;">{{ pending_orders }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">Pending Orders</div>
+        </div>
+      </div>
+
+      <!-- Month Revenue -->
+      <div class="col-6 col-md-3">
+        <div style="background: white; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 2px solid #f3f4f6;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-chart-line" style="color: #3b82f6;"></i>
+            </div>
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; color: #1f2937;">GHS {{ month_revenue|floatformat:0 }}</div>
+          <div style="color: #6b7280; font-size: 0.875rem;">This Month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Actions & Recent Orders -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Quick Actions -->
+      <div class="col-lg-4">
+        <div style="background: white; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #f3f4f6;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1.25rem;">
+            <i class="fas fa-bolt" style="color: #ea580c; margin-right: 0.5rem;"></i>Quick Actions
+          </h5>
+          
+          <a href="{% url 'food:manage_orders' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #fff7ed; border-radius: 0.75rem; text-decoration: none; margin-bottom: 0.75rem; transition: all 0.3s;">
+            <div style="width: 44px; height: 44px; background: #ea580c; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-list" style="color: white;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: #1f2937;">Manage Orders</div>
+              <div style="font-size: 0.8125rem; color: #6b7280;">{{ active_orders }} active orders</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+          </a>
+
+          <a href="{% url 'food:manage_menu' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 0.75rem; text-decoration: none; margin-bottom: 0.75rem; transition: all 0.3s;">
+            <div style="width: 44px; height: 44px; background: #22c55e; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-utensils" style="color: white;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: #1f2937;">Manage Menu</div>
+              <div style="font-size: 0.8125rem; color: #6b7280;">{{ menu_items_count }} items</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+          </a>
+
+          <a href="{% url 'food:restaurant_analytics' %}" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #eff6ff; border-radius: 0.75rem; text-decoration: none; transition: all 0.3s;">
+            <div style="width: 44px; height: 44px; background: #3b82f6; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-chart-bar" style="color: white;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; color: #1f2937;">Analytics</div>
+              <div style="font-size: 0.8125rem; color: #6b7280;">View reports</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+          </a>
+        </div>
+
+        <!-- Revenue Summary -->
+        <div style="background: white; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; margin-top: 1.5rem;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1.25rem;">
+            <i class="fas fa-wallet" style="color: #22c55e; margin-right: 0.5rem;"></i>Revenue Summary
+          </h5>
+          
+          <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="color: #6b7280;">Today</span>
+              <span style="font-weight: 700; color: #1f2937;">GHS {{ today_revenue|floatformat:2 }}</span>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="color: #6b7280;">This Week</span>
+              <span style="font-weight: 700; color: #1f2937;">GHS {{ week_revenue|floatformat:2 }}</span>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="color: #6b7280;">This Month</span>
+              <span style="font-weight: 700; color: #1f2937;">GHS {{ month_revenue|floatformat:2 }}</span>
+            </div>
+          </div>
+          
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="color: #6b7280;">Total</span>
+              <span style="font-weight: 800; color: #22c55e; font-size: 1.125rem;">GHS {{ total_revenue|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="col-lg-8">
+        <div style="background: white; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #f3f4f6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h5 style="font-weight: 700; color: #1f2937; margin: 0;">
+              <i class="fas fa-receipt" style="color: #ea580c; margin-right: 0.5rem;"></i>Recent Orders
+            </h5>
+            <a href="{% url 'food:manage_orders' %}" style="color: #ea580c; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+              View All <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+
+          {% if latest_orders %}
+          <div class="table-responsive">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 2px solid #f3f4f6;">
+                  <th style="padding: 0.75rem 0.5rem; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.8125rem;">Order</th>
+                  <th style="padding: 0.75rem 0.5rem; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.8125rem;">Customer</th>
+                  <th style="padding: 0.75rem 0.5rem; text-align: left; font-weight: 600; color: #6b7280; font-size: 0.8125rem;">Status</th>
+                  <th style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 600; color: #6b7280; font-size: 0.8125rem;">Amount</th>
+                  <th style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 600; color: #6b7280; font-size: 0.8125rem;">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in latest_orders %}
+                <tr style="border-bottom: 1px solid #f3f4f6;">
+                  <td style="padding: 1rem 0.5rem;">
+                    <span style="font-weight: 700; color: #1f2937;">#{{ order.order_number|default:order.id }}</span>
+                  </td>
+                  <td style="padding: 1rem 0.5rem;">
+                    <span style="color: #374151;">{{ order.customer.get_full_name|default:order.customer.username }}</span>
+                  </td>
+                  <td style="padding: 1rem 0.5rem;">
+                    <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600;
+                      {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+                      {% elif order.status == 'confirmed' %}background: #dbeafe; color: #1e40af;
+                      {% elif order.status == 'preparing' %}background: #e0e7ff; color: #4338ca;
+                      {% elif order.status == 'ready' %}background: #d1fae5; color: #065f46;
+                      {% elif order.status == 'delivered' %}background: #f3e8ff; color: #6b21a8;
+                      {% else %}background: #fee2e2; color: #991b1b;{% endif %}">
+                      {{ order.get_status_display }}
+                    </span>
+                  </td>
+                  <td style="padding: 1rem 0.5rem; text-align: right;">
+                    <span style="font-weight: 700; color: #ea580c;">GHS {{ order.total_amount|floatformat:2 }}</span>
+                  </td>
+                  <td style="padding: 1rem 0.5rem; text-align: right;">
+                    <span style="color: #6b7280; font-size: 0.875rem;">{{ order.created_at|timesince }} ago</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="text-align: center; padding: 3rem;">
+            <div style="width: 80px; height: 80px; background: #fff7ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+              <i class="fas fa-inbox" style="font-size: 2rem; color: #ea580c;"></i>
+            </div>
+            <h6 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">No Orders Yet</h6>
+            <p style="color: #6b7280; margin: 0;">Orders will appear here when customers place them.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Popular Items -->
+        {% if popular_items %}
+        <div style="background: white; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid #f3f4f6; margin-top: 1.5rem;">
+          <h5 style="font-weight: 700; color: #1f2937; margin-bottom: 1.25rem;">
+            <i class="fas fa-fire" style="color: #ef4444; margin-right: 0.5rem;"></i>Popular Items
+          </h5>
+          
+          <div class="row g-3">
+            {% for item in popular_items %}
+            <div class="col-md-6 col-lg-4">
+              <div style="background: #f8fafc; border-radius: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb;">
+                <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">{{ item.menu_item__name }}</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">
+                  <span style="font-weight: 600; color: #ea580c;">{{ item.total_quantity }}</span> sold
+                  &bull; GHS {{ item.revenue|floatformat:0 }}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
