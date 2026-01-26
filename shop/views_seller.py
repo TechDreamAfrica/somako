@@ -6,8 +6,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Product, ProductImage, Shop
+from .models import Product, ProductImage, ProductVariant, Shop
 from .forms import ProductForm, ProductImageForm, ShopForm
+import uuid
 
 
 def get_user_subscription(user):
@@ -263,7 +264,20 @@ def product_create(request, shop_pk=None):
             product = form.save(commit=False)
             product.created_by = request.user
             product.save()
-            messages.success(request, f'Product "{product.name}" created successfully!')
+            
+            # Create default variant with stock quantity
+            stock_quantity = form.cleaned_data.get('stock_quantity', 0) or 0
+            sku = product.sku or f"{product.name[:10].upper().replace(' ', '-')}-{uuid.uuid4().hex[:6].upper()}"
+            
+            ProductVariant.objects.create(
+                product=product,
+                sku=sku,
+                name='Default',
+                stock_quantity=stock_quantity,
+                is_active=True
+            )
+            
+            messages.success(request, f'Product "{product.name}" created successfully with {stock_quantity} items in stock!')
             return redirect('shop:seller_product_detail', pk=product.pk)
     else:
         form = ProductForm(user=request.user, initial=initial)
@@ -369,6 +383,11 @@ def product_image_add(request, product_pk):
         if form.is_valid():
             image = form.save(commit=False)
             image.product = product
+            
+            # Set as primary if this is the first image for the product
+            if not product.images.exists():
+                image.is_primary = True
+            
             image.save()
             messages.success(request, 'Image added successfully!')
             return redirect('shop:seller_product_detail', pk=product.pk)
@@ -390,9 +409,19 @@ def product_image_delete(request, pk):
         Q(pk=pk) & (Q(product__shop__in=user_shops) | Q(product__created_by=request.user))
     )
     product_pk = image.product.pk
+    was_primary = image.is_primary
     
     if request.method == 'POST':
+        product = image.product
         image.delete()
+        
+        # If the deleted image was primary, set the first remaining image as primary
+        if was_primary:
+            first_image = product.images.first()
+            if first_image:
+                first_image.is_primary = True
+                first_image.save()
+        
         messages.success(request, 'Image deleted successfully!')
         return redirect('shop:seller_product_detail', pk=product_pk)
     

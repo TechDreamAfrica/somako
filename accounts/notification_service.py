@@ -32,40 +32,54 @@ class NotificationService:
                           reference_id=None, reference_type=None, data=None):
         """Create notification in database"""
         from .notification_models import Notification, NotificationPreference
+        from django.core.exceptions import ObjectDoesNotExist
 
-        # Get user preferences
+        # Get user preferences - use ObjectDoesNotExist to catch RelatedObjectDoesNotExist
         try:
             prefs = user.notification_preferences
-        except NotificationPreference.DoesNotExist:
-            prefs = NotificationPreference.objects.create(user=user)
+        except (ObjectDoesNotExist, AttributeError):
+            # Create default notification preferences if not exists
+            prefs, created = NotificationPreference.objects.get_or_create(user=user)
+            if created:
+                logger.info(f"Created notification preferences for user {user.username}")
 
         # Default to in-app if no channels specified
         if channels is None:
-            channels = prefs.get_enabled_channels()
+            channels = prefs.get_enabled_channels() if prefs else ['in_app']
 
         notifications_created = []
 
         for channel in channels:
-            # Check if user has enabled this channel
-            if channel == 'sms' and not prefs.enable_sms:
-                continue
-            if channel == 'whatsapp' and not prefs.enable_whatsapp:
-                continue
-            if channel == 'email' and not prefs.enable_email:
-                continue
+            # Check if user has enabled this channel (with safe attribute access)
+            if prefs:
+                if channel == 'sms' and not getattr(prefs, 'enable_sms', True):
+                    continue
+                if channel == 'whatsapp' and not getattr(prefs, 'enable_whatsapp', True):
+                    continue
+                if channel == 'email' and not getattr(prefs, 'enable_email', True):
+                    continue
 
-            notification = Notification.objects.create(
-                user=user,
-                notification_type=notification_type,
-                channel=channel,
-                title=title,
-                message=message,
-                reference_id=reference_id,
-                reference_type=reference_type,
-                data=data,
-                phone_number=user.phone_number if channel in ['sms', 'whatsapp'] else ''
-            )
-            notifications_created.append(notification)
+            try:
+                # Get phone number safely
+                phone_number = ''
+                if channel in ['sms', 'whatsapp']:
+                    phone_number = getattr(user, 'phone_number', '') or ''
+                
+                notification = Notification.objects.create(
+                    user=user,
+                    notification_type=notification_type,
+                    channel=channel,
+                    title=title,
+                    message=message,
+                    reference_id=str(reference_id) if reference_id else '',
+                    reference_type=str(reference_type) if reference_type else '',
+                    data=data,
+                    phone_number=phone_number
+                )
+                notifications_created.append(notification)
+                logger.info(f"Created {channel} notification for user {user.username}: {title}")
+            except Exception as e:
+                logger.error(f"Failed to create {channel} notification for user {user.username}: {str(e)}")
 
         return notifications_created
 

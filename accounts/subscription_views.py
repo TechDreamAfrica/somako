@@ -234,6 +234,25 @@ def subscription_verify(request, reference):
             amount=plan.price,
             notes=f"Payment successful - Reference: {reference}"
         )
+        
+        # Send subscription notification
+        try:
+            from .notification_service import send_notification
+            notification_title = f'Subscription {action.title()}!'
+            notification_message = f'Your {plan.display_name} subscription is now active. Enjoy all the premium features until {user_sub.end_date.strftime("%B %d, %Y")}.'
+            send_notification(
+                user=request.user,
+                notification_type='subscription_created' if action == 'subscribed' else 'subscription_renewed',
+                title=notification_title,
+                message=notification_message,
+                channels=['in_app', 'email'],
+                reference_id=str(user_sub.id),
+                reference_type='UserSubscription'
+            )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send subscription notification: {e}")
 
         messages.success(request, f'Payment successful! You are now subscribed to {plan.display_name} plan.')
         return redirect('accounts:subscription_manage')
@@ -365,8 +384,9 @@ def paystack_webhook(request):
                             try:
                                 user_sub = UserSubscription.objects.get(user=user)
                                 user_sub.renew()
+                                action = 'renewed'
                             except UserSubscription.DoesNotExist:
-                                UserSubscription.objects.create(
+                                user_sub = UserSubscription.objects.create(
                                     user=user,
                                     plan=plan,
                                     start_date=timezone.now(),
@@ -376,6 +396,16 @@ def paystack_webhook(request):
                                     last_payment_date=timezone.now(),
                                     last_payment_amount=plan.price,
                                 )
+                                action = 'subscribed'
+                            
+                            # Create subscription history record
+                            SubscriptionHistory.objects.create(
+                                user=user,
+                                plan=plan,
+                                action=action,
+                                amount=plan.price,
+                                notes=f"Webhook payment successful - Reference: {reference}"
+                            )
             except Payment.DoesNotExist:
                 pass
 

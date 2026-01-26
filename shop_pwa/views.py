@@ -930,6 +930,13 @@ def pwa_add_product(request):
         base_price = request.POST.get('base_price')
         category_id = request.POST.get('category')
         image_url = request.POST.get('image_url')
+        stock_quantity = request.POST.get('stock_quantity', 0)
+        
+        # Convert stock_quantity to int safely
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 0
+        except (ValueError, TypeError):
+            stock_quantity = 0
 
         category = get_object_or_404(Category, pk=category_id)
 
@@ -939,6 +946,17 @@ def pwa_add_product(request):
             description=description or '',
             base_price=base_price,
             category=category,
+            is_active=True
+        )
+        
+        # Create default variant with stock quantity
+        import uuid
+        sku = f"{name[:10].upper().replace(' ', '-')}-{uuid.uuid4().hex[:6].upper()}"
+        ProductVariant.objects.create(
+            product=product,
+            sku=sku,
+            name='Default',
+            stock_quantity=stock_quantity,
             is_active=True
         )
 
@@ -954,7 +972,7 @@ def pwa_add_product(request):
             except Exception:
                 pass
 
-        messages.success(request, 'Product added successfully!')
+        messages.success(request, f'Product added successfully with {stock_quantity} items in stock!')
         return redirect('shop_pwa:manage_products')
 
     context = {

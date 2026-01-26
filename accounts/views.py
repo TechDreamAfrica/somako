@@ -139,23 +139,29 @@ class SignUpView(CreateView):
 
         login(self.request, user)
         
-        # Generate and send verification code via SMS
+        # Mark session as main website signup (not PWA)
+        self.request.session['signup_source'] = 'main_website'
+        
+        # Generate and send verification code via SMS and Email
         try:
             from utils.sms_utils import send_user_verification_code
             vc = VerificationCode.generate_for_user(user, purpose='signup', ttl_minutes=15)
             result = send_user_verification_code(user, vc.code)
             if result.get('success'):
-                messages.success(self.request, 'Account created! A verification code has been sent to your phone.')
+                channels = result.get('message', 'your phone/email')
+                messages.success(self.request, f'Account created! A verification code has been sent to {channels}.')
             else:
                 messages.warning(self.request, 
                     'Account created! However, we could not send the verification code. '
-                    'Please check your phone number and try to resend the code.')
+                    'Please check your phone number and email, then try to resend the code.')
         except Exception as e:
             logger.error(f"Failed to generate/send verification code: {e}")
             messages.success(self.request, 'Account created successfully!')
         
-        # Redirect to verification page
-        return redirect('accounts:pwa_verify')
+        # Redirect to verification page with main website dashboard as next URL
+        from django.urls import reverse
+        verify_url = f"{reverse('accounts:pwa_verify')}?next={reverse('accounts:dashboard')}&source=main"
+        return redirect(verify_url)
 
     def get_success_url(self):
         return reverse_lazy('accounts:dashboard')
@@ -2681,7 +2687,16 @@ def pwa_verify_view(request):
         next_url = request.GET.get('next', '/pwa/food/')
         return redirect(f"{reverse_lazy('accounts:pwa_login')}?next={next_url}")
 
-    next_url = request.GET.get('next', '/pwa/food/')
+    # Determine appropriate next_url based on source
+    source = request.GET.get('source', request.session.get('signup_source', ''))
+    
+    if source == 'main' or source == 'main_website':
+        # Main website signup - redirect to main dashboard after verification
+        from django.urls import reverse
+        next_url = request.GET.get('next', reverse('accounts:dashboard'))
+    else:
+        # PWA signup - redirect to PWA dashboard
+        next_url = request.GET.get('next', '/pwa/food/')
 
     if request.method == 'POST':
         code = (request.POST.get('code') or '').strip()

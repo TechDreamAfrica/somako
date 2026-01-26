@@ -538,38 +538,97 @@ def send_user_verification_code(user, code):
 
     message = f"SOMA KO - Your verification code is {code}. It expires in 15 minutes."
     
-    logger.info(f"Attempting to send verification code to {user.username}. Phone: {phone}, Email: {user.email}")
+    logger.info(f"Attempting to send verification code to {user.username}. Phone: {phone}, Email: {getattr(user, 'email', 'N/A')}")
 
     sms_sent = False
     email_sent = False
+    errors = []
     
     # Try SMS first if phone is available
     if phone:
-        result = sms.send_sms(phone, message)
-        if result.get('success'):
-            logger.info(f"Verification code sent via SMS to {user.username} at {phone}")
-            sms_sent = True
-        else:
-            logger.error(f"Failed to send verification SMS to {user.username} at {phone}: {result.get('message')}")
+        try:
+            result = sms.send_sms(phone, message)
+            if result.get('success'):
+                logger.info(f"Verification code sent via SMS to {user.username} at {phone}")
+                sms_sent = True
+            else:
+                error_msg = result.get('message', 'Unknown SMS error')
+                logger.error(f"Failed to send verification SMS to {user.username} at {phone}: {error_msg}")
+                errors.append(f"SMS: {error_msg}")
+        except Exception as e:
+            logger.error(f"SMS exception for {user.username}: {e}")
+            errors.append(f"SMS: {str(e)}")
+    else:
+        logger.warning(f"No phone number available for {user.username}")
 
     # Always try to send email as well (backup)
     to_email = getattr(user, 'email', None)
     if to_email:
         try:
-            from django.core.mail import send_mail
+            from django.core.mail import EmailMultiAlternatives
             from django.conf import settings
             
-            send_mail(
+            user_name = user.get_full_name() or user.username
+            
+            # HTML email content for verification code
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+                    .content {{ background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }}
+                    .code-box {{ background: white; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center; border: 2px dashed #8b5cf6; }}
+                    .code {{ font-size: 36px; font-weight: bold; color: #8b5cf6; letter-spacing: 8px; }}
+                    .footer {{ text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>🔐 Verification Code</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Hello {user_name}!</h2>
+                        <p>Thank you for signing up with Soma Ko. To complete your registration, please use the verification code below:</p>
+                        
+                        <div class="code-box">
+                            <p class="code">{code}</p>
+                        </div>
+                        
+                        <p><strong>⏰ This code expires in 15 minutes.</strong></p>
+                        
+                        <p>If you didn't create an account with Soma Ko, please ignore this email.</p>
+                        
+                        <p>Best regards,<br><strong>The Soma Ko Team</strong></p>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; 2025 Soma Ko Logistics. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Create email with both plain text and HTML
+            email = EmailMultiAlternatives(
                 subject="Your Soma Ko Verification Code",
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[to_email],
-                fail_silently=False,
+                body=message,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[to_email]
             )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+            
             logger.info(f"Verification code emailed to {user.username} at {to_email}")
             email_sent = True
         except Exception as e:
             logger.error(f"Failed to email verification code to {user.username} at {to_email}: {e}")
+            errors.append(f"Email: {str(e)}")
+    else:
+        logger.warning(f"No email address available for {user.username}")
 
     # Return success if either SMS or email was sent
     if sms_sent or email_sent:
@@ -580,8 +639,9 @@ def send_user_verification_code(user, code):
             channels.append('email')
         return {'success': True, 'message': f'Code sent via {" and ".join(channels)}'}
     
-    logger.warning(f"Failed to send verification code to {user.username} via any channel")
-    return {'success': False, 'message': 'Failed to send verification code via SMS or email'}
+    error_details = '; '.join(errors) if errors else 'No phone or email available'
+    logger.warning(f"Failed to send verification code to {user.username} via any channel: {error_details}")
+    return {'success': False, 'message': f'Failed to send verification code: {error_details}'}
 
 
 def send_express_order_notification(express_order):

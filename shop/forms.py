@@ -35,6 +35,20 @@ class ShopForm(forms.ModelForm):
 
 class ProductForm(forms.ModelForm):
     """Form for creating/updating products"""
+    
+    # Add stock quantity field (not part of Product model, handled separately)
+    stock_quantity = forms.IntegerField(
+        min_value=0,
+        initial=0,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Stock quantity',
+            'min': '0'
+        }),
+        help_text='Initial stock quantity for this product'
+    )
+    
     class Meta:
         model = Product
         fields = ['shop', 'category', 'name', 'description', 'short_description', 'sku', 'brand',

@@ -84,19 +84,25 @@
           </div>
         </div>
 
-        <!-- Pricing -->
+        <!-- Pricing & Inventory -->
         <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
           <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-tag" style="color: #7c3aed;"></i> Pricing
+            <i class="fas fa-tag" style="color: #7c3aed;"></i> Pricing & Inventory
           </h3>
           
           <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Base Price (GH₵) *</label>
               {{ form.base_price }}
               {% if form.base_price.errors %}<div style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.base_price.errors.0 }}</div>{% endif %}
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Stock Quantity *</label>
+              {{ form.stock_quantity }}
+              {% if form.stock_quantity.errors %}<div style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.stock_quantity.errors.0 }}</div>{% endif %}
+              <small style="color: #6b7280;">Initial number of items in stock</small>
+            </div>
+            <div class="col-md-4">
               <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Discount (%)</label>
               {{ form.discount_percentage }}
               <small style="color: #6b7280;">0-100%</small>
