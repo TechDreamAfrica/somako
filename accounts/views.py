@@ -181,6 +181,10 @@ class CustomLoginView(LoginView):
         if self.request.user.has_role('delivery_driver') or self.request.user.has_role('rider'):
             return reverse_lazy('express_pwa:rider_dashboard')
         
+        # Check if user is a seller and redirect to seller products page
+        if self.request.user.has_role('seller'):
+            return reverse_lazy('shop:seller_product_list')
+        
         # Check if user has a driver profile and redirect to driver dashboard
         try:
             from ride.models import DriverProfile
