@@ -36,6 +36,12 @@ class RestaurantForm(forms.ModelForm):
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make status not required so it uses model default on create
+        self.fields['status'].required = False
+        self.fields['status'].initial = 'active'
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         # Auto-generate slug from name if not set
