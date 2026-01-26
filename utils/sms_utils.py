@@ -517,7 +517,7 @@ def send_passenger_ride_completed(passenger, ride):
 
 
 def send_user_verification_code(user, code):
-    """Send a 4-digit verification code to the user's phone if available; fallback to email.
+    """Send a 4-digit verification code to the user's phone AND email.
 
     Returns a dict with success flag and optional message.
     """
@@ -540,15 +540,19 @@ def send_user_verification_code(user, code):
     
     logger.info(f"Attempting to send verification code to {user.username}. Phone: {phone}, Email: {user.email}")
 
+    sms_sent = False
+    email_sent = False
+    
+    # Try SMS first if phone is available
     if phone:
         result = sms.send_sms(phone, message)
         if result.get('success'):
             logger.info(f"Verification code sent via SMS to {user.username} at {phone}")
+            sms_sent = True
         else:
             logger.error(f"Failed to send verification SMS to {user.username} at {phone}: {result.get('message')}")
-        return result
 
-    # Fallback: try to send via email using Django's built-in mail
+    # Always try to send email as well (backup)
     to_email = getattr(user, 'email', None)
     if to_email:
         try:
@@ -563,13 +567,21 @@ def send_user_verification_code(user, code):
                 fail_silently=False,
             )
             logger.info(f"Verification code emailed to {user.username} at {to_email}")
-            return {'success': True}
+            email_sent = True
         except Exception as e:
             logger.error(f"Failed to email verification code to {user.username} at {to_email}: {e}")
-            return {'success': False, 'message': str(e)}
 
-    logger.warning(f"No phone or email available to send verification code for {user.username}")
-    return {'success': False, 'message': 'No phone or email to send code'}
+    # Return success if either SMS or email was sent
+    if sms_sent or email_sent:
+        channels = []
+        if sms_sent:
+            channels.append('SMS')
+        if email_sent:
+            channels.append('email')
+        return {'success': True, 'message': f'Code sent via {" and ".join(channels)}'}
+    
+    logger.warning(f"Failed to send verification code to {user.username} via any channel")
+    return {'success': False, 'message': 'Failed to send verification code via SMS or email'}
 
 
 def send_express_order_notification(express_order):
