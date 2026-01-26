@@ -140,7 +140,7 @@ def shop_create(request):
 def shop_detail(request, pk):
     """View shop details with its products"""
     shop = get_object_or_404(Shop, pk=pk, owner=request.user)
-    products = shop.products.all().order_by('-created_at')
+    products = shop.products.prefetch_related('images').order_by('-created_at')
     
     context = {
         'shop': shop,
@@ -260,7 +260,7 @@ def product_detail(request, pk):
     """View product details"""
     user_shops = Shop.objects.filter(owner=request.user)
     product = get_object_or_404(
-        Product,
+        Product.objects.prefetch_related('images'),
         Q(pk=pk) & (Q(shop__in=user_shops) | Q(created_by=request.user))
     )
     images = product.images.all()
