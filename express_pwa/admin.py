@@ -496,6 +496,7 @@ class DeliveryDriverProfileAdmin(admin.ModelAdmin):
         for driver_profile in queryset:
             if not driver_profile.user.has_role('delivery_driver'):
                 driver_profile.user.add_role('delivery_driver')
+                driver_profile.user.save()
         self.message_user(request, f'{count} driver(s) approved successfully.')
     approve_drivers.short_description = 'Approve selected drivers'
 

@@ -59,6 +59,7 @@ def become_delivery_driver(request):
             # Add delivery_driver role
             if not request.user.has_role('delivery_driver'):
                 request.user.add_role('delivery_driver')
+                request.user.save()
 
             messages.success(request, 'Your driver application has been submitted! We will review it shortly.')
             return redirect('express_pwa:rider_dashboard')
