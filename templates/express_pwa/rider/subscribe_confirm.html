@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#06b6d4">
+  <title>Confirm Subscription - Express Driver</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      padding: 1.5rem 1rem;
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+    }
+    .header-title {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .content {
+      padding: 1.5rem 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .plan-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .plan-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .plan-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .plan-icon i {
+      font-size: 2rem;
+      color: white;
+    }
+    .plan-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    .plan-description {
+      color: #6b7280;
+      font-size: 0.9375rem;
+    }
+    .price-section {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .price-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+    .price-amount {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #06b6d4;
+    }
+    .price-period {
+      font-size: 1rem;
+      color: #6b7280;
+    }
+    .features-list {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    .features-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9375rem;
+      color: #4b5563;
+    }
+    .features-list li:last-child {
+      border-bottom: none;
+    }
+    .features-list li i {
+      color: #10b981;
+      width: 20px;
+      text-align: center;
+    }
+    .warning-box {
+      background: #fef3c7;
+      border: 2px solid #fcd34d;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .warning-box i {
+      color: #f59e0b;
+      font-size: 1.25rem;
+      margin-top: 0.125rem;
+    }
+    .warning-box p {
+      color: #92400e;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .subscribe-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .subscribe-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    .cancel-btn {
+      display: block;
+      text-align: center;
+      padding: 1rem;
+      color: #6b7280;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #6b7280;
+      font-size: 0.8125rem;
+      margin-top: 1rem;
+    }
+    .secure-badge i {
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <a href="{% url 'express_pwa:subscription_plans' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <h1 class="header-title">Confirm Subscription</h1>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="plan-card">
+      <div class="plan-header">
+        <div class="plan-icon">
+          {% if plan.name == 'basic' %}
+          <i class="fas fa-bicycle"></i>
+          {% elif plan.name == 'standard' %}
+          <i class="fas fa-motorcycle"></i>
+          {% else %}
+          <i class="fas fa-truck"></i>
+          {% endif %}
+        </div>
+        <h2 class="plan-name">{{ plan.display_name }}</h2>
+        <p class="plan-description">{{ plan.description }}</p>
+      </div>
+
+      <div class="price-section">
+        <p class="price-label">Monthly Subscription</p>
+        <span class="price-amount">GHS {{ plan.price }}</span>
+        <span class="price-period">/month</span>
+      </div>
+
+      <ul class="features-list">
+        <li>
+          <i class="fas fa-check"></i>
+          {% if plan.max_listings == -1 %}Unlimited deliveries{% else %}Up to {{ plan.max_listings }} deliveries/month{% endif %}
+        </li>
+        {% if plan.priority_support %}
+        <li>
+          <i class="fas fa-check"></i>
+          Priority customer support
+        </li>
+        {% endif %}
+        {% if plan.analytics_access %}
+        <li>
+          <i class="fas fa-check"></i>
+          Detailed earnings analytics
+        </li>
+        {% endif %}
+        {% if plan.verification_badge %}
+        <li>
+          <i class="fas fa-check"></i>
+          Verified driver badge
+        </li>
+        {% endif %}
+        <li>
+          <i class="fas fa-check"></i>
+          {{ plan.commission_rate }}% commission rate
+        </li>
+      </ul>
+
+      <div class="warning-box">
+        <i class="fas fa-info-circle"></i>
+        <p>You will be redirected to a secure payment page. Your subscription will be activated immediately after successful payment.</p>
+      </div>
+
+      <form method="POST" class="actions">
+        {% csrf_token %}
+        <button type="submit" class="subscribe-btn">
+          <i class="fas fa-lock"></i>
+          Pay GHS {{ plan.price }} & Subscribe
+        </button>
+        <a href="{% url 'express_pwa:subscription_plans' %}" class="cancel-btn">Cancel</a>
+      </form>
+
+      <div class="secure-badge">
+        <i class="fas fa-shield-alt"></i>
+        Secured by Paystack
+      </div>
+    </div>
+  </div>
+</body>
+</html>

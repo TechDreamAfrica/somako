@@ -1,0 +1,343 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#06b6d4">
+  <title>Subscription Status - Express Driver</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+    .header {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      padding: 1.5rem 1rem;
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+    }
+    .header-title {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .content {
+      padding: 1.5rem 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .status-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .status-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .status-icon.active {
+      background: #d1fae5;
+      color: #10b981;
+    }
+    .status-icon.expired {
+      background: #fee2e2;
+      color: #ef4444;
+    }
+    .status-icon.no-plan {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .status-info h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.25rem;
+    }
+    .status-info p {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-badge.active {
+      background: #d1fae5;
+      color: #047857;
+    }
+    .status-badge.expired {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .plan-details {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .plan-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .plan-detail-row:last-child {
+      border-bottom: none;
+    }
+    .plan-detail-label {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    .plan-detail-value {
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .action-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    .history-section h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .history-item {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .history-item-info h4 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.25rem;
+    }
+    .history-item-info p {
+      font-size: 0.8125rem;
+      color: #6b7280;
+    }
+    .history-item-amount {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #06b6d4;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      color: #d1d5db;
+      margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem 0;
+      border-top: 1px solid #e5e7eb;
+      z-index: 100;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+    }
+    .bottom-nav-item.active, .bottom-nav-item:hover {
+      color: #06b6d4;
+    }
+    .bottom-nav-item i {
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <a href="{% url 'express_pwa:rider_dashboard' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <h1 class="header-title">Subscription Status</h1>
+    </div>
+  </div>
+
+  <div class="content">
+    {% if user_subscription %}
+    <div class="status-card">
+      <div class="status-header">
+        <div class="status-icon {% if user_subscription.is_active %}active{% else %}expired{% endif %}">
+          <i class="fas {% if user_subscription.is_active %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+        </div>
+        <div class="status-info">
+          <h2>{{ user_subscription.plan.display_name }}</h2>
+          <span class="status-badge {% if user_subscription.is_active %}active{% else %}expired{% endif %}">
+            {{ user_subscription.status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="plan-details">
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Plan</span>
+          <span class="plan-detail-value">{{ user_subscription.plan.display_name }}</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Start Date</span>
+          <span class="plan-detail-value">{{ user_subscription.start_date|date:"M d, Y" }}</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">End Date</span>
+          <span class="plan-detail-value">{{ user_subscription.end_date|date:"M d, Y" }}</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Days Remaining</span>
+          <span class="plan-detail-value">{{ user_subscription.days_remaining }} days</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Commission Rate</span>
+          <span class="plan-detail-value">{{ user_subscription.plan.commission_rate }}%</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Auto-Renew</span>
+          <span class="plan-detail-value">{% if user_subscription.auto_renew %}Yes{% else %}No{% endif %}</span>
+        </div>
+      </div>
+
+      <a href="{% url 'express_pwa:subscription_plans' %}" class="action-btn">
+        {% if user_subscription.is_active %}Upgrade Plan{% else %}Renew Subscription{% endif %}
+      </a>
+    </div>
+
+    {% if subscription_history %}
+    <div class="status-card">
+      <div class="history-section">
+        <h3>Payment History</h3>
+        <div class="history-list">
+          {% for history in subscription_history %}
+          <div class="history-item">
+            <div class="history-item-info">
+              <h4>{{ history.plan.display_name }} - {{ history.get_action_display }}</h4>
+              <p>{{ history.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+            <span class="history-item-amount">GHS {{ history.amount }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="status-card">
+      <div class="empty-state">
+        <i class="fas fa-crown"></i>
+        <h3>No Active Subscription</h3>
+        <p>Subscribe to a plan to unlock premium features and lower commission rates.</p>
+        <a href="{% url 'express_pwa:subscription_plans' %}" class="action-btn">View Plans</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="bottom-nav">
+    <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item">
+      <i class="fas fa-box"></i>
+      <span>Available</span>
+    </a>
+    <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item">
+      <i class="fas fa-wallet"></i>
+      <span>Earnings</span>
+    </a>
+    <a href="{% url 'express_pwa:subscription_status' %}" class="bottom-nav-item active">
+      <i class="fas fa-crown"></i>
+      <span>Subscription</span>
+    </a>
+  </div>
+</body>
+</html>

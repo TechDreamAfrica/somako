@@ -1,0 +1,383 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#06b6d4">
+  <title>Subscription Plans - Express Driver</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+    .header {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+    }
+    .header-title {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .content {
+      padding: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .intro-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .intro-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .intro-icon i {
+      font-size: 1.5rem;
+      color: white;
+    }
+    .intro-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    .intro-text {
+      color: #6b7280;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    .current-plan {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 2px solid #10b981;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .current-plan-icon {
+      width: 50px;
+      height: 50px;
+      background: #10b981;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+    .current-plan-info h4 {
+      font-size: 0.875rem;
+      color: #065f46;
+      margin-bottom: 0.25rem;
+    }
+    .current-plan-info p {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #047857;
+    }
+    .plans-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .plan-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .plan-card.popular {
+      border-color: #06b6d4;
+    }
+    .popular-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.375rem 1rem;
+      border-bottom-left-radius: 12px;
+    }
+    .plan-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .plan-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .plan-icon.basic { background: #f3f4f6; color: #6b7280; }
+    .plan-icon.standard { background: #dbeafe; color: #3b82f6; }
+    .plan-icon.premium { background: #fef3c7; color: #f59e0b; }
+    .plan-name {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .price-currency {
+      font-size: 1rem;
+      color: #6b7280;
+      font-weight: 600;
+    }
+    .price-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1f2937;
+    }
+    .price-period {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    .plan-features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      font-size: 0.875rem;
+      color: #4b5563;
+    }
+    .plan-features li i {
+      color: #10b981;
+      font-size: 0.875rem;
+    }
+    .plan-features li i.fa-times {
+      color: #ef4444;
+    }
+    .subscribe-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .subscribe-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    .subscribe-btn.current {
+      background: #e5e7eb;
+      color: #6b7280;
+      cursor: default;
+    }
+    .subscribe-btn.current:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem 0;
+      border-top: 1px solid #e5e7eb;
+      z-index: 100;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+    }
+    .bottom-nav-item.active, .bottom-nav-item:hover {
+      color: #06b6d4;
+    }
+    .bottom-nav-item i {
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <a href="{% url 'express_pwa:rider_dashboard' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <h1 class="header-title">Subscription Plans</h1>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="intro-card">
+      <div class="intro-icon">
+        <i class="fas fa-crown"></i>
+      </div>
+      <h2 class="intro-title">Upgrade Your Driver Account</h2>
+      <p class="intro-text">Subscribe to get more deliveries, priority assignments, lower commissions, and premium support.</p>
+    </div>
+
+    {% if user_subscription and user_subscription.is_active %}
+    <div class="current-plan">
+      <div class="current-plan-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="current-plan-info">
+        <h4>Current Plan</h4>
+        <p>{{ user_subscription.plan.display_name }} - {{ user_subscription.days_remaining }} days left</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="plans-grid">
+      {% for plan in plans %}
+      <div class="plan-card {% if plan.is_popular %}popular{% endif %}">
+        {% if plan.is_popular %}
+        <div class="popular-badge">MOST POPULAR</div>
+        {% endif %}
+        
+        <div class="plan-header">
+          <div class="plan-icon {{ plan.name }}">
+            {% if plan.name == 'basic' %}
+            <i class="fas fa-bicycle"></i>
+            {% elif plan.name == 'standard' %}
+            <i class="fas fa-motorcycle"></i>
+            {% else %}
+            <i class="fas fa-truck"></i>
+            {% endif %}
+          </div>
+          <div class="plan-name">{{ plan.display_name }}</div>
+        </div>
+        
+        <div class="plan-price">
+          <span class="price-currency">GHS</span>
+          <span class="price-amount">{{ plan.price|floatformat:0 }}</span>
+          <span class="price-period">/month</span>
+        </div>
+        
+        <ul class="plan-features">
+          <li>
+            <i class="fas fa-check"></i>
+            {% if plan.max_listings == -1 %}Unlimited deliveries{% else %}Up to {{ plan.max_listings }} deliveries/month{% endif %}
+          </li>
+          <li>
+            <i class="fas {% if plan.priority_support %}fa-check{% else %}fa-times{% endif %}"></i>
+            Priority support
+          </li>
+          <li>
+            <i class="fas {% if plan.analytics_access %}fa-check{% else %}fa-times{% endif %}"></i>
+            Earnings analytics
+          </li>
+          <li>
+            <i class="fas {% if plan.verification_badge %}fa-check{% else %}fa-times{% endif %}"></i>
+            Verified badge
+          </li>
+          <li>
+            <i class="fas fa-check"></i>
+            {{ plan.commission_rate }}% commission rate
+          </li>
+        </ul>
+        
+        {% if user_subscription and user_subscription.plan.id == plan.id and user_subscription.is_active %}
+        <span class="subscribe-btn current">
+          <i class="fas fa-check-circle"></i> Current Plan
+        </span>
+        {% else %}
+        <a href="{% url 'express_pwa:subscription_subscribe' plan.id %}" class="subscribe-btn">
+          Subscribe Now
+        </a>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="intro-card">
+        <p>No subscription plans available at the moment.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="{% url 'express_pwa:rider_dashboard' %}" class="bottom-nav-item">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'express_pwa:rider_available_deliveries' %}" class="bottom-nav-item">
+      <i class="fas fa-box"></i>
+      <span>Available</span>
+    </a>
+    <a href="{% url 'express_pwa:rider_earnings' %}" class="bottom-nav-item">
+      <i class="fas fa-wallet"></i>
+      <span>Earnings</span>
+    </a>
+    <a href="{% url 'express_pwa:subscription_plans' %}" class="bottom-nav-item active">
+      <i class="fas fa-crown"></i>
+      <span>Plans</span>
+    </a>
+  </div>
+</body>
+</html>

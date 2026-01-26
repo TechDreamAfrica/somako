@@ -15,6 +15,14 @@ from .models import (
 from .views import send_delivery_sms
 from utils.sms_utils import send_custom_sms
 from core.pwa_decorators import pwa_login_required
+from accounts.subscription_models import SubscriptionPlan, UserSubscription, SubscriptionHistory
+from payment.models import Payment
+from payment.paystack import PaystackAPI
+from django.urls import reverse
+import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -943,3 +951,188 @@ def update_order_item_status(request, order_id, item_id):
     }
 
     return render(request, 'express_pwa/rider/update_item_status.html', context)
+
+
+@pwa_login_required(pwa_app='express')
+def rider_subscription_plans(request):
+    """Display subscription plans for delivery drivers"""
+    plans = SubscriptionPlan.objects.filter(is_active=True).order_by('sort_order', 'price')
+    
+    user_subscription = None
+    try:
+        user_subscription = UserSubscription.objects.get(user=request.user)
+    except UserSubscription.DoesNotExist:
+        pass
+    
+    context = {
+        'plans': plans,
+        'user_subscription': user_subscription,
+    }
+    return render(request, 'express_pwa/rider/subscription_plans.html', context)
+
+
+@pwa_login_required(pwa_app='express')
+def rider_subscribe(request, plan_id):
+    """Initiate subscription payment for delivery drivers"""
+    plan = get_object_or_404(SubscriptionPlan, id=plan_id, is_active=True)
+    
+    if request.method == 'POST':
+        # Generate unique payment reference
+        payment_reference = f"EXP-SUB-{uuid.uuid4().hex[:12].upper()}"
+        
+        # Create payment record
+        payment = Payment.objects.create(
+            user=request.user,
+            amount=plan.price,
+            currency='GHS',
+            payment_method='paystack',
+            status='pending',
+            source_app='express_subscription',
+            order_id=str(plan.id),
+            paystack_reference=payment_reference,
+            customer_email=request.user.email,
+            customer_phone=getattr(request.user, 'phone_number', ''),
+            description=f'Express Delivery Driver Subscription to {plan.display_name} plan',
+            metadata={
+                'plan_id': plan.id,
+                'plan_name': plan.display_name,
+                'user_id': request.user.id,
+                'username': request.user.username,
+                'app': 'express',
+            }
+        )
+        
+        # Initialize Paystack transaction
+        paystack = PaystackAPI()
+        callback_url = request.build_absolute_uri(reverse('express_pwa:subscription_verify', args=[payment_reference]))
+        
+        result = paystack.initialize_transaction(
+            email=request.user.email,
+            amount=plan.price,
+            reference=payment_reference,
+            callback_url=callback_url,
+            metadata=payment.metadata
+        )
+        
+        if result['status']:
+            # Update payment with Paystack details
+            payment.paystack_access_code = result['data'].get('access_code')
+            payment.paystack_authorization_url = result['data'].get('authorization_url')
+            payment.save()
+            
+            # Redirect to Paystack payment page
+            return redirect(result['data'].get('authorization_url'))
+        else:
+            messages.error(request, f'Payment initialization failed: {result["message"]}')
+            payment.delete()
+            return redirect('express_pwa:subscription_plans')
+    
+    context = {
+        'plan': plan,
+    }
+    return render(request, 'express_pwa/rider/subscribe_confirm.html', context)
+
+
+@pwa_login_required(pwa_app='express')
+def rider_subscription_verify(request, reference):
+    """Verify subscription payment and activate subscription for delivery drivers"""
+    # Get payment record
+    try:
+        payment = Payment.objects.get(paystack_reference=reference)
+    except Payment.DoesNotExist:
+        messages.error(request, 'Payment record not found.')
+        return redirect('express_pwa:subscription_plans')
+    
+    # Verify with Paystack
+    paystack = PaystackAPI()
+    result = paystack.verify_transaction(reference)
+    
+    if result['status'] and result['data'].get('status') == 'success':
+        # Mark payment as successful
+        payment.mark_as_paid()
+        payment.transaction_id = result['data'].get('id')
+        payment.gateway_response = str(result['data'])
+        payment.save()
+        
+        # Get plan from metadata
+        plan_id = payment.metadata.get('plan_id')
+        plan = get_object_or_404(SubscriptionPlan, id=plan_id)
+        
+        # Create or update subscription
+        try:
+            user_sub = UserSubscription.objects.get(user=request.user)
+            old_plan = user_sub.plan
+            
+            # Update existing subscription
+            user_sub.plan = plan
+            user_sub.start_date = timezone.now()
+            user_sub.end_date = timezone.now() + timedelta(days=30)
+            user_sub.next_billing_date = user_sub.end_date
+            user_sub.status = 'active'
+            user_sub.last_payment_date = timezone.now()
+            user_sub.last_payment_amount = plan.price
+            user_sub.save()
+            
+            # Record history
+            SubscriptionHistory.objects.create(
+                user=request.user,
+                plan=plan,
+                action='upgrade' if old_plan and plan.price > old_plan.price else 'renewal',
+                amount=plan.price,
+                payment_reference=reference
+            )
+            
+            messages.success(request, f'Successfully upgraded to {plan.display_name} plan!')
+            
+        except UserSubscription.DoesNotExist:
+            # Create new subscription
+            user_sub = UserSubscription.objects.create(
+                user=request.user,
+                plan=plan,
+                start_date=timezone.now(),
+                end_date=timezone.now() + timedelta(days=30),
+                next_billing_date=timezone.now() + timedelta(days=30),
+                status='active',
+                last_payment_date=timezone.now(),
+                last_payment_amount=plan.price
+            )
+            
+            # Record history
+            SubscriptionHistory.objects.create(
+                user=request.user,
+                plan=plan,
+                action='subscription',
+                amount=plan.price,
+                payment_reference=reference
+            )
+            
+            messages.success(request, f'Welcome to {plan.display_name}! Your subscription is now active.')
+        
+        return redirect('express_pwa:rider_dashboard')
+    
+    else:
+        # Payment failed
+        messages.error(request, 'Payment verification failed. Please try again or contact support.')
+        return redirect('express_pwa:subscription_plans')
+
+
+@pwa_login_required(pwa_app='express')
+def rider_subscription_status(request):
+    """View current subscription status for delivery drivers"""
+    user_subscription = None
+    subscription_history = []
+    
+    try:
+        user_subscription = UserSubscription.objects.get(user=request.user)
+        subscription_history = SubscriptionHistory.objects.filter(user=request.user).order_by('-created_at')[:10]
+    except UserSubscription.DoesNotExist:
+        pass
+    
+    plans = SubscriptionPlan.objects.filter(is_active=True).order_by('sort_order', 'price')
+    
+    context = {
+        'user_subscription': user_subscription,
+        'subscription_history': subscription_history,
+        'plans': plans,
+    }
+    return render(request, 'express_pwa/rider/subscription_status.html', context)

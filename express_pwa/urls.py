@@ -88,4 +88,10 @@ urlpatterns = [
     path('rider/order/<int:order_id>/', views_rider.order_detail_rider, name='order_detail_rider'),
     path('rider/order/<int:order_id>/start/', views_rider.start_order, name='start_order'),
     path('rider/order/<int:order_id>/item/<int:item_id>/update/', views_rider.update_order_item_status, name='update_order_item_status'),
+    
+    # Rider Subscription Management
+    path('rider/subscription/', views_rider.rider_subscription_plans, name='subscription_plans'),
+    path('rider/subscription/subscribe/<int:plan_id>/', views_rider.rider_subscribe, name='subscription_subscribe'),
+    path('rider/subscription/verify/<str:reference>/', views_rider.rider_subscription_verify, name='subscription_verify'),
+    path('rider/subscription/status/', views_rider.rider_subscription_status, name='subscription_status'),
 ]
