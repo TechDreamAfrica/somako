@@ -121,6 +121,26 @@
                   {% endif %}
                 </div>
 
+                <!-- Phone Number -->
+                <div style="margin-bottom: 1.5rem;">
+                  <label for="{{ form.phone_number.id_for_label }}" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.75rem; font-size: 0.875rem;">
+                    <i class="fas fa-phone" style="color: #22c55e;"></i>Phone Number <span style="color: #dc2626;">*</span>
+                  </label>
+                  <input type="tel"
+                         name="{{ form.phone_number.html_name }}"
+                         id="{{ form.phone_number.id_for_label }}"
+                         placeholder="0XX XXX XXXX or +233 XX XXX XXXX"
+                         value="{{ form.phone_number.value|default:'' }}"
+                         required
+                         style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1rem; transition: all 0.3s ease; background: #f9fafb;"
+                         onfocus="this.style.borderColor='#22c55e'; this.style.background='white'"
+                         onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                  {% if form.phone_number.errors %}
+                    <div style="color: #dc2626; font-size: 0.8125rem; margin-top: 0.5rem; font-weight: 600;">{{ form.phone_number.errors.0 }}</div>
+                  {% endif %}
+                  <div style="color: #6b7280; font-size: 0.8125rem; margin-top: 0.5rem;">Required for SMS verification code</div>
+                </div>
+
                 <!-- Password Fields -->
                 <div class="row g-3" style="margin-bottom: 1.5rem;">
                   <div class="col-md-6">

@@ -134,14 +134,28 @@ class SignUpView(CreateView):
         # Send welcome email
         try:
             send_welcome_email(user)
-            messages.success(self.request, 'Account created successfully! Please check your email for welcome instructions.')
         except Exception as e:
             logger.error(f"Error sending welcome email: {str(e)}")
-            messages.success(self.request, 'Account created successfully!')
-            messages.info(self.request, 'We could not send a welcome email, but your account is ready to use.')
 
         login(self.request, user)
-        return redirect('accounts:dashboard')
+        
+        # Generate and send verification code via SMS
+        try:
+            from utils.sms_utils import send_user_verification_code
+            vc = VerificationCode.generate_for_user(user, purpose='signup', ttl_minutes=15)
+            result = send_user_verification_code(user, vc.code)
+            if result.get('success'):
+                messages.success(self.request, 'Account created! A verification code has been sent to your phone.')
+            else:
+                messages.warning(self.request, 
+                    'Account created! However, we could not send the verification code. '
+                    'Please check your phone number and try to resend the code.')
+        except Exception as e:
+            logger.error(f"Failed to generate/send verification code: {e}")
+            messages.success(self.request, 'Account created successfully!')
+        
+        # Redirect to verification page
+        return redirect('accounts:pwa_verify')
 
     def get_success_url(self):
         return reverse_lazy('accounts:dashboard')

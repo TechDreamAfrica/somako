@@ -10,7 +10,11 @@ class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, required=True)
     last_name = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
-    phone_number = forms.CharField(max_length=15, required=False)
+    phone_number = forms.CharField(
+        max_length=15, 
+        required=True,
+        help_text='Required for SMS verification. Format: 0XX XXX XXXX or +233 XX XXX XXXX'
+    )
     location = forms.CharField(max_length=100, required=False)
 
     class Meta:
