@@ -733,11 +733,11 @@ def dashboard_view(request):
         ).distinct()
         context['my_products'] = products.order_by('-created_at')[:5]
         context['products_count'] = products.count()
-        # Get orders for products in user's shops
+        # Get orders for products in user's shops (Order -> OrderItem -> ProductVariant -> Product -> Shop)
         if shop_ids:
-            context['pending_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids, status='pending').distinct().count()
-            context['completed_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids, status='delivered').distinct().count()
-            context['total_orders'] = Order.objects.filter(items__product__shop_id__in=shop_ids).distinct().count()
+            context['pending_orders'] = Order.objects.filter(items__variant__product__shop_id__in=shop_ids, status='pending').distinct().count()
+            context['completed_orders'] = Order.objects.filter(items__variant__product__shop_id__in=shop_ids, status='delivered').distinct().count()
+            context['total_orders'] = Order.objects.filter(items__variant__product__shop_id__in=shop_ids).distinct().count()
         else:
             context['pending_orders'] = 0
             context['completed_orders'] = 0
