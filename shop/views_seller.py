@@ -49,6 +49,20 @@ def can_create_shop(user):
     return True, None, subscription
 
 
+def can_add_products(user):
+    """
+    Check if user can add products based on subscription.
+    Requires an active subscription to add products.
+    Returns (can_add, message, subscription)
+    """
+    subscription = get_user_subscription(user)
+    
+    if not subscription:
+        return False, "You need an active subscription to add products. Please subscribe to a plan first.", None
+    
+    return True, None, subscription
+
+
 # ============================================
 # Seller Dashboard
 # ============================================
@@ -230,6 +244,12 @@ def product_create(request, shop_pk=None):
     if not user_shops.exists():
         messages.warning(request, 'You need to create a shop first before adding products.')
         return redirect('shop:seller_shop_create')
+    
+    # Check subscription before allowing product creation
+    can_add, message, subscription = can_add_products(request.user)
+    if not can_add:
+        messages.warning(request, message)
+        return redirect('accounts:subscription_plans')
     
     # Pre-select shop if provided
     initial = {}
