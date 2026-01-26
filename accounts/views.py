@@ -207,8 +207,8 @@ def profile_view(request):
                     messages.error(request, 'Please enter a valid email address.')
                     return redirect('accounts:profile')
                 
-                # Check if email is already taken by another user
-                if User.objects.filter(email=email).exclude(id=user.id).exists():
+                # Check if email is already taken by another user (case-insensitive)
+                if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
                     messages.error(request, 'This email address is already registered to another account.')
                     return redirect('accounts:profile')
                 
