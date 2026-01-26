@@ -318,6 +318,29 @@ def product_update(request, pk):
         form = ProductForm(request.POST, request.FILES, instance=product, user=request.user)
         if form.is_valid():
             form.save()
+            
+            # Update stock quantity on default variant
+            stock_quantity = form.cleaned_data.get('stock_quantity')
+            if stock_quantity is not None:
+                # Try to find default variant, or first variant, or create one
+                default_variant = product.variants.filter(name='Default').first()
+                if not default_variant:
+                    default_variant = product.variants.first()
+                
+                if default_variant:
+                    default_variant.stock_quantity = stock_quantity
+                    default_variant.save()
+                else:
+                    # Create a default variant if none exists
+                    sku = product.sku or f"{product.name[:10].upper().replace(' ', '-')}-{uuid.uuid4().hex[:6].upper()}"
+                    ProductVariant.objects.create(
+                        product=product,
+                        sku=sku,
+                        name='Default',
+                        stock_quantity=stock_quantity,
+                        is_active=True
+                    )
+            
             messages.success(request, f'Product "{product.name}" updated successfully!')
             return redirect('shop:seller_product_detail', pk=product.pk)
     else:

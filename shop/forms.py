@@ -72,6 +72,14 @@ class ProductForm(forms.ModelForm):
         if user:
             # Only show shops owned by the current user
             self.fields['shop'].queryset = Shop.objects.filter(owner=user)
+        
+        # Pre-populate stock_quantity from existing product's default variant
+        if self.instance and self.instance.pk:
+            default_variant = self.instance.variants.filter(name='Default').first()
+            if not default_variant:
+                default_variant = self.instance.variants.first()
+            if default_variant:
+                self.fields['stock_quantity'].initial = default_variant.stock_quantity
 
 
 class ProductImageForm(forms.ModelForm):

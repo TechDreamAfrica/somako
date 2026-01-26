@@ -994,13 +994,45 @@ def pwa_edit_product(request, product_id):
         category_id = request.POST.get('category')
         product.category = get_object_or_404(Category, pk=category_id)
         product.save()
+        
+        # Update stock quantity
+        stock_quantity = request.POST.get('stock_quantity', 0)
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 0
+        except (ValueError, TypeError):
+            stock_quantity = 0
+        
+        # Find or create default variant
+        default_variant = product.variants.filter(name='Default').first()
+        if not default_variant:
+            default_variant = product.variants.first()
+        
+        if default_variant:
+            default_variant.stock_quantity = stock_quantity
+            default_variant.save()
+        else:
+            # Create a default variant if none exists
+            import uuid
+            sku = f"{product.name[:10].upper().replace(' ', '-')}-{uuid.uuid4().hex[:6].upper()}"
+            ProductVariant.objects.create(
+                product=product,
+                sku=sku,
+                name='Default',
+                stock_quantity=stock_quantity,
+                is_active=True
+            )
 
         messages.success(request, 'Product updated!')
         return redirect('shop_pwa:manage_products')
 
+    # Get current stock quantity for display
+    default_variant = product.variants.filter(name='Default').first() or product.variants.first()
+    current_stock = default_variant.stock_quantity if default_variant else 0
+
     context = {
         'seller_name': request.user.get_full_name() or request.user.username,
         'product': product,
+        'current_stock': current_stock,
         'categories': Category.objects.filter(is_active=True),
     }
     return render(request, 'shop/pwa/owner/edit_product.html', context)
