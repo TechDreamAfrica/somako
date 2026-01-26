@@ -32,9 +32,21 @@ urlpatterns = [
     # ============================================
     # Seller CRUD URLs
     # ============================================
+    # Seller Dashboard
+    path('seller/', views_seller.seller_dashboard, name='seller_dashboard'),
+    
+    # Shop Management
+    path('seller/shops/', views_seller.shop_list, name='seller_shop_list'),
+    path('seller/shops/create/', views_seller.shop_create, name='seller_shop_create'),
+    path('seller/shops/<int:pk>/', views_seller.shop_detail, name='seller_shop_detail'),
+    path('seller/shops/<int:pk>/update/', views_seller.shop_update, name='seller_shop_update'),
+    path('seller/shops/<int:pk>/delete/', views_seller.shop_delete, name='seller_shop_delete'),
+    path('seller/shops/<int:pk>/toggle/', views_seller.shop_toggle_status, name='seller_shop_toggle'),
+    
     # Product Management
     path('seller/products/', views_seller.product_list, name='seller_product_list'),
     path('seller/products/create/', views_seller.product_create, name='seller_product_create'),
+    path('seller/products/create/<int:shop_pk>/', views_seller.product_create, name='seller_product_create_for_shop'),
     path('seller/products/<int:pk>/', views_seller.product_detail, name='seller_product_detail'),
     path('seller/products/<int:pk>/update/', views_seller.product_update, name='seller_product_update'),
     path('seller/products/<int:pk>/delete/', views_seller.product_delete, name='seller_product_delete'),

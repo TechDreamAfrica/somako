@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}My Products - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: #7c3aed; padding: 2rem 0; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="{% url 'shop:seller_dashboard' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; color: white; text-decoration: none; transition: all 0.3s ease;">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">My Products</h1>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">Manage your product catalog</p>
+        </div>
+      </div>
+      <a href="{% url 'shop:seller_product_create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #7c3aed; padding: 0.875rem 1.5rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <i class="fas fa-plus"></i>Add Product
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div style="background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%); border-radius: 1.25rem; padding: 1.5rem; color: white; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.25rem;">Total Products</div>
+              <div style="font-size: 2rem; font-weight: 900;">{{ total_products }}</div>
+            </div>
+            <div style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div style="background: linear-gradient(135deg, #22c55e 0%, #86efac 100%); border-radius: 1.25rem; padding: 1.5rem; color: white; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin-bottom: 0.25rem;">Active Products</div>
+              <div style="font-size: 2rem; font-weight: 900;">{{ active_products }}</div>
+            </div>
+            <div style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Products List -->
+<section style="padding: 1rem 0 3rem;">
+  <div class="container">
+    {% if products %}
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-md-4 col-6">
+        <div style="background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.08)'">
+          {% if product.images.first %}
+          <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 180px; object-fit: cover;">
+          {% else %}
+          <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%); display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-image" style="font-size: 3rem; color: #9ca3af;"></i>
+          </div>
+          {% endif %}
+          
+          <div style="padding: 1.25rem;">
+            <h5 style="font-weight: 700; margin-bottom: 0.25rem; color: #1f2937;">{{ product.name|truncatechars:30 }}</h5>
+            {% if product.shop %}
+            <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 0.5rem;"><i class="fas fa-store"></i> {{ product.shop.name }}</div>
+            {% endif %}
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <div style="font-weight: 800; color: #7c3aed; font-size: 1.125rem;">GH₵ {{ product.base_price }}</div>
+              {% if product.is_active %}
+              <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">Active</span>
+              {% else %}
+              <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">Inactive</span>
+              {% endif %}
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{% url 'shop:seller_product_detail' pk=product.pk %}" style="flex: 1; text-align: center; background: #7c3aed; color: white; padding: 0.625rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+                <i class="fas fa-eye"></i> View
+              </a>
+              <a href="{% url 'shop:seller_product_update' pk=product.pk %}" style="flex: 1; text-align: center; background: #f3f4f6; color: #374151; padding: 0.625rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div style="background: white; border-radius: 1.5rem; padding: 4rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+      <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+        <i class="fas fa-box" style="font-size: 2.5rem; color: white;"></i>
+      </div>
+      <h3 style="font-weight: 800; color: #1f2937; margin-bottom: 0.75rem;">No Products Yet</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+        {% if shops %}
+        Add your first product to start selling to customers.
+        {% else %}
+        Create a shop first, then add products to it.
+        {% endif %}
+      </p>
+      {% if shops %}
+      <a href="{% url 'shop:seller_product_create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #7c3aed; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; font-size: 1rem;">
+        <i class="fas fa-plus"></i> Add First Product
+      </a>
+      {% else %}
+      <a href="{% url 'shop:seller_shop_create' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #7c3aed; color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; font-size: 1rem;">
+        <i class="fas fa-store"></i> Create a Shop First
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

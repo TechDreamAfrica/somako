@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content_class %}app-shop{% endblock %}
+{% block title %}Delete Image - Soma Ko{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="position: relative; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); padding: 2rem 0; overflow: hidden;">
+  <div class="container" style="position: relative; z-index: 2;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="{% url 'shop:seller_product_detail' pk=product.pk %}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem; color: white; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 900; color: white; margin-bottom: 0.25rem;">Delete Image</h1>
+        <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 0.9375rem;">This action cannot be undone</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Confirmation Section -->
+<section style="padding: 2rem 0;">
+  <div class="container">
+    <div style="max-width: 500px; margin: 0 auto;">
+      <div style="background: white; border-radius: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; text-align: center;">
+        <!-- Image Preview -->
+        <div style="padding: 2rem; background: #f9fafb;">
+          {% if image.image %}
+            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:'Product image' }}" style="max-width: 200px; max-height: 200px; border-radius: 0.75rem; object-fit: cover;">
+          {% else %}
+            <div style="width: 100px; height: 100px; background: #e5e7eb; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <i class="fas fa-image" style="font-size: 2.5rem; color: #9ca3af;"></i>
+            </div>
+          {% endif %}
+        </div>
+        
+        <div style="padding: 2rem;">
+          <div style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <i class="fas fa-trash-alt" style="font-size: 2rem; color: #dc2626;"></i>
+          </div>
+          
+          <h2 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">Delete This Image?</h2>
+          <p style="color: #6b7280; margin-bottom: 1.5rem;">This image from <strong>{{ product.name }}</strong> will be permanently removed.</p>
+
+          <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+              <a href="{% url 'shop:seller_product_detail' pk=product.pk %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #e5e7eb; color: #374151; border-radius: 0.75rem; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+              <button type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #dc2626; color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-trash-alt"></i> Delete Image
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
