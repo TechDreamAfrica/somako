@@ -333,7 +333,7 @@ JAZZMIN_SETTINGS = {
     "copyright": "Soma Ko Ghana - All Services in One Place",
 
     # Search model in the admin
-    "search_model": ["auth.User", "shop.Product", "rent.Property", "food.Restaurant"],
+    "search_model": ["accounts.User", "shop.Product", "rent.Equipment", "food.Restaurant"],
 
     # Field name on user model that contains avatar ImageField/URLField/Charfield
     "user_avatar": None,
@@ -346,8 +346,7 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "View Site", "url": "/", "new_window": True},
-        {"name": "Support", "url": "/admin/support/", "new_window": False},
-        {"model": "auth.User"},
+        {"model": "accounts.User"},
     ],
 
     #############
@@ -357,7 +356,7 @@ JAZZMIN_SETTINGS = {
     # Additional links to include in the user menu on the top right
     "usermenu_links": [
         {"name": "View Site", "url": "/", "new_window": True},
-        {"model": "auth.user"}
+        {"model": "accounts.User"}
     ],
 
     #############
@@ -389,14 +388,7 @@ JAZZMIN_SETTINGS = {
     ],
 
     # Custom links to append to app groups, keyed on app name
-    "custom_links": {
-        "shop": [{
-            "name": "Scrape Products",
-            "url": "admin:shop_product_scrape",
-            "icon": "fas fa-download",
-            "permissions": ["shop.add_product"]
-        }],
-    },
+    "custom_links": {},
 
     # Custom icons for side menu apps/models
     "icons": {
@@ -420,9 +412,7 @@ JAZZMIN_SETTINGS = {
         "shop.Wishlist": "fas fa-heart",
 
         # Rent
-        "rent.Property": "fas fa-home",
         "rent.Equipment": "fas fa-tools",
-        "rent.PropertyCategory": "fas fa-th-large",
         "rent.EquipmentCategory": "fas fa-list",
         "rent.RentalBooking": "fas fa-calendar-check",
         "rent.RentalReview": "fas fa-comment",
@@ -483,7 +473,7 @@ JAZZMIN_SETTINGS = {
 
     # Override the change form template
     "changeform_format_overrides": {
-        "auth.user": "collapsible",
+        "accounts.user": "collapsible",
         "auth.group": "vertical_tabs",
     },
 
