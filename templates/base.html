@@ -844,21 +844,27 @@
             </h6>
             <ul style="list-style: none; padding: 0; margin: 0;">
               <li style="margin-bottom: 0.875rem;">
+                <a href="{% url 'core:about' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                  <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
+                  About Us
+                </a>
+              </li>
+              <li style="margin-bottom: 0.875rem;">
                 <a href="{% url 'accounts:subscription_plans' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
                   <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
                   Pricing
                 </a>
               </li>
               <li style="margin-bottom: 0.875rem;">
-                <a href="#" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                <a href="{% url 'core:contact' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
                   <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
-                  Help Center
+                  Contact Us
                 </a>
               </li>
               <li style="margin-bottom: 0.875rem;">
-                <a href="#" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
+                <a href="{% url 'core:downloads' %}" style="color: #d1d5db; text-decoration: none; display: flex; align-items: center; gap: 0.625rem; font-size: 0.9375rem; transition: all 0.3s ease;" onmouseover="this.style.color='#10b981'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#d1d5db'; this.style.paddingLeft='0'">
                   <i class="fas fa-chevron-right" style="font-size: 0.7rem; color: #059669;"></i>
-                  Contact Us
+                  Download App
                 </a>
               </li>
             </ul>
@@ -937,11 +943,11 @@
             &copy; {{ "now"|date:"Y" }} <span style="color: #10b981; font-weight: 600;">Soma Ko Ghana</span>. All rights reserved.
           </p>
           <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
-            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a>
+            <a href="{% url 'core:privacy_policy' %}" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a>
             <span class="d-none d-md-inline" style="color: #4b5563;">•</span>
-            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Terms of Service</a>
+            <a href="{% url 'core:terms_of_service' %}" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Terms of Service</a>
             <span class="d-none d-md-inline" style="color: #4b5563;">•</span>
-            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">Cookies</a>
+            <a href="{% url 'core:about' %}" style="color: #9ca3af; text-decoration: none; font-size: 0.9375rem; transition: color 0.3s ease;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#9ca3af'">About Us</a>
           </div>
         </div>
       </div>

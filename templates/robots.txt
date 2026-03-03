@@ -1,0 +1,40 @@
+# Soma Ko Ghana - robots.txt
+# https://www.somako.org
+
+User-agent: *
+Allow: /
+
+# Allow search engines to index main content
+Allow: /shop/
+Allow: /food/
+Allow: /pharmacy/
+Allow: /rent/
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /messages/
+Disallow: /payment/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /orders/
+Disallow: /seller/
+Disallow: /owner/
+Disallow: /manage/
+Disallow: /dashboard/
+
+# Disallow PWA internal routes
+Disallow: /pwa/
+
+# Disallow user-specific pages
+Disallow: /wishlist/
+Disallow: /saved/
+Disallow: /my-equipment/
+Disallow: /bookings/
+Disallow: /prescriptions/
+
+# Sitemap location
+Sitemap: https://www.somako.org/sitemap.xml
+
+# Crawl-delay (optional - some crawlers respect this)
+Crawl-delay: 1

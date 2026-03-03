@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+{% block keywords %}Soma Ko, about us, Ghana marketplace, company, mission, vision, e-commerce Ghana, logistics Ghana{% endblock %}
+
+{% block og_title %}{{ page_title }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+{% block twitter_title %}{{ page_title }}{% endblock %}
+{% block twitter_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">About Soma Ko Ghana</h1>
+        <p class="text-xl text-primary-100 max-w-3xl mx-auto">
+            Ghana's premier all-in-one marketplace platform connecting people with the services they need.
+        </p>
+    </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Our Story</h2>
+            <div class="prose prose-lg text-gray-600 mx-auto">
+                <p class="mb-6">
+                    Soma Ko was founded with a simple mission: to make everyday services accessible to everyone in Ghana. 
+                    We recognized the challenges people face in finding reliable services - from ordering food and medicine 
+                    to renting equipment and booking rides.
+                </p>
+                <p class="mb-6">
+                    Our platform brings together all these essential services in one convenient place, making life easier 
+                    for millions of Ghanaians. Whether you're in Accra, Kumasi, Takoradi, or anywhere across the country, 
+                    Soma Ko is your trusted partner for all your daily needs.
+                </p>
+                <p>
+                    Today, we're proud to serve thousands of customers and partner with hundreds of local businesses, 
+                    restaurants, pharmacies, and service providers who share our commitment to quality and reliability.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6">
+                    <i class="fas fa-bullseye text-3xl text-primary-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
+                <p class="text-gray-600">
+                    To empower Ghanaians by providing seamless access to essential services through technology, 
+                    connecting communities with local businesses and service providers they can trust.
+                </p>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6">
+                    <i class="fas fa-eye text-3xl text-primary-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Vision</h3>
+                <p class="text-gray-600">
+                    To become Africa's leading marketplace platform, transforming how people access services 
+                    and supporting the growth of local economies across the continent.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Services -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">What We Offer</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-utensils text-3xl text-orange-500"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Food Delivery</h4>
+                <p class="text-gray-600">Order from your favorite restaurants and get food delivered to your doorstep.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-pills text-3xl text-blue-500"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Pharmacy</h4>
+                <p class="text-gray-600">Get medicines and health products delivered from trusted pharmacies.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shopping-bag text-3xl text-purple-500"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Online Shopping</h4>
+                <p class="text-gray-600">Shop from local vendors and get products delivered anywhere in Ghana.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tools text-3xl text-green-500"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Equipment Rental</h4>
+                <p class="text-gray-600">Rent tools, vehicles, and equipment for your projects.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-car text-3xl text-yellow-600"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Ride Hailing</h4>
+                <p class="text-gray-600">Book rides safely and conveniently with our trusted drivers.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-motorcycle text-3xl text-red-500"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Express Delivery</h4>
+                <p class="text-gray-600">Fast courier services for documents and packages across the city.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="py-16 bg-primary-600 text-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-12 text-center">Our Values</h2>
+        <div class="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+            <div class="text-center">
+                <i class="fas fa-handshake text-4xl mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Trust</h4>
+                <p class="text-primary-100">Building reliable connections between customers and service providers.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-bolt text-4xl mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Speed</h4>
+                <p class="text-primary-100">Delivering services quickly and efficiently.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-heart text-4xl mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Care</h4>
+                <p class="text-primary-100">Putting our customers and partners first in everything we do.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-chart-line text-4xl mb-4"></i>
+                <h4 class="text-xl font-bold mb-2">Innovation</h4>
+                <p class="text-primary-100">Continuously improving to serve you better.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Ready to Get Started?</h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Join thousands of Ghanaians who trust Soma Ko for their daily needs.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'core:downloads' %}" class="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white font-bold rounded-full hover:bg-primary-700 transition">
+                <i class="fas fa-download mr-2"></i> Download App
+            </a>
+            <a href="{% url 'core:contact' %}" class="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-600 text-primary-600 font-bold rounded-full hover:bg-primary-50 transition">
+                <i class="fas fa-envelope mr-2"></i> Contact Us
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

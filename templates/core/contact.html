@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+{% block keywords %}Soma Ko contact, customer support Ghana, help, inquiries, support team, Accra{% endblock %}
+
+{% block og_title %}{{ page_title }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+{% block twitter_title %}{{ page_title }}{% endblock %}
+{% block twitter_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
+        <p class="text-xl text-primary-100 max-w-3xl mx-auto">
+            We're here to help! Reach out to us with any questions, feedback, or support requests.
+        </p>
+    </div>
+</section>
+
+<!-- Contact Info & Form -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <!-- Contact Information -->
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-8">Get in Touch</h2>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt text-xl text-primary-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800 mb-1">Address</h4>
+                            <p class="text-gray-600">
+                                Soma Ko Ghana Ltd.<br>
+                                Accra, Ghana
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-envelope text-xl text-primary-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800 mb-1">Email</h4>
+                            <p class="text-gray-600">
+                                <a href="mailto:support@somako.org" class="text-primary-600 hover:underline">support@somako.org</a><br>
+                                <a href="mailto:info@somako.org" class="text-primary-600 hover:underline">info@somako.org</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone text-xl text-primary-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800 mb-1">Phone</h4>
+                            <p class="text-gray-600">
+                                <a href="tel:+233000000000" class="text-primary-600 hover:underline">+233 XX XXX XXXX</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-clock text-xl text-primary-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800 mb-1">Business Hours</h4>
+                            <p class="text-gray-600">
+                                Monday - Friday: 8:00 AM - 6:00 PM<br>
+                                Saturday: 9:00 AM - 4:00 PM<br>
+                                Sunday: Closed
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="mt-8">
+                    <h4 class="font-bold text-gray-800 mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://facebook.com/SomaKoGhana" target="_blank" rel="noopener" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="https://twitter.com/SomaKoGhana" target="_blank" rel="noopener" class="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600 transition">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="https://instagram.com/somakoghana" target="_blank" rel="noopener" class="w-12 h-12 bg-pink-600 text-white rounded-full flex items-center justify-center hover:bg-pink-700 transition">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com/company/somako-ghana" target="_blank" rel="noopener" class="w-12 h-12 bg-blue-700 text-white rounded-full flex items-center justify-center hover:bg-blue-800 transition">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-8">Send Us a Message</h2>
+                <form class="space-y-6" method="post" action="">
+                    {% csrf_token %}
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                        <input type="text" id="name" name="name" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                        <select id="subject" name="subject" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                            <option value="">Select a topic</option>
+                            <option value="order">Order Issue</option>
+                            <option value="delivery">Delivery Problem</option>
+                            <option value="account">Account Help</option>
+                            <option value="payment">Payment Question</option>
+                            <option value="partnership">Business Partnership</option>
+                            <option value="feedback">General Feedback</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                        <textarea id="message" name="message" rows="5" required 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition resize-none"
+                                  placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full px-6 py-4 bg-primary-600 text-white font-bold rounded-lg hover:bg-primary-700 transition flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Frequently Asked Questions</h2>
+        <div class="max-w-3xl mx-auto space-y-4">
+            <div class="bg-white rounded-lg shadow-sm">
+                <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    How do I track my order?
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-gray-600">You can track your order in real-time through the Soma Ko app. Go to "My Orders" and select the order you want to track. You'll see the current status and estimated delivery time.</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm">
+                <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    What payment methods do you accept?
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-gray-600">We accept mobile money (MTN, Vodafone, AirtelTigo), bank cards (Visa, Mastercard), and cash on delivery for select services.</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm">
+                <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    How do I become a partner or seller?
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-gray-600">We welcome restaurants, shops, pharmacies, and service providers to join our platform. Contact us at <a href="mailto:partners@somako.org" class="text-primary-600 hover:underline">partners@somako.org</a> or fill out the contact form above with "Business Partnership" as the subject.</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm">
+                <button class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    What areas do you serve?
+                    <i class="fas fa-chevron-down text-gray-400"></i>
+                </button>
+                <div class="px-6 pb-4 hidden">
+                    <p class="text-gray-600">We currently operate in major cities across Ghana including Accra, Kumasi, Takoradi, Tema, and surrounding areas. We're continuously expanding to serve more locations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # Required for site domain URLs in notifications
+    'django.contrib.sitemaps',  # SEO sitemaps
     'core',
     'accounts',
     'messaging',  # Cross-app messaging system

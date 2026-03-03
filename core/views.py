@@ -141,3 +141,39 @@ def download_apk(request):
             return response
     except Exception as e:
         raise Http404(f"Error serving APK file: {str(e)}")
+
+
+def about(request):
+    """About Us page for SEO and company information"""
+    context = {
+        'page_title': 'About Soma Ko Ghana',
+        'meta_description': 'Learn about Soma Ko Ghana - your all-in-one marketplace platform for shopping, food delivery, pharmacy, equipment rental, and ride-hailing services across Ghana.',
+    }
+    return render(request, 'core/about.html', context)
+
+
+def contact(request):
+    """Contact page for customer inquiries"""
+    context = {
+        'page_title': 'Contact Soma Ko Ghana',
+        'meta_description': 'Get in touch with Soma Ko Ghana. Contact our support team for assistance with orders, deliveries, or any questions about our services.',
+    }
+    return render(request, 'core/contact.html', context)
+
+
+def privacy_policy(request):
+    """Privacy Policy page"""
+    context = {
+        'page_title': 'Privacy Policy - Soma Ko Ghana',
+        'meta_description': 'Read the Soma Ko Ghana privacy policy. Learn how we collect, use, and protect your personal information.',
+    }
+    return render(request, 'core/privacy_policy.html', context)
+
+
+def terms_of_service(request):
+    """Terms of Service page"""
+    context = {
+        'page_title': 'Terms of Service - Soma Ko Ghana',
+        'meta_description': 'Read the Soma Ko Ghana terms of service. Understand the rules and guidelines for using our platform.',
+    }
+    return render(request, 'core/terms_of_service.html', context)
