@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.utils.html import format_html
+from django.utils.html import format_html, escape
+from django.utils.safestring import mark_safe
 from .models import User, RoleApplication
 from .subscription_models import SubscriptionPlan, UserSubscription, SubscriptionHistory
 from .notification_models import Notification, NotificationPreference
@@ -27,13 +28,16 @@ class CustomUserAdmin(UserAdmin):
         """Display user's roles as colored badges"""
         roles = obj.get_roles_list()
         if not roles:
-            return format_html('<span style="color: gray;">No roles</span>')
+            return format_html('<span style="color: gray;">{}</span>', 'No roles')
 
         badges = []
         for role in roles:
-            badges.append(f'<span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-right: 4px;">{role}</span>')
+            badges.append(format_html(
+                '<span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-right: 4px;">{}</span>',
+                role
+            ))
 
-        return format_html(' '.join(badges))
+        return mark_safe(' '.join(badges))
 
     service_roles_display.short_description = 'Service Roles'
 
