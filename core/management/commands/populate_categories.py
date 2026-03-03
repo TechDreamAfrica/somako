@@ -8,7 +8,7 @@ from django.db import transaction
 from django.utils.text import slugify
 
 # Import all category models
-from rent.models import PropertyCategory, EquipmentCategory
+from rent.models import EquipmentCategory
 from shop.models import Category as ShopCategory
 from pharmacy.models import MedicineCategory
 from food.models import FoodCategory
@@ -70,68 +70,12 @@ class Command(BaseCommand):
         )
 
     def populate_rent_categories(self, clear=False):
-        """Populate property and equipment categories for rent app"""
+        """Populate equipment categories for rent app"""
         self.stdout.write('📍 Populating rent categories...')
         
         if clear:
-            PropertyCategory.objects.all().delete()
             EquipmentCategory.objects.all().delete()
             self.stdout.write('  Cleared existing rent categories')
-
-        # Property Categories
-        property_categories = [
-            {
-                'name': 'Houses',
-                'description': 'Single-family homes, duplexes, and townhouses for rent',
-                'icon': 'fas fa-home'
-            },
-            {
-                'name': 'Apartments',
-                'description': 'Studio, 1BR, 2BR+ apartments and condominiums',
-                'icon': 'fas fa-building'
-            },
-            {
-                'name': 'Office Spaces',
-                'description': 'Commercial office spaces and coworking areas',
-                'icon': 'fas fa-briefcase'
-            },
-            {
-                'name': 'Retail Spaces',
-                'description': 'Shops, stores, and commercial retail spaces',
-                'icon': 'fas fa-store'
-            },
-            {
-                'name': 'Warehouses',
-                'description': 'Storage facilities and industrial warehouses',
-                'icon': 'fas fa-warehouse'
-            },
-            {
-                'name': 'Land',
-                'description': 'Plots of land for various purposes',
-                'icon': 'fas fa-map'
-            },
-            {
-                'name': 'Event Venues',
-                'description': 'Halls, conference rooms, and event spaces',
-                'icon': 'fas fa-calendar'
-            },
-            {
-                'name': 'Vacation Rentals',
-                'description': 'Short-term holiday and vacation properties',
-                'icon': 'fas fa-umbrella-beach'
-            }
-        ]
-
-        for cat_data in property_categories:
-            category, created = PropertyCategory.objects.get_or_create(
-                name=cat_data['name'],
-                defaults={
-                    'description': cat_data['description'],
-                    'icon': cat_data['icon']
-                }
-            )
-            if created:
-                self.stdout.write(f'  ✓ Created property category: {category.name}')
 
         # Equipment Categories
         equipment_categories = [
